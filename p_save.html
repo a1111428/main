@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人資訊</title>
+    <style>
+        /* 簡易 CSS 樣式 */
+        body {
+            font-family: sans-serif; display: flex; flex-direction: column; align-items: center;
+            height: 100vh; margin: 0; background-color: #fff;
+            background: linear-gradient(to bottom, #fffaf2, #ffeccc 150px, #ffffff 400px);
+            background-color: #fffaf2;
+        }
+        .header {
+            display: flex; justify-content: flex-start; align-items: center; 
+            width: 90%; max-width: 400px; padding: 20px 20px 0 20px; box-sizing: border-box; 
+        }
+        .back-btn { font-size: 24px; cursor: pointer; color: #666; text-decoration: none; }
+        .profile-container {
+            width: 90%; max-width: 400px; flex-grow: 1; padding-bottom: 20px;
+        }
+        .avatar-section { text-align: center; padding: 20px 0; }
+        .avatar-placeholder {
+            width: 100px; height: 100px; background-color: #ddd; border-radius: 50%;
+            margin: 0 auto 10px auto; display: flex; justify-content: center; align-items: center;
+            position: relative;
+        }
+        .avatar-camera-icon {
+            position: absolute; bottom: 0; right: 0; background-color: #ff9800;
+            color: white; border-radius: 50%; width: 30px; height: 30px;
+            display: flex; justify-content: center; align-items: center; font-size: 16px;
+        }
+        .plus-icon {
+            position: absolute; top: 0; right: 0; background-color: #ff9800;
+            color: white; border-radius: 50%; width: 24px; height: 24px;
+            display: flex; justify-content: center; align-items: center; font-size: 16px;
+        }
+        .id-text { font-size: 14px; color: #666; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; }
+        input {
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;
+            box-sizing: border-box; background-color: #fffaf2;
+        }
+        .save-btn {
+            display: block; width: 100%; padding: 15px; background-color: #ff9800;
+            color: white; border: none; border-radius: 8px; font-size: 16px;
+            cursor: pointer; margin-top: 30px; text-align: center; text-decoration: none;
+        }
+
+        /* 儲存成功提示樣式 (從 8.html 移過來) */
+        .toast-notification {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+            background-color: white; color: #4CAF50; padding: 10px 20px;
+            border-radius: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0; transition: opacity 0.5s, transform 0.5s;
+            display: flex; align-items: center; pointer-events: none;
+        }
+        .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="3.html" class="back-btn">&lt;</a> 
+    </div>
+
+    <div class="profile-container">
+        <div class="avatar-section">
+            <div class="avatar-placeholder">👤</div>
+            <div class="plus-icon">+</div>
+            <div class="id-text">ID:0123456789</div>
+        </div>
+
+        <form id="profileForm">
+            <div class="form-group"> <label for="name">姓名</label> <input type="text" id="name" name="name"> </div>
+            <div class="form-group"> <label for="nickname">暱稱</label> <input type="text" id="nickname" name="nickname"> </div>
+            <div class="form-group"> <label for="email">電子郵件</label> <input type="text" id="email" name="email"> </div>
+            <div class="form-group"> <label for="phone">電話號碼</label> <input type="text" id="phone" name="phone"> </div>
+            <div class="form-group"> <label for="birthday">生日</label> <input type="text" id="birthday" name="birthday"> </div>
+            <div class="form-group"> <label for="gender">性別</label> <input type="text" id="gender" name="gender"> </div>
+            
+            <button type="button" id="saveButton" class="save-btn">儲存</button>
+        </form>
+    </div>
+
+    <!-- 儲存成功提示 -->
+    <div id="toast" class="toast-notification">
+        ✅ 儲存成功!
+    </div>
+
+    <script>
+        document.getElementById('saveButton').addEventListener('click', function() {
+            const toast = document.getElementById('toast');
+            // 顯示提示
+            toast.classList.add('show');
+            // 1.5秒後隱藏提示並跳轉頁面
+            setTimeout(function() {
+                toast.classList.remove('show');
+                window.location.href = '3.html'; 
+            }, 1500); // 1.5 秒延遲
+        });
+    </script>
+</body>
+</html>
+
