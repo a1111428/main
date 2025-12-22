@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furry Café Map - 註冊</title>
+    <style>
+        /* 簡易 CSS 樣式，使其看起來更像應用程式介面 */
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column; align-items: center; height: 100vh; margin: 0; background-color: #fff;
+        }
+        .header {
+            display: flex;
+            /* 調整為靠左對齊 */
+            justify-content: flex-start;
+            align-items: center; width: 90%;
+            max-width: 400px; padding: 20px 0 0 0;
+        }
+        /* 移除 .close-btn 的樣式定義，因为它已經被移除了 */
+        .back-btn { 
+            font-size: 24px; cursor: pointer; color: #666; text-decoration: none; 
+        }
+        .register-container {
+            width: 90%; max-width: 400px; text-align: center; flex-grow: 1; display: flex;
+            flex-direction: column; justify-content: center; padding-bottom: 50px;
+        }
+        .logo { width: 100px; height: auto; margin: 0 auto 20px auto; content: url('placeholder_logo.png'); }
+        h1 { color: #333; font-size: 20px; margin-bottom: 30px; }
+        .form-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; }
+        input {
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;
+        }
+        button {
+            width: 100%; padding: 10px; background-color: #ff9800; color: white; border: none;
+            border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="4.html" class="back-btn">&lt;</a> 
+        <!-- 已移除關閉按鈕 X -->
+    </div>
+
+    <div class="register-container">
+        <div class="logo"></div> 
+        <h1>Furry Café Map</h1>
+        
+        <form action="6.html" method="get">
+            <div class="form-group">
+                <label for="email">電子郵件地址</label>
+                <input type="text" id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label for="password">密碼</label>
+                <input type="password" id="password" name="password">
+            </div>
+            <div class="form-group">
+                <label for="confirm-password">確認密碼</label>
+                <input type="password" id="confirm-password" name="confirm-password">
+            </div>
+            
+            <button type="submit">**註冊**</button>
+        </form>
+    </div>
+</body>
+</html>
