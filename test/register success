@@ -54,10 +54,10 @@
         <h1>Furry Café Map</h1>
         
         <div class="success-message">
-            **註冊成功! 請重新登入.**
+            註冊成功! 請重新登入.
         </div>
 
-        <a href="4.html" class="login-btn">**重新登入**</a> 
+        <a href="4.html" class="login-btn">重新登入</a> 
     </div>
 </body>
 </html>
