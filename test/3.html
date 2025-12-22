@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人資訊</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(to bottom, #fffaf2, #ffeccc); /* 圖片頂部漸層背景 */
+            position: relative;
+        }
+
+        .back-btn, .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            text-decoration: none;
+        }
+
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(to bottom, #ffeccc, #fff);
+        }
+
+        .avatar-placeholder {
+            width: 100px;
+            height: 100px;
+            background-color: #ddd;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .id-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .menu-list {
+            padding: 20px;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            display: block;
+            background-color: #fffaf2;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: background-color 0.2s;
+        }
+        
+        .menu-item:hover {
+            background-color: #ffeccc;
+        }
+
+        .login-btn-container {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .login-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #ff9800; /* 圖片中的橘色按鈕 */
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .footer-links {
+            text-align: center;
+            padding-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .footer-links div {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <!-- 這裡已經修改為 2.html -->
+        <a href="2.html" class="back-btn">&lt;</a> 
+        <a href="homepage.html" class="close-btn">X</a>
+    </div>
+
+    <div class="profile-section">
+        <div class="avatar-placeholder">👤</div>
+        <div class="id-text">ID:0123456789</div>
+    </div>
+
+    <div class="menu-list">
+        <a href="#" class="menu-item">個人資訊</a>
+        <a href="#" class="menu-item">定位設置</a>
+        <a href="#" class="menu-item">隱私權設置</a>
+        <a href="#" class="menu-item">Email客服</a>
+        <a href="#" class="menu-item">使用條款</a>
+        <a href="#" class="menu-item">評分我們</a>
+    </div>
+
+    <div class="login-btn-container">
+        <a href="#" class="login-btn">登入</a>
+    </div>
+
+    <div class="footer-links">
+        <div>幫助中心</div>
+        <div>關於我們</div>
+    </div>
+
+</body>
+</html>
