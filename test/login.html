@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furry Café Map - 登入</title>
+    <style>
+        /* 簡易 CSS 樣式，使其看起來更像應用程式介面 */
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #fff;
+        }
+        .login-container {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .logo {
+            width: 100px; /* 調整為適合的尺寸 */
+            height: auto;
+            margin-bottom: 20px;
+            /* 圖片來源需要替換 */
+            content: url('placeholder_logo.png'); 
+        }
+        h1 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        input,
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* 確保 padding 不會增加寬度 */
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .links {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .links a {
+            color: #ff9800;
+            text-decoration: none;
+        }
+        .register-link {
+            float: left;
+        }
+        .forgot-link {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- 標誌圖片的佔位符 -->
+        <div class="logo"></div> 
+        <h1>Furry Café Map</h1>
+        <!-- 已修改 form 的 action 屬性 -->
+        <form action="3.html" method="get">
+            <div class="form-group">
+                <label for="email">電子郵件地址</label>
+                <input type="text" id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label for="password">密碼</label>
+                <input type="password" id="password" name="password">
+            </div>
+            <button type="submit">登入</button>
+        </form>
+        <div class="links">
+            <span class="register-link">
+                尚未擁有帳號? <a href="#">立即註冊</a>
+            </span>
+            <span class="forgot-link">
+                <a href="#">忘記密碼?</a>
+            </span>
+        </div>
+    </div>
+</body>
+</html>
+
+
