@@ -1,107 +1,65 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Furry Café Map - 登入</title>
+    <title>Furry Café Map</title>
     <style>
-        /* 簡易 CSS 樣式，使其看起來更像應用程式介面 */
-        body {
-            font-family: sans-serif;
+        /* 基礎設定 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #FFF9EB; /* 封面背景色 */
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #fff;
+            overflow: hidden;
         }
-        .login-container {
-            width: 90%;
-            max-width: 400px;
+
+        /* 內容容器：包含淡入淡出動畫 */
+        .splash-content {
             text-align: center;
+            animation: fadeInOut 2.5s ease-in-out forwards;
         }
-        .logo {
-            width: 100px; /* 調整為適合的尺寸 */
+
+        .logo-img {
+            width: 120px;
             height: auto;
             margin-bottom: 20px;
-            /* 圖片來源需要替換 */
-            content: url('placeholder_logo.png'); 
         }
-        h1 {
-            color: #333;
-            font-size: 20px;
-            margin-bottom: 30px;
+
+        .title {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: #000;
         }
-        .form-group {
-            text-align: left;
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-        }
-        input,
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box; /* 確保 padding 不會增加寬度 */
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #ff9800;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        .links {
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        .links a {
-            color: #ff9800;
-            text-decoration: none;
-        }
-        .register-link {
-            float: left;
-        }
-        .forgot-link {
-            float: right;
+
+        /* 淡入淡出動畫邏輯 */
+        /* 0% 開始透明 -> 20% 完全顯現 -> 80% 開始變透明 -> 100% 完全消失 */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: scale(0.95); }
+            20% { opacity: 1; transform: scale(1); }
+            80% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.05); }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <!-- 標誌圖片的佔位符 -->
-        <div class="logo"></div> 
-        <h1>Furry Café Map</h1>
-        <!-- 已修改 form 的 action 屬性 -->
-        <form action="3.html" method="get">
-            <div class="form-group">
-                <label for="email">電子郵件地址</label>
-                <input type="text" id="email" name="email">
-            </div>
-            <div class="form-group">
-                <label for="password">密碼</label>
-                <input type="password" id="password" name="password">
-            </div>
-            <button type="submit">登入</button>
-        </form>
-        <div class="links">
-            <span class="register-link">
-                尚未擁有帳號? <a href="#">立即註冊</a>
-            </span>
-            <span class="forgot-link">
-                <a href="#">忘記密碼?</a>
-            </span>
-        </div>
+
+    <div class="splash-content">
+        <img src="logo.png" alt="Logo" class="logo-img">
+        <div class="title">Furry Café Map</div>
     </div>
+
+    <script>
+        // 在 2500 毫秒（2.5秒）後跳轉到 2.html
+        setTimeout(function() {
+            window.location.href = "home.html";
+        }, 2500);
+    </script>
+
 </body>
 </html>
 
