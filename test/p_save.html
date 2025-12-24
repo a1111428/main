@@ -3,103 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>個人資訊</title>
+    <title>修改個人資訊 - Furry Café Map</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* 簡易 CSS 樣式 */
-        body {
-            font-family: sans-serif; display: flex; flex-direction: column; align-items: center;
-            height: 100vh; margin: 0; background-color: #fff;
-            background: linear-gradient(to bottom, #fffaf2, #ffeccc 150px, #ffffff 400px);
-            background-color: #fffaf2;
-        }
-        .header {
-            display: flex; justify-content: flex-start; align-items: center; 
-            width: 90%; max-width: 400px; padding: 20px 20px 0 20px; box-sizing: border-box; 
-        }
-        .back-btn { font-size: 24px; cursor: pointer; color: #666; text-decoration: none; }
-        .profile-container {
-            width: 90%; max-width: 400px; flex-grow: 1; padding-bottom: 20px;
-        }
-        .avatar-section { text-align: center; padding: 20px 0; }
-        .avatar-placeholder {
-            width: 100px; height: 100px; background-color: #ddd; border-radius: 50%;
-            margin: 0 auto 10px auto; display: flex; justify-content: center; align-items: center;
-            position: relative;
-        }
-        .avatar-camera-icon {
-            position: absolute; bottom: 0; right: 0; background-color: #ff9800;
-            color: white; border-radius: 50%; width: 30px; height: 30px;
-            display: flex; justify-content: center; align-items: center; font-size: 16px;
-        }
-        .plus-icon {
-            position: absolute; top: 0; right: 0; background-color: #ff9800;
-            color: white; border-radius: 50%; width: 24px; height: 24px;
-            display: flex; justify-content: center; align-items: center; font-size: 16px;
-        }
-        .id-text { font-size: 14px; color: #666; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: #666; }
-        input {
-            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;
-            box-sizing: border-box; background-color: #fffaf2;
-        }
-        .save-btn {
-            display: block; width: 100%; padding: 15px; background-color: #ff9800;
-            color: white; border: none; border-radius: 8px; font-size: 16px;
-            cursor: pointer; margin-top: 30px; text-align: center; text-decoration: none;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
+        body { background-color: #FFF2DF; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 450px; background-color: #FFF2DF; padding: 20px; display: flex; flex-direction: column; align-items: center; position: relative; }
 
-        /* 儲存成功提示樣式 (從 8.html 移過來) */
-        .toast-notification {
-            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
-            background-color: white; color: #4CAF50; padding: 10px 20px;
-            border-radius: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            opacity: 0; transition: opacity 0.5s, transform 0.5s;
-            display: flex; align-items: center; pointer-events: none;
-        }
-        .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+        /* 儲存成功提示視窗 (Toast) */
+        .save-toast { position: absolute; top: 20px; background-color: white; padding: 10px 20px; border-radius: 10px; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #EEE; z-index: 100; }
+        .save-toast i, .save-toast span { color: #4CAF50; font-weight: bold; }
+
+        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px 0; }
+        .header a { color: #333; text-decoration: none; font-size: 24px; }
+        .save-icon-btn { font-size: 24px; cursor: pointer; color: #333; }
+
+        .avatar-section { position: relative; margin-bottom: 30px; text-align: center; }
+        .avatar-main { width: 120px; height: 120px; background-color: #DDE1E4; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; overflow: hidden; }
+        .avatar-main i { font-size: 80px; color: #B0B5B9; }
+        .camera-badge { position: absolute; bottom: 5px; right: 5px; width: 32px; height: 32px; background-color: black; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; border: 2px solid white; cursor: pointer; }
+        .id-display { margin-top: 10px; color: #888; font-size: 14px; }
+
+        .input-list { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 18px; color: #333; }
+        .input-group input, .input-group select { width: 100%; padding: 12px 15px; background-color: #FFF9F0; border: none; border-radius: 10px; font-size: 16px; color: #333; outline: none; }
+
+        .submit-btn { width: 100%; background-color: #FFB352; color: white; padding: 15px; border: none; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 30px; box-shadow: 0 4px 6px rgba(255, 179, 82, 0.3); }
+        .submit-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
-    <div class="header">
-        <a href="personal.html" class="back-btn">&lt;</a> 
-    </div>
 
-    <div class="profile-container">
-        <div class="avatar-section">
-            <div class="avatar-placeholder">👤</div>
-            <div class="plus-icon">+</div>
-            <div class="id-text">ID:0123456789</div>
+    <div class="container">
+        <div id="saveToast" class="save-toast">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>儲存成功!</span>
         </div>
 
-        <form id="profileForm">
-            <div class="form-group"> <label for="name">姓名</label> <input type="text" id="name" name="name"> </div>
-            <div class="form-group"> <label for="nickname">暱稱</label> <input type="text" id="nickname" name="nickname"> </div>
-            <div class="form-group"> <label for="email">電子郵件</label> <input type="text" id="email" name="email"> </div>
-            <div class="form-group"> <label for="phone">電話號碼</label> <input type="text" id="phone" name="phone"> </div>
-            <div class="form-group"> <label for="birthday">生日</label> <input type="text" id="birthday" name="birthday"> </div>
-            <div class="form-group"> <label for="gender">性別</label> <input type="text" id="gender" name="gender"> </div>
-            
-            <button type="button" id="saveButton" class="save-btn">儲存</button>
-        </form>
-    </div>
+        <header class="header">
+            <a href="profile.html"><i class="fa-solid fa-chevron-left"></i></a>
+            <div class="save-icon-btn" onclick="handleSaveAction()"><i class="fa-solid fa-floppy-disk"></i></div>
+        </header>
 
-    <!-- 儲存成功提示 -->
-    <div id="toast" class="toast-notification">
-        ✅ 儲存成功!
+        <div class="avatar-section">
+            <div class="avatar-main"><i class="fa-solid fa-user"></i></div>
+            <div class="camera-badge"><i class="fa-solid fa-camera"></i></div>
+            <p class="id-display">ID:0123456789</p>
+        </div>
+
+        <div class="input-list">
+            <div class="input-group"><label>姓名</label><input type="text" id="p_name" placeholder="請輸入姓名"></div>
+            <div class="input-group"><label>暱稱</label><input type="text" id="p_nickname" placeholder="請輸入暱稱"></div>
+            <div class="input-group"><label>電子郵件</label><input type="email" id="p_email" placeholder="請輸入電子郵件"></div>
+            <div class="input-group"><label>電話號碼</label><input type="tel" id="p_phone" placeholder="請輸入電話號碼"></div>
+            <div class="input-group">
+                <label>生日</label>
+                <select id="p_birthday">
+                    <option value="">請選擇日期</option>
+                    <option value="100/10/10">100/10/10</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>性別</label>
+                <select id="p_gender">
+                    <option value="">請選擇性別</option>
+                    <option value="不願透露">不願透露</option>
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="submit-btn" onclick="handleSaveAction()">儲存</button>
     </div>
 
     <script>
-        document.getElementById('saveButton').addEventListener('click', function() {
-            const toast = document.getElementById('toast');
-            // 顯示提示
-            toast.classList.add('show');
-            // 1.5秒後隱藏提示並跳轉頁面
-            setTimeout(function() {
-                toast.classList.remove('show');
-                window.location.href = 'personal.html'; 
-            }, 1500); // 1.5 秒延遲
-        });
+        // 頁面載入時讀取最後一次儲存的資料
+        window.onload = function() {
+            const fields = ['p_name', 'p_nickname', 'p_email', 'p_phone', 'p_birthday', 'p_gender'];
+            fields.forEach(field => {
+                const savedData = localStorage.getItem(field);
+                if (savedData) {
+                    document.getElementById(field).value = savedData;
+                }
+            });
+        };
+
+        // 儲存邏輯：更新 localStorage 並顯示成功提示
+        function handleSaveAction() {
+            const fields = ['p_name', 'p_nickname', 'p_email', 'p_phone', 'p_birthday', 'p_gender'];
+            
+            // 將目前輸入的值存入 localStorage
+            fields.forEach(field => {
+                const val = document.getElementById(field).value;
+                localStorage.setItem(field, val);
+            });
+
+            const toast = document.getElementById('saveToast');
+            toast.style.display = 'flex';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
     </script>
 </body>
 </html>
