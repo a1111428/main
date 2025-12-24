@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人主頁 - Furry Café Map</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
+        body { background-color: #FFF2DF; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 450px; background-color: #FFF2DF; display: flex; flex-direction: column; align-items: center; }
+        
+        /* 頂部導覽列 */
+        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 20px; }
+        .circle-btn { width: 36px; height: 36px; border: 2px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #333; text-decoration: none; }
+        
+        /* 個人資訊區 */
+        .avatar-section { text-align: center; margin: 10px 0 40px; }
+        .avatar-main { width: 120px; height: 120px; background-color: #DDE1E4; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; position: relative; }
+        .user-icon { font-size: 80px; color: #B0B5B9; }
+        .camera-icon { position: absolute; bottom: 5px; right: 5px; width: 32px; height: 32px; background: black; border-radius: 50%; color: white; display: flex; justify-content: center; align-items: center; border: 2px solid white; text-decoration: none; }
+        .id-text { margin-top: 15px; color: #888; font-size: 14px; }
+
+        /* 選單列表 - 包含所有 6 個選項 */
+        .menu-list { width: 100%; padding: 0 30px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+        .menu-item { background-color: #FFECCB; padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: #333; font-weight: bold; transition: background 0.2s; }
+        .menu-item:active { background-color: #ffd8a8; }
+        .menu-item span { display: flex; align-items: center; gap: 10px; }
+
+        /* 登出按鈕 */
+        .logout-btn { width: 85%; padding: 15px; background-color: #FFB352; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; text-align: center; margin-bottom: 40px; box-shadow: 0 4px 10px rgba(255, 179, 82, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="home.html" class="circle-btn"><i class="fa-solid fa-chevron-left"></i></a>
+            <div class="circle-btn" style="background:#888; border:none; color:white;"><i class="fa-solid fa-plus"></i></div>
+            <a href="home.html" class="circle-btn" style="border:none; font-size:24px;"><i class="fa-solid fa-xmark"></i></a>
+        </header>
+
+        <div class="avatar-section">
+            <div class="avatar-main">
+                <i class="fa-solid fa-user user-icon"></i>
+                <a href="p_save.html" class="camera-icon"><i class="fa-solid fa-camera"></i></a>
+            </div>
+            <p class="id-text">ID:0123456789</p>
+        </div>
+
+        <nav class="menu-list">
+            <a href="p_save.html" class="menu-item">
+                <span><i class="fa-solid fa-gear"></i> 個人設置</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="social_link.html" class="menu-item">
+                <span><i class="fa-solid fa-share-nodes"></i> 社群串接</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="#" class="menu-item">
+                <span><i class="fa-solid fa-location-dot"></i> 定位設置</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="#" class="menu-item">
+                <span><i class="fa-solid fa-file-lines"></i> 我的文章</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="#" class="menu-item">
+                <span><i class="fa-solid fa-bookmark"></i> 收藏文章</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="#" class="menu-item">
+                <span><i class="fa-solid fa-utensils"></i> 收藏餐廳</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </nav>
+
+        <button onclick="handleLogout()" class="logout-btn">登出帳號</button>
+    </div>
+
+    <script>
+        // 持久登入核心邏輯：只有手動點擊登出才會清除狀態
+        function handleLogout() {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'home.html';
+        }
+
+        // 安全檢查：如果意外進入此頁但沒登入，自動踢回 personal.html
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'personal.html';
+        }
+    </script>
+</body>
+</html>
