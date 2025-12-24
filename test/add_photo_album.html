@@ -5,25 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>新增相簿</title>
     <style>
-        body { font-family: sans-serif; background-color: #A09E97; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #A09E97; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
         .modal-container { width: 90%; max-width: 400px; background-color: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
         .back-btn-text, .close-btn-text { font-size: 24px; color: #333; text-decoration: none; cursor: pointer; }
-        .content-area { flex-grow: 1; padding: 0 20px; }
+        .content-area { padding: 0 20px; }
         .image-upload-box { background-color: #f0f0f0; border-radius: 12px; height: 200px; display: flex; justify-content: center; align-items: center; cursor: pointer; margin-bottom: 20px; }
         .image-upload-icon { background-color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 24px; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .form-area { background-color: #ffeccc; padding: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
-        .form-group input { width: 100%; padding: 10px; border: none; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .save-btn { width: 100%; padding: 12px; background-color: #ff9800; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+        .form-group input { width: 100%; padding: 12px; border: none; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
+        .save-btn { width: 100%; padding: 12px; background-color: #ff9800; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="modal-container">
         <div class="header">
-            <a href="photo album.html" class="back-btn-text">&lt;</a> 
-            <a href="photo album.html" class="close-btn-text">X</a> 
+            <a href="photo_album.html" class="back-btn-text">&lt;</a> 
+            <a href="photo_album.html" class="close-btn-text">X</a> 
         </div>
 
         <div class="content-area">
@@ -45,17 +45,16 @@
 
     <script>
         document.getElementById('addAlbumForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // 阻止表單預設提交
+            event.preventDefault();
 
             const albumName = document.getElementById('album-name').value;
             if (albumName.trim() === "") return;
 
             const albums = JSON.parse(localStorage.getItem('albums')) || [];
-            
             const now = new Date();
             const dateString = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
 
-            albums.unshift({ // Add to the beginning of the array
+            albums.unshift({
                 name: albumName,
                 date: dateString,
                 count: 0
@@ -63,9 +62,12 @@
 
             localStorage.setItem('albums', JSON.stringify(albums));
 
-            // 跳轉回相簿列表頁面，並帶上參數以顯示提示
-            window.location.href = 'photo album.html?newAlbumAdded=true';
+            // 修正：跳轉路徑必須與您的檔案名稱完全一致（建議使用底線 photo_album.html）
+            window.location.href = 'photo_album.html?newAlbumAdded=true';
         });
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
