@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的相簿</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #FFF9EB; margin: 0; padding: 0; }
+        .container { width: 100%; max-width: 450px; margin: 0 auto; padding: 0 10px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0 10px 0; }
+        .back-btn-text { font-size: 24px; color: #333; text-decoration: none; cursor: pointer; padding: 5px; }
+        .action-icons-group { display: flex; gap: 8px; align-items: center; }
+        .nav-icon { background-color: #D3C9B4; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #FFF9EB; text-decoration: none; font-size: 20px; }
+        .nav-button-select { background-color: #D3C9B4; color: #333; padding: 0 15px; height: 40px; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .album-list { padding-top: 20px; }
+        .album-card { position: relative; display: flex; background-color: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; overflow: hidden; cursor: pointer; }
+        .album-thumbnail.default { width: 100px; height: 100px; display: flex; justify-content: center; align-items: center; background-color: #f0f0f0; flex-shrink: 0; }
+        .album-info { padding: 15px; display: flex; flex-direction: column; justify-content: center; }
+        .album-title { font-weight: bold; font-size: 16px; color: #333; }
+        .album-meta { font-size: 12px; color: #666; margin-top: 4px; }
+        .toast-notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: white; color: #4CAF50; padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); opacity: 0; transition: opacity 0.5s; pointer-events: none; z-index: 1000; }
+        .toast-notification.show { opacity: 1; }
+        .delete-btn { position: absolute; top: 5px; left: 5px; background-color: #ff4d4d; color: white; border-radius: 50%; width: 24px; height: 24px; display: none; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; z-index: 10; }
+        body.edit-mode .delete-btn { display: flex; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="top-nav">
+            <a href="home.html" class="back-btn-text">&lt;</a>
+            <div class="action-icons-group">
+                <a href="add_photo_album.html" class="nav-icon">+</a>
+                <div class="nav-button-select" id="selectButton">選取</div>
+                <div class="nav-icon" id="editButton">...</div>
+            </div>
+        </div>
+
+        <div id="toast" class="toast-notification">✅ 新增成功!</div>
+        <div class="album-list" id="albumList"></div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAlbums();
+            checkNewAlbumToast();
+        });
+
+        function setEditMode(isEditMode) {
+            document.body.classList.toggle('edit-mode', isEditMode);
+            document.getElementById('selectButton').textContent = isEditMode ? '完成' : '選取';
+        }
+
+        document.getElementById('editButton').addEventListener('click', () => {
+            setEditMode(!document.body.classList.contains('edit-mode'));
+        });
+
+        function loadAlbums() {
+            const albumList = document.getElementById('albumList');
+            albumList.innerHTML = '';
+            const albums = JSON.parse(localStorage.getItem('albums')) || [];
+
+            if (albums.length === 0) {
+                albumList.innerHTML = '<p style="text-align:center; color:#999; margin-top:50px;">目前尚無相簿</p>';
+                return;
+            }
+
+            albums.forEach((album, index) => {
+                const albumCard = document.createElement('div');
+                albumCard.classList.add('album-card');
+                albumCard.innerHTML = `
+                    <div class="delete-btn" onclick="deleteAlbum(event, ${index})">−</div>
+                    <div class="album-thumbnail default"><span style="font-size:40px;">🖼️</span></div>
+                    <div class="album-info">
+                        <div class="album-title">${album.name}</div>
+                        <div class="album-meta">更新時間 ${album.date}</div>
+                        <div class="album-meta">共 ${album.count} 張相片</div>
+                    </div>
+                `;
+                albumCard.onclick = () => {
+                    if (!document.body.classList.contains('edit-mode')) {
+                        window.location.href = 'photo.html?albumName=' + encodeURIComponent(album.name);
+                    }
+                };
+                albumList.appendChild(albumCard);
+            });
+        }
+
+        function deleteAlbum(event, index) {
+            event.stopPropagation();
+            let albums = JSON.parse(localStorage.getItem('albums')) || [];
+            if (confirm(`確定要刪除相簿 "${albums[index].name}" 嗎？`)) {
+                albums.splice(index, 1);
+                localStorage.setItem('albums', JSON.stringify(albums));
+                loadAlbums();
+                setEditMode(false);
+            }
+        }
+
+        function checkNewAlbumToast() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('newAlbumAdded')) {
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    </script>
+</body>
+</html>
