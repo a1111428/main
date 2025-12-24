@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社群帳號設定 - Furry Café Map</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
+        body { background-color: #FFF2DF; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 450px; background-color: #FFF2DF; padding: 20px; display: flex; flex-direction: column; }
+        
+        .header { display: flex; align-items: center; margin-bottom: 30px; }
+        .back-btn { width: 36px; height: 36px; border: 1.5px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #333; text-decoration: none; margin-right: 20px; }
+        .header h1 { font-size: 24px; font-weight: bold; }
+
+        .social-box { background-color: #FFECCB; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .social-item { background-color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-radius: 8px; }
+        
+        .platform-info { display: flex; align-items: center; gap: 12px; font-size: 18px; color: #333; }
+        .brand-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 16px; }
+        
+        /* 品牌配色 */
+        .ig { background: linear-gradient(45deg, #f09433 0%, #bc1888 100%); }
+        .x-tw, .threads { background-color: black; }
+        .fb { background-color: #1877F2; }
+
+        .status { font-weight: bold; font-size: 16px; }
+        .is-bind { color: #57D0A2; }   /* 綠色 */
+        .is-unbind { color: #FF6B6B; } /* 紅色 */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="profile.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+            <h1>社群帳號設定</h1>
+        </header>
+
+        <div class="social-box">
+            <div class="social-item" onclick="toggleBind(this, 'Instagram')">
+                <div class="platform-info"><div class="brand-icon ig"><i class="fa-brands fa-instagram"></i></div><span>Instagram</span></div>
+                <span class="status is-bind" id="s-Instagram">綁定</span>
+            </div>
+            <div class="social-item" onclick="toggleBind(this, 'X')">
+                <div class="platform-info"><div class="brand-icon x-tw"><i class="fa-brands fa-x-twitter"></i></div><span>X</span></div>
+                <span class="status is-bind" id="s-X">綁定</span>
+            </div>
+            <div class="social-item" onclick="toggleBind(this, 'Threads')">
+                <div class="platform-info"><div class="brand-icon threads"><i class="fa-solid fa-at"></i></div><span>Threads</span></div>
+                <span class="status is-bind" id="s-Threads">綁定</span>
+            </div>
+            <div class="social-item" onclick="toggleBind(this, 'Facebook')">
+                <div class="platform-info"><div class="brand-icon fb"><i class="fa-brands fa-facebook-f"></i></div><span>Facebook</span></div>
+                <span class="status is-bind" id="s-Facebook">綁定</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化載入同步狀態
+        window.onload = function() {
+            ['Instagram', 'X', 'Threads', 'Facebook'].forEach(p => {
+                const saved = localStorage.getItem('social_' + p) || 'bind';
+                const el = document.getElementById('s-' + p);
+                if (saved === 'unbind') {
+                    el.innerText = '取消綁定'; el.className = 'status is-unbind';
+                } else {
+                    el.innerText = '綁定'; el.className = 'status is-bind';
+                }
+            });
+        };
+
+        function toggleBind(element, platform) {
+            const statusText = element.querySelector('.status');
+            const isNowBinding = statusText.innerText === '取消綁定';
+            
+            if (isNowBinding) {
+                statusText.innerText = '綁定'; statusText.className = 'status is-bind';
+                localStorage.setItem('social_' + platform, 'bind');
+            } else {
+                statusText.innerText = '取消綁定'; statusText.className = 'status is-unbind';
+                localStorage.setItem('social_' + platform, 'unbind');
+            }
+        }
+    </script>
+</body>
+</html>
