@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=452, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的寵物</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 452px;
+            height: 968px;
+            margin: 0 auto;
+            font-family: "Microsoft JhengHei", sans-serif;
+            background: #FFF2DF;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+        }
+
+        .container {
+            width: 452px;
+            height: 968px;
+            padding: 60px 40px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 返回按鈕 */
+        .back-btn {
+            position: absolute;
+            top: 60px;
+            left: 25px;
+            width: 40px;
+            height: 40px;
+            border: 1.5px solid #000;
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #000;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* 新增按鈕 */
+        .add-btn {
+            position: absolute;
+            top: 60px;
+            right: 25px;
+            width: 40px;
+            height: 40px;
+            border: 1.5px solid #000;
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            color: #000;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* 標題 */
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+            margin: 20px 0 40px;
+        }
+
+        /* 寵物卡片列表 */
+        .pet-list {
+            width: 372px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .pet-card {
+            width: 372px;
+            background: #FFF7E9;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .pet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .pet-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .more-btn {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .pet-photo {
+            width: 332px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 返回按鈕 -->
+        <a href="personal.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+
+        <!-- 新增按鈕 -->
+        <div class="add-btn"><i class="fa-solid fa-plus"></i></div>
+
+        <!-- 標題 -->
+        <h1 class="title">我的寵物</h1>
+
+        <!-- 寵物卡片列表 -->
+        <div class="pet-list">
+            <!-- 鬆鬆 -->
+            <div class="pet-card">
+                <div class="pet-header">
+                    <div class="pet-name">鬆鬆</div>
+                    <button class="more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                </div>
+                <img src="https://via.placeholder.com/332x180/FFB6C1/000000?text=鬆鬆" alt="鬆鬆" class="pet-photo">
+            </div>
+
+            <!-- 魯夫 -->
+            <div class="pet-card">
+                <div class="pet-header">
+                    <div class="pet-name">魯夫</div>
+                    <button class="more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                </div>
+                <img src="https://via.placeholder.com/332x180/F5DEB3/000000?text=魯夫" alt="魯夫" class="pet-photo">
+            </div>
+
+            <!-- 掰咖小鳥 -->
+            <div class="pet-card">
+                <div class="pet-header">
+                    <div class="pet-name">掰咖小鳥</div>
+                    <button class="more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                </div>
+                <img src="https://via.placeholder.com/332x180/90EE90/000000?text=掰咖小鳥" alt="掰咖小鳥" class="pet-photo">
+            </div>
+
+            <!-- 另一隻鬆鬆 -->
+            <div class="pet-card">
+                <div class="pet-header">
+                    <div class="pet-name">鬆鬆</div>
+                    <button class="more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                </div>
+                <img src="https://via.placeholder.com/332x180/FFB6C1/000000?text=鬆鬆" alt="鬆鬆" class="pet-photo">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
