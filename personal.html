@@ -4,51 +4,208 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>個人資訊</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
-        body, html { height: 100%; overflow: auto; background: #FFF2DF; }
-        .phone { width: 100%; max-width: 452px; margin: 0 auto; aspect-ratio: 452 / 968; position: relative; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
-        .container { position: absolute; inset: 0; width: 100%; height: 100%; display: flex; flex-direction: column; overflow-y: auto; }
-        .top-wrapper { background: linear-gradient(to bottom, #FFFFFF 0%, #FFF2DF 100%); padding-bottom: 4%; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 6% 5% 3%; }
-        .back-btn, .close-btn { font-size: clamp(16px, 4.5vw, 20px); cursor: pointer; color: #555; text-decoration: none; }
-        .profile-section { display: flex; flex-direction: column; align-items: center; padding: 2% 4%; }
-        .avatar-placeholder { width: clamp(80px, 20vw, 110px); height: clamp(80px, 20vw, 110px); background-color: #DDE1E4; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 3%; border: 1px solid rgba(255,255,255,0.5); }
-        .avatar-placeholder i { font-size: clamp(20px, 8vw, 28px); color: #513D7A; }
-        .id-text { font-size: clamp(11px, 2.5vw, 13px); color: #666; }
-        .menu-list { padding: 3% 5%; flex-grow: 1; }
-        .menu-item { display: block; background-color: #FFFFFF; padding: 4% 5%; margin-bottom: 3%; border-radius: 14px; text-decoration: none; color: #444; font-size: clamp(14px, 3.5vw, 16px); font-weight: 500; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-        .locked { opacity: 0.6; pointer-events: none; background-color: #f9f9f9; }
-        .bottom-section { padding: 0 5% 8%; }
-        .login-btn { display: block; width: 100%; padding: 3.5% 0; background-color: #FF9800; color: white; text-align: center; border: none; border-radius: 14px; font-size: clamp(16px, 4vw, 18px); font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3); }
-        .footer-links { text-align: center; padding: 5% 0; font-size: clamp(11px, 2.5vw, 13px); color: #999; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { 
+            height: 100%; 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            background: linear-gradient(180deg, #FFE7C7 5.08%, #FFFFFF 23.64%, #FFF2DF 100%);
+            -webkit-font-smoothing: antialiased; 
+        }
+
+        /* 主容器：滿版漸層，內容置中 */
+        .container {
+            min-height: 100vh;
+            padding: 60px 20px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 返回按鈕：純透明 + 黑邊框圓圈（無任何底線或陰影） */
+        .back-btn {
+            position: absolute;
+            top: 60px;
+            left: 25px;
+            width: 40px;
+            height: 40px;
+            border: 1.5px solid #000000;
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #000;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .back-btn:hover { background: rgba(0,0,0,0.08); }
+
+        /* 關閉按鈕：純透明 + 黑邊框圓圈（無任何底線或陰影） */
+        .close-btn {
+            position: absolute;
+            top: 60px;
+            right: 25px;
+            width: 43px;
+            height: 43px;
+            border: 1.5px solid #000000;
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            color: #000;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .close-btn:hover { background: rgba(0,0,0,0.08); }
+
+        /* 頭像 */
+        .avatar {
+            width: 100px;
+            height: 100px;
+            background: #E0E0E0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 37px auto 16px;
+            box-shadow: 0px 4px 4px rgba(0,0,0,0.25);
+        }
+        .avatar i {
+            font-size: 50px;
+            color: #AAA;
+        }
+
+        /* ID 文字 */
+        .user-id {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        /* 選單上下橘色橫槓 */
+        .divider-top, .divider-bottom {
+            width: 372px;
+            height: 9px;
+            background: #FFE8C7;
+            border-radius: 8px;
+            margin: 20px auto;
+        }
+        .divider-bottom { margin: 40px auto 30px; }
+
+        /* 選單列表：整體置中 */
+        .menu-list {
+            width: 372px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+        .menu-item {
+            width: 372px;
+            height: 48px;
+            background: #FFF7E9;
+            border-radius: 10px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* 文字靠左 */
+            text-decoration: none;
+            color: #555;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .menu-item:hover {
+            background: #FFEDD9;
+        }
+        .menu-item.locked {
+            background: #F0F0F0;
+            color: #AAA;
+            pointer-events: none;
+        }
+
+        /* 登入按鈕：整體置中，文字靠左 */
+        .login-btn {
+            width: 372px;
+            height: 48px;
+            background: #FF9800;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 24px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            margin-bottom: 40px;
+            transition: background 0.3s;
+        }
+        .login-btn:hover {
+            background: #F57C00;
+        }
+
+        /* 底部文字 */
+        .footer-links {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* RWD：大螢幕放大 */
+        @media (min-width: 768px) {
+            .container { padding: 80px 60px 100px; }
+            .back-btn { top: 80px; left: 40px; width: 48px; height: 48px; font-size: 24px; }
+            .close-btn { top: 80px; right: 40px; width: 48px; height: 48px; font-size: 26px; }
+            .avatar { width: 120px; height: 120px; margin-top: 50px; }
+            .avatar i { font-size: 60px; }
+            .user-id { font-size: 16px; }
+            .divider-top, .divider-bottom, .menu-list, .login-btn { width: 500px; }
+            .menu-item { height: 56px; padding: 0 32px; font-size: 18px; }
+            .login-btn { height: 56px; font-size: 20px; padding-left: 32px; }
+        }
     </style>
 </head>
 <body>
-    <div class="phone">
-        <div class="container">
-            <div class="top-wrapper">
-                <div class="header">
-                    <a href="home.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a> 
-                    <a href="home.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
-                </div>
-                <div class="profile-section">
-                    <div class="avatar-placeholder"><i class="fa-solid fa-user"></i></div>
-                    <div class="id-text">ID:0123456789</div>
-                </div>
-            </div>
-            <div class="menu-list">
-                <div class="menu-item locked">個人資訊</div>
-                <a href="#" class="menu-item">隱私權設置</a>
-                <a href="#" class="menu-item">Email 客服</a>
-                <a href="#" class="menu-item">使用條款</a>
-                <a href="#" class="menu-item">評分我們</a>
-            </div>
-            <div class="bottom-section">
-                <a href="login.html" class="login-btn">登入</a>
-                <div class="footer-links"><div>幫助中心</div><div>關於我們</div></div>
-            </div>
+    <div class="container">
+        <!-- 返回與關閉按鈕 -->
+        <a href="home.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+        <a href="home.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+
+        <!-- 頭像與 ID -->
+        <div class="avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="user-id">ID: 0123456789</div>
+
+        <!-- 上橫槓 -->
+        <div class="divider-top"></div>
+
+        <!-- 選單列表 -->
+        <div class="menu-list">
+            <div class="menu-item locked">個人資訊</div>
+            <a href="#" class="menu-item">定位設置</a>
+            <a href="#" class="menu-item">隱私權設置</a>
+            <a href="#" class="menu-item">Email 客服</a>
+            <a href="#" class="menu-item">使用條款</a>
+            <a href="#" class="menu-item">評分我們</a>
+        </div>
+
+        <!-- 登入按鈕（文字靠左） -->
+        <a href="login.html" class="login-btn">登入</a>
+
+        <!-- 下橫槓 -->
+        <div class="divider-bottom"></div>
+
+        <!-- 底部文字 -->
+        <div class="footer-links">
+            <div>幫助中心</div>
+            <div>關於我們</div>
         </div>
     </div>
 </body>
