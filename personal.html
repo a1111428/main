@@ -10,21 +10,22 @@
         body, html { 
             height: 100%; 
             font-family: "Microsoft JhengHei", sans-serif; 
-            background: linear-gradient(180deg, #FFE7C7 5.08%, #FFFFFF 23.64%, #FFF2DF 100%);
+            /* 背景漸層平滑調整，無撕裂感 */
+            background: linear-gradient(180deg, #FFE7C7 0%, #FFF2DF 50%, #FFFBF5 100%);
             -webkit-font-smoothing: antialiased; 
         }
 
-        /* 主容器：滿版漸層，內容置中 */
+        /* 主容器：內容嚴格置中 */
         .container {
             min-height: 100vh;
             padding: 60px 20px 80px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: center; /* 所有子元素水平置中 */
             position: relative;
         }
 
-        /* 返回按鈕：純透明 + 黑邊框圓圈（無任何底線或陰影） */
+        /* 返回按鈕：純黑邊框圓圈，無底線、無陰影 */
         .back-btn {
             position: absolute;
             top: 60px;
@@ -40,11 +41,9 @@
             font-size: 20px;
             color: #000;
             cursor: pointer;
-            transition: background 0.3s;
         }
-        .back-btn:hover { background: rgba(0,0,0,0.08); }
 
-        /* 關閉按鈕：純透明 + 黑邊框圓圈（無任何底線或陰影） */
+        /* 關閉按鈕：純黑邊框圓圈，無底線、無陰影 */
         .close-btn {
             position: absolute;
             top: 60px;
@@ -60,9 +59,7 @@
             font-size: 22px;
             color: #000;
             cursor: pointer;
-            transition: background 0.3s;
         }
-        .close-btn:hover { background: rgba(0,0,0,0.08); }
 
         /* 頭像 */
         .avatar {
@@ -88,7 +85,7 @@
             margin-bottom: 30px;
         }
 
-        /* 選單上下橘色橫槓 */
+        /* 選單上下橘色橫槓（置中） */
         .divider-top, .divider-bottom {
             width: 372px;
             height: 9px;
@@ -98,13 +95,13 @@
         }
         .divider-bottom { margin: 40px auto 30px; }
 
-        /* 選單列表：整體置中 */
+        /* 選單列表（置中） */
         .menu-list {
             width: 372px;
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 40px;
+            margin: 0 auto 40px;
         }
         .menu-item {
             width: 372px;
@@ -114,7 +111,7 @@
             padding: 0 24px;
             display: flex;
             align-items: center;
-            justify-content: flex-start; /* 文字靠左 */
+            justify-content: flex-start;
             text-decoration: none;
             color: #555;
             font-size: 16px;
@@ -130,7 +127,7 @@
             pointer-events: none;
         }
 
-        /* 登入按鈕：整體置中，文字靠左 */
+        /* 登入按鈕（置中 + 文字靠左） */
         .login-btn {
             width: 372px;
             height: 48px;
@@ -144,7 +141,7 @@
             font-size: 18px;
             font-weight: 700;
             text-decoration: none;
-            margin-bottom: 40px;
+            margin: 0 auto 40px;
             transition: background 0.3s;
         }
         .login-btn:hover {
@@ -167,7 +164,7 @@
             .avatar { width: 120px; height: 120px; margin-top: 50px; }
             .avatar i { font-size: 60px; }
             .user-id { font-size: 16px; }
-            .divider-top, .divider-bottom, .menu-list, .login-btn { width: 500px; }
+            .divider-top, .divider-bottom, .menu-list, .login-btn { width: 500px; margin-left: auto; margin-right: auto; }
             .menu-item { height: 56px; padding: 0 32px; font-size: 18px; }
             .login-btn { height: 56px; font-size: 20px; padding-left: 32px; }
         }
@@ -175,7 +172,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- 返回與關閉按鈕 -->
+        <!-- 返回與關閉按鈕（純黑框，無底線） -->
         <a href="home.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
         <a href="home.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
 
@@ -196,7 +193,7 @@
             <a href="#" class="menu-item">評分我們</a>
         </div>
 
-        <!-- 登入按鈕（文字靠左） -->
+        <!-- 登入按鈕（置中 + 文字靠左） -->
         <a href="login.html" class="login-btn">登入</a>
 
         <!-- 下橫槓 -->
