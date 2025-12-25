@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furry Café Map - 主畫面</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { 
+            height: 100%; 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            overflow: hidden; 
+            background: #f5f5f5; 
+            -webkit-font-smoothing: antialiased; 
+        }
+        
+        /* 主容器：滿版布局 */
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* 地圖：永遠填滿整個畫面 */
+        #mapid {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        /* 搜尋欄：精確符合 452x968 設計規格（手機版） */
+        .search-bar {
+            position: absolute;
+            top: 74px;                      /* 固定 top 74px */
+            left: 30px;                     /* 固定 left 30px */
+            width: 392px;                   /* 固定寬度 392px */
+            height: 50px;                   /* 固定高度 50px */
+            background: #E9E9EA;
+            border: 1px solid #000000;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;                /* 左右內距 12px */
+            box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
+            z-index: 20;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar i {
+            font-size: 22px;                /* 放大鏡與麥克風大小 */
+            color: #888;
+            flex-shrink: 0;
+        }
+        
+        .search-bar input {
+            border: none;
+            background: transparent;
+            margin: 0 8px;                  /* 與左右 icon 間距 8px */
+            flex: 1;
+            font-size: 16px;                /* 文字大小接近設計 */
+            outline: none;
+        }
+        
+        /* 麥克風圖示：可點擊提示 */
+        .search-bar .fa-microphone {
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .search-bar .fa-microphone:hover { color: #FF9800; }
+        
+        /* 底部導航列：精確符合 452x968 設計規格（手機版） */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%;
+            height: 104px;
+            background: white;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 56px;
+            padding: 0 24px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 30;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8E8E93;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.3s ease;
+        }
+        
+        .nav-item i { 
+            font-size: clamp(24px, 6.5vw, 32px); 
+            transition: transform 0.3s ease;
+        }
+        
+        /* 懸浮效果：整體上浮 + icon 放大 */
+        .nav-item:hover {
+            color: #FF9800;
+            transform: translateY(-4px);
+        }
+        .nav-item:hover i { transform: scale(1.2); }
+        
+        /* 當前頁面高亮 */
+        .nav-item.active { color: #FF9800; }
+        
+        /* active 底線指標 */
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            max-width: 40px;
+            height: 5px;
+            background: #FF9800;
+            border-radius: 18px;
+            opacity: 1;
+            transition: transform 0.3s ease;
+        }
+        
+        /* iPhone 底部安全區支援 */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .bottom-nav { padding-bottom: calc(2.48% + env(safe-area-inset-bottom)); }
+        }
+        
+        /* 大螢幕（web）優化：search-bar 置中放大，NavBar 適度放大 */
+        @media (min-width: 768px) {
+            .search-bar {
+                top: 5%;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 60%;
+                max-width: 600px;
+                height: clamp(56px, 5vh, 70px);
+                padding: 0 16px;            /* web 版內距稍大 */
+            }
+            .search-bar i { font-size: clamp(24px, 2.5vw, 32px); }
+            .search-bar input {
+                margin: 0 12px;
+                font-size: clamp(18px, 2vw, 24px);
+            }
+            
+            .bottom-nav {
+                height: 120px;
+                gap: 80px;
+                padding: 0 40px;
+                border-top-left-radius: 30px;
+                border-top-right-radius: 30px;
+            }
+            .nav-item i { font-size: clamp(36px, 4vw, 56px); }
+            .nav-item.active::after {
+                bottom: -16px;
+                height: 6px;
+                max-width: 56px;
+                border-radius: 20px;
+            }
+        }
+        
+        /* 目前位置按鈕（使用主題色） */
+        .my-location-btn {
+            position: absolute;
+            bottom: 144px;
+            right: 32px;
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .my-location-btn i {
+            font-size: 24px;
+            color: #FF9800;
+        }
+        
+        .my-location-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            background: #FFB352;
+        }
+        .my-location-btn:hover i {
+            color: white;
+        }
+        
+        @media (min-width: 768px) {
+            .my-location-btn {
+                width: 56px;
+                height: 56px;
+                bottom: 152px;
+                right: 40px;
+            }
+            .my-location-btn i { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 地圖滿版 -->
+        <div id="mapid"></div>
+        
+        <!-- 搜尋欄 + 麥克風 -->
+        <div class="search-bar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="搜尋餐廳">
+            <i class="fa-solid fa-microphone"></i>
+        </div>
+        
+        <!-- 底部導航列 -->
+        <nav class="bottom-nav">
+            <a href="home.html" class="nav-item active"><i class="fa-solid fa-house"></i></a>
+            <a href="ai write.html" class="nav-item"><i class="fa-solid fa-book"></i></a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-camera"></i></a>
+            <a href="photo_album.html" class="nav-item"><i class="fa-solid fa-image"></i></a>
+            <a href="#" onclick="checkLoginStatus()" class="nav-item"><i class="fa-solid fa-user"></i></a>
+        </nav>
+        
+        <!-- 返回目前位置按鈕 -->
+        <div class="my-location-btn" onclick="flyToHome()">
+            <i class="fa-solid fa-location-crosshairs"></i>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        const map = L.map('mapid', {
+            center: [22.7333, 120.2847],
+            zoom: 17,
+            zoomControl: false
+        });
+        
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap contributors © CARTO',
+            maxZoom: 20
+        }).addTo(map);
+
+        fetch('https://raw.githubusercontent.com/kiang/taiwan_geojson/master/town.json')
+            .then(response => response.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: {
+                        fillColor: '#FFB352',
+                        weight: 1.5,
+                        opacity: 0.8,
+                        color: '#FF9800',
+                        fillOpacity: 0.4
+                    },
+                    onEachFeature: (feature, layer) => {
+                        if (feature.properties?.TOWNNAME) {
+                            layer.bindPopup(feature.properties.TOWNNAME);
+                        }
+                    }
+                }).addTo(map);
+            })
+            .catch(err => console.error('載入鄉鎮區失敗:', err));
+
+        L.circleMarker([22.7333, 120.2847], {
+            radius: 10,
+            fillColor: "#FFB352",
+            color: "#FF9800",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.8
+        }).addTo(map).bindPopup('高雄大學 🎓<br>高雄市楠梓區高雄大學路700號');
+        
+        window.addEventListener('resize', () => {
+            setTimeout(() => map.invalidateSize(true), 200);
+        });
+
+        function flyToHome() {
+            map.flyTo([22.7333, 120.2847], 17, {
+                animate: true,
+                duration: 1.5
+            });
+        }
+    </script>
+    <script>
+        function checkLoginStatus() {
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                window.location.href = 'profile.html';
+            } else {
+                window.location.href = 'personal.html';
+            }
+        }
+    </script>
+</body>
+</html>

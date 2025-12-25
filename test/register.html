@@ -7,45 +7,48 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
-        body { background-color: #FFF2DF; display: flex; justify-content: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 450px; padding: 40px 25px; display: flex; flex-direction: column; }
+        body, html { height: 100%; overflow: auto; background: #FFF2DF; }
+        .phone { width: 100%; max-width: 452px; margin: 0 auto; aspect-ratio: 452 / 968; position: relative; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+        .container { position: absolute; inset: 0; width: 100%; height: 100%; padding: 8% 5.5%; display: flex; flex-direction: column; overflow-y: auto; }
         
-        .header { display: flex; align-items: center; margin-bottom: 30px; }
-        .back-btn { font-size: 24px; color: #333; text-decoration: none; margin-right: 20px; }
-        h2 { font-size: 24px; color: #333; }
+        .header { display: flex; align-items: center; margin-bottom: 6%; }
+        .back-btn { font-size: clamp(18px, 5vw, 24px); color: #333; text-decoration: none; margin-right: 4%; }
+        h2 { font-size: clamp(18px, 5vw, 24px); color: #333; }
 
-        .form-group { width: 100%; margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
-        .form-group input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #DDD; font-size: 16px; }
+        .form-group { width: 100%; margin-bottom: 4%; }
+        .form-group label { display: block; margin-bottom: 2%; font-weight: bold; color: #555; font-size: clamp(12px, 3vw, 14px); }
+        .form-group input { width: 100%; padding: 3% 4%; border-radius: 12px; border: 1px solid #DDD; font-size: clamp(12px, 3.5vw, 16px); }
 
-        .register-btn { width: 100%; padding: 16px; background-color: #FFB352; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .register-btn { width: 100%; padding: 3.5%; background-color: #FFB352; color: white; border: none; border-radius: 12px; font-size: clamp(14px, 4vw, 18px); font-weight: bold; cursor: pointer; margin-top: 4%; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <a href="login.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
-            <h2>加入我們</h2>
-        </header>
+    <div class="phone">
+        <div class="container">
+            <header class="header">
+                <a href="login.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+                <h2>加入我們</h2>
+            </header>
 
-        <div class="form-group">
-            <label>使用者名稱</label>
-            <input type="text" placeholder="請輸入姓名">
-        </div>
-        <div class="form-group">
-            <label>電子郵件</label>
-            <input type="email" placeholder="請輸入 Email">
-        </div>
-        <div class="form-group">
-            <label>密碼</label>
-            <input type="password" placeholder="至少 8 位字元">
-        </div>
-        <div class="form-group">
-            <label>確認密碼</label>
-            <input type="password" placeholder="請再次輸入密碼">
-        </div>
+            <div class="form-group">
+                <label>使用者名稱</label>
+                <input type="text" placeholder="請輸入姓名">
+            </div>
+            <div class="form-group">
+                <label>電子郵件</label>
+                <input type="email" placeholder="請輸入 Email">
+            </div>
+            <div class="form-group">
+                <label>密碼</label>
+                <input type="password" placeholder="至少 8 位字元">
+            </div>
+            <div class="form-group">
+                <label>確認密碼</label>
+                <input type="password" placeholder="請再次輸入密碼">
+            </div>
 
-        <button class="register-btn" onclick="location.href='register_success.html'">確認註冊</button>
+            <button class="register-btn" onclick="location.href='register_success.html'">確認註冊</button>
+        </div>
     </div>
 </body>
 </html>

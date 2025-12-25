@@ -7,74 +7,77 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
-        body { background-color: #FFF2DF; display: flex; justify-content: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 450px; background-color: #FFF2DF; padding: 20px; display: flex; flex-direction: column; align-items: center; position: relative; }
+        body, html { height: 100%; overflow: auto; background: #FFF2DF; }
+        .phone { width: 100%; max-width: 452px; margin: 0 auto; aspect-ratio: 452 / 968; position: relative; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+        .container { position: absolute; inset: 0; width: 100%; height: 100%; padding: 4% 5%; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
 
         /* 儲存成功提示視窗 (Toast) */
-        .save-toast { position: absolute; top: 20px; background-color: white; padding: 10px 20px; border-radius: 10px; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #EEE; z-index: 100; }
-        .save-toast i, .save-toast span { color: #4CAF50; font-weight: bold; }
+        .save-toast { position: absolute; top: 5%; left: 50%; transform: translateX(-50%); background-color: white; padding: 2% 4%; border-radius: 10px; display: none; align-items: center; gap: 2%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #EEE; z-index: 100; }
+        .save-toast i, .save-toast span { color: #4CAF50; font-weight: bold; font-size: clamp(12px, 3vw, 14px); }
 
-        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px 0; }
-        .header a { color: #333; text-decoration: none; font-size: 24px; }
-        .save-icon-btn { font-size: 24px; cursor: pointer; color: #333; }
+        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4%; padding: 2% 0; }
+        .header a { color: #333; text-decoration: none; font-size: clamp(18px, 5vw, 24px); }
+        .save-icon-btn { font-size: clamp(18px, 5vw, 24px); cursor: pointer; color: #333; }
 
-        .avatar-section { position: relative; margin-bottom: 30px; text-align: center; }
-        .avatar-main { width: 120px; height: 120px; background-color: #DDE1E4; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; overflow: hidden; }
-        .avatar-main i { font-size: 80px; color: #B0B5B9; }
-        .camera-badge { position: absolute; bottom: 5px; right: 5px; width: 32px; height: 32px; background-color: black; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; border: 2px solid white; cursor: pointer; }
-        .id-display { margin-top: 10px; color: #888; font-size: 14px; }
+        .avatar-section { position: relative; margin-bottom: 6%; text-align: center; }
+        .avatar-main { width: clamp(90px, 22vw, 120px); height: clamp(90px, 22vw, 120px); background-color: #DDE1E4; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; overflow: hidden; }
+        .avatar-main i { font-size: clamp(60px, 15vw, 80px); color: #B0B5B9; }
+        .camera-badge { position: absolute; bottom: 2%; right: 2%; width: clamp(24px, 6vw, 32px); height: clamp(24px, 6vw, 32px); background-color: black; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; border: 2px solid white; cursor: pointer; font-size: clamp(12px, 3vw, 16px); }
+        .id-display { margin-top: 3%; color: #888; font-size: clamp(12px, 2.5vw, 14px); }
 
-        .input-list { width: 100%; display: flex; flex-direction: column; gap: 15px; }
-        .input-group label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 18px; color: #333; }
-        .input-group input, .input-group select { width: 100%; padding: 12px 15px; background-color: #FFF9F0; border: none; border-radius: 10px; font-size: 16px; color: #333; outline: none; }
+        .input-list { width: 100%; display: flex; flex-direction: column; gap: 3%; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 1.5%; font-size: clamp(14px, 3.5vw, 18px); color: #333; }
+        .input-group input, .input-group select { width: 100%; padding: 2.5% 3%; background-color: #FFF9F0; border: none; border-radius: 10px; font-size: clamp(12px, 3vw, 16px); color: #333; outline: none; }
 
-        .submit-btn { width: 100%; background-color: #FFB352; color: white; padding: 15px; border: none; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 30px; box-shadow: 0 4px 6px rgba(255, 179, 82, 0.3); }
+        .submit-btn { width: 100%; background-color: #FFB352; color: white; padding: 3% 0; border: none; border-radius: 12px; font-size: clamp(16px, 4vw, 20px); font-weight: bold; cursor: pointer; margin-top: 6%; box-shadow: 0 4px 6px rgba(255, 179, 82, 0.3); }
         .submit-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div id="saveToast" class="save-toast">
-            <i class="fa-solid fa-circle-check"></i>
-            <span>儲存成功!</span>
-        </div>
-
-        <header class="header">
-            <a href="profile.html"><i class="fa-solid fa-chevron-left"></i></a>
-            <div class="save-icon-btn" onclick="handleSaveAction()"><i class="fa-solid fa-floppy-disk"></i></div>
-        </header>
-
-        <div class="avatar-section">
-            <div class="avatar-main"><i class="fa-solid fa-user"></i></div>
-            <div class="camera-badge"><i class="fa-solid fa-camera"></i></div>
-            <p class="id-display">ID:0123456789</p>
-        </div>
-
-        <div class="input-list">
-            <div class="input-group"><label>姓名</label><input type="text" id="p_name" placeholder="請輸入姓名"></div>
-            <div class="input-group"><label>暱稱</label><input type="text" id="p_nickname" placeholder="請輸入暱稱"></div>
-            <div class="input-group"><label>電子郵件</label><input type="email" id="p_email" placeholder="請輸入電子郵件"></div>
-            <div class="input-group"><label>電話號碼</label><input type="tel" id="p_phone" placeholder="請輸入電話號碼"></div>
-            <div class="input-group">
-                <label>生日</label>
-                <select id="p_birthday">
-                    <option value="">請選擇日期</option>
-                    <option value="100/10/10">100/10/10</option>
-                </select>
+    <div class="phone">
+        <div class="container">
+            <div id="saveToast" class="save-toast">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>儲存成功!</span>
             </div>
-            <div class="input-group">
-                <label>性別</label>
-                <select id="p_gender">
-                    <option value="">請選擇性別</option>
-                    <option value="不願透露">不願透露</option>
-                    <option value="男">男</option>
-                    <option value="女">女</option>
-                </select>
-            </div>
-        </div>
 
-        <button class="submit-btn" onclick="handleSaveAction()">儲存</button>
+            <header class="header">
+                <a href="profile.html"><i class="fa-solid fa-chevron-left"></i></a>
+                <div class="save-icon-btn" onclick="handleSaveAction()"><i class="fa-solid fa-floppy-disk"></i></div>
+            </header>
+
+            <div class="avatar-section">
+                <div class="avatar-main"><i class="fa-solid fa-user"></i></div>
+                <div class="camera-badge"><i class="fa-solid fa-camera"></i></div>
+                <p class="id-display">ID:0123456789</p>
+            </div>
+
+            <div class="input-list">
+                <div class="input-group"><label>姓名</label><input type="text" id="p_name" placeholder="請輸入姓名"></div>
+                <div class="input-group"><label>暱稱</label><input type="text" id="p_nickname" placeholder="請輸入暱稱"></div>
+                <div class="input-group"><label>電子郵件</label><input type="email" id="p_email" placeholder="請輸入電子郵件"></div>
+                <div class="input-group"><label>電話號碼</label><input type="tel" id="p_phone" placeholder="請輸入電話號碼"></div>
+                <div class="input-group">
+                    <label>生日</label>
+                    <select id="p_birthday">
+                        <option value="">請選擇日期</option>
+                        <option value="100/10/10">100/10/10</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>性別</label>
+                    <select id="p_gender">
+                        <option value="">請選擇性別</option>
+                        <option value="不願透露">不願透露</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="submit-btn" onclick="handleSaveAction()">儲存</button>
+        </div>
     </div>
 
     <script>
