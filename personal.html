@@ -7,12 +7,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { 
-            height: 100%; 
+        body, html {
+            padding: 0; 
+            min-height: 100vh; 
             font-family: "Microsoft JhengHei", sans-serif; 
-            background: linear-gradient(180deg, #FFE7C7 5.08%, #FFFFFF 23.64%, #FFF2DF 100%);
+            background: linear-gradient(180deg, #FFE7C7 5.08%, #FFFFFF 23.64%);
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* 固定背景，視窗滾動時不動 */
+            margin: 0;
             -webkit-font-smoothing: antialiased; 
         }
+        body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, #FFE7C7 5.08%, #FFFFFF 23.64%);
+    z-index: -1; /* 放在最底層 */
+}
 
         /* 主容器：內容嚴格置中 */
         .container {
@@ -22,6 +33,7 @@
             flex-direction: column;
             align-items: center;
             position: relative;
+            background: inherit;
         }
 
         /* 返回按鈕：純黑邊框圓圈 */
