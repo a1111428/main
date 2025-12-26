@@ -11,47 +11,60 @@
         
         .container { width: 100%; max-width: 450px; padding: 20px; display: flex; flex-direction: column; gap: 15px; position: relative; }
 
-        /* 頂部導覽 */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .back-btn { width: 36px; height: 36px; border: 2.3px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; color: #333; }
         .post-btn { background-color: #FFB352; color: white; padding: 8px 25px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; }
 
-        /* 標題 */
         .title-section { display: flex; align-items: center; gap: 10px; font-size: 22px; color: #333; margin-top: 5px; }
 
-        /* 社群頭像列表 */
+        /* --- 改良後的社群圖示列 --- */
         .social-group { display: flex; gap: 12px; margin: 10px 0; overflow-x: auto; padding-bottom: 5px; }
-        .social-item { position: relative; width: 60px; height: 60px; flex-shrink: 0; }
-        .avatar { width: 100%; height: 100%; background-color: #999; border-radius: 50%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .avatar i { color: white; font-size: 35px; margin-top: 10px; } /* 模擬預設頭像 */
+        .social-item { 
+            position: relative; 
+            width: 60px; 
+            height: 60px; 
+            flex-shrink: 0; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+
+        /* 未綁定狀態：黑白且半透明 */
+        .social-item.unbind {
+            filter: grayscale(100%);
+            opacity: 0.4;
+        }
+
+        /* 綁定狀態：彩色且正常透明度 */
+        .social-item.bind {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.05); /* 稍微放大表示選中 */
+        }
+
+        .avatar { width: 100%; height: 100%; background-color: #999; border-radius: 50%; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 2px solid transparent; }
+        .social-item.bind .avatar { border-color: #FFB352; } /* 選中時增加橘色邊框 */
+        
+        .avatar i { color: white; font-size: 35px; margin-top: 10px; } 
         .badge { position: absolute; bottom: 0; right: 0; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; font-size: 12px; color: white; }
+        
         .badge.fb { background-color: #1877F2; }
-        .badge.ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .badge.ig { background: linear-gradient(45deg, #f09433 0%, #bc1888 100%); }
         .badge.threads { background-color: #000; }
         .badge.x { background-color: #000; }
-        .badge.bluesky { background-color: #0085ff; }
+        .badge.bluesky { background-color: #0085ff; } /* */
 
-        /* 文章輸入區域 */
+        /* 其他區域樣式保持不變 */
         .post-content-wrapper { background-color: white; border-radius: 20px; padding: 15px; display: flex; flex-direction: column; min-height: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         textarea { width: 100%; flex-grow: 1; border: none; outline: none; resize: none; font-size: 16px; color: #333; line-height: 1.5; background: transparent; }
-        textarea::placeholder { color: #AAA; }
-
-        /* 底部工具欄 */
         .toolbar { display: flex; gap: 20px; padding-top: 10px; border-top: 1px solid #EEE; margin-top: 10px; }
-        .tool-btn { font-size: 24px; color: #333; cursor: pointer; text-decoration: none; display: flex; align-items: center; }
+        .tool-btn { font-size: 24px; color: #333; cursor: pointer; text-decoration: none; }
 
-        /* 彈窗確認視窗 (Modal) */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-box { background: white; width: 85%; max-width: 320px; border-radius: 25px; text-align: center; overflow: hidden; }
         .modal-body { padding: 30px 20px; }
-        .modal-title { font-size: 24px; font-weight: bold; margin-bottom: 10px; color: #333; }
-        .modal-text { font-size: 16px; color: #555; line-height: 1.4; }
         .modal-footer { display: flex; border-top: 1px solid #EEE; }
         .modal-footer button { flex: 1; padding: 15px; border: none; background: white; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .btn-cancel { border-right: 1px solid #EEE !important; color: #FFB352; }
         .btn-confirm { color: white !important; background-color: #FFB352 !important; }
-
-        /* 針對隱藏顯示的輔助樣式 */
         .show { display: flex !important; }
     </style>
 </head>
@@ -63,36 +76,33 @@
             <button class="post-btn" onclick="openModal()">發佈</button>
         </header>
 
-        <div class="title-section">
-            <i class="fa-solid fa-pen-nib"></i>
-            <strong>撰寫文章</strong>
-        </div>
+        <div class="title-section"><i class="fa-solid fa-pen-nib"></i><strong>撰寫文章</strong></div>
 
         <div class="social-group">
-            <div class="social-item">
+            <div class="social-item" id="post-Facebook" onclick="togglePlatform('Facebook')">
                 <div class="avatar"><i class="fa-solid fa-user"></i></div>
                 <div class="badge fb"><i class="fa-brands fa-facebook-f"></i></div>
             </div>
-            <div class="social-item">
+            <div class="social-item" id="post-Instagram" onclick="togglePlatform('Instagram')">
                 <div class="avatar"><i class="fa-solid fa-user"></i></div>
                 <div class="badge ig"><i class="fa-brands fa-instagram"></i></div>
             </div>
-            <div class="social-item">
+            <div class="social-item" id="post-Threads" onclick="togglePlatform('Threads')">
                 <div class="avatar"><i class="fa-solid fa-user"></i></div>
                 <div class="badge threads"><i class="fa-solid fa-at"></i></div>
             </div>
-            <div class="social-item">
+            <div class="social-item" id="post-X" onclick="togglePlatform('X')">
                 <div class="avatar"><i class="fa-solid fa-user"></i></div>
-                <div class="badge x"><i class="fa-solid fa-x"></i></div>
+                <div class="badge x"><i class="fa-brands fa-x-twitter"></i></div>
             </div>
-            <div class="social-item">
+            <div class="social-item" id="post-BlueSky" onclick="togglePlatform('BlueSky')">
                 <div class="avatar"><i class="fa-solid fa-user"></i></div>
-                <div class="badge bluesky"><i class="fa-solid fa-republican"></i></div> </div>
+                <div class="badge bluesky"><i class="fa-solid fa-republican"></i></div> 
+            </div>
         </div>
 
         <div class="post-content-wrapper">
             <textarea id="articleContent" placeholder="寫點什麼吧"></textarea>
-            
             <div class="toolbar">
                 <div class="tool-btn"><i class="fa-regular fa-image"></i></div>
                 <div class="tool-btn"><i class="fa-solid fa-camera"></i></div>
@@ -104,44 +114,48 @@
 
     <div id="publishModal" class="modal-overlay">
         <div class="modal-box">
-            <div class="modal-body">
-                <div class="modal-title">發佈文章</div>
-                <div class="modal-text">文章內容確認後，將完成發佈</div>
-            </div>
+            <div class="modal-body">確認發佈文章？</div>
             <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeModal()">取消</button>
+                <button onclick="closeModal()">取消</button>
                 <button class="btn-confirm" onclick="confirmPublish()">確認</button>
             </div>
         </div>
     </div>
 
     <script>
-        const modal = document.getElementById('publishModal');
-        const textarea = document.getElementById('articleContent');
+        const platforms = ['Facebook', 'Instagram', 'Threads', 'X', 'BlueSky'];
 
-        // 打開彈窗
-        function openModal() {
-            modal.classList.add('show');
+        // 初始化：讀取狀態並套用黑白/彩色效果
+        function initSocialIcons() {
+            platforms.forEach(p => {
+                const status = localStorage.getItem('social_' + p) || 'unbind';
+                const el = document.getElementById('post-' + p);
+                
+                if (status === 'bind') {
+                    el.classList.add('bind');
+                    el.classList.remove('unbind');
+                } else {
+                    el.classList.add('unbind');
+                    el.classList.remove('bind');
+                }
+            });
         }
 
-        // 關閉彈窗
-        function closeModal() {
-            modal.classList.remove('show');
+        // 點擊切換功能
+        function togglePlatform(p) {
+            const currentStatus = localStorage.getItem('social_' + p) || 'unbind';
+            const newStatus = (currentStatus === 'bind') ? 'unbind' : 'bind';
+            
+            localStorage.setItem('social_' + p, newStatus);
+            initSocialIcons(); // 重新整理視覺效果
         }
 
-        // 確認發佈
-        function confirmPublish() {
-            alert('文章已發佈！');
-            closeModal();
-            // 這裡可以導向其他頁面，例如首頁
-        }
+        window.onload = initSocialIcons;
 
-        // 復原/重設內容
-        function resetContent() {
-            if(confirm('確定要清除所有內容嗎？')) {
-                textarea.value = '';
-            }
-        }
+        function openModal() { document.getElementById('publishModal').classList.add('show'); }
+        function closeModal() { document.getElementById('publishModal').classList.remove('show'); }
+        function confirmPublish() { alert('文章已同步發佈至選中平台！'); closeModal(); }
+        function resetContent() { if(confirm('確定清除內容？')) document.getElementById('articleContent').value = ''; }
     </script>
 </body>
 </html>
