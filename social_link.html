@@ -7,81 +7,76 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
-        body { background-color: #FFF2DF; display: flex; justify-content: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 450px; background-color: #FFF2DF; padding: 20px; display: flex; flex-direction: column; }
-        
+        body, html { height: 100%; overflow: auto; background: #FFF2DF; }
+        .phone { width: 100%; max-width: 452px; margin: 0 auto; aspect-ratio: 452 / 968; position: relative; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+        .container { position: absolute; inset: 0; width: 100%; height: 100%; padding: 6% 5%; display: flex; flex-direction: column; overflow-y: auto; }
         .header { display: flex; align-items: center; margin-bottom: 30px; }
         .back-btn { width: 36px; height: 36px; border: 1.5px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #333; text-decoration: none; margin-right: 20px; }
         .header h1 { font-size: 24px; font-weight: bold; }
-
-        .social-box { background-color: #FFECCB; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .social-item { background-color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-radius: 8px; }
-        
+        .social-box { background-color: #FFECCB; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .social-item { background-color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         .platform-info { display: flex; align-items: center; gap: 12px; font-size: 18px; color: #333; }
         .brand-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 16px; }
-        
-        /* 品牌配色 */
         .ig { background: linear-gradient(45deg, #f09433 0%, #bc1888 100%); }
         .x-tw, .threads { background-color: black; }
         .fb { background-color: #1877F2; }
-
+        .bsky { background-color: #1185fe; } /* BlueSky 蝴蝶藍 */
         .status { font-weight: bold; font-size: 16px; }
-        .is-bind { color: #57D0A2; }   /* 綠色 */
-        .is-unbind { color: #FF6B6B; } /* 紅色 */
+        .is-bind { color: #57D0A2; } .is-unbind { color: #FF6B6B; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <a href="profile.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
-            <h1>社群帳號設定</h1>
-        </header>
-
-        <div class="social-box">
-            <div class="social-item" onclick="toggleBind(this, 'Instagram')">
-                <div class="platform-info"><div class="brand-icon ig"><i class="fa-brands fa-instagram"></i></div><span>Instagram</span></div>
-                <span class="status is-bind" id="s-Instagram">綁定</span>
-            </div>
-            <div class="social-item" onclick="toggleBind(this, 'X')">
-                <div class="platform-info"><div class="brand-icon x-tw"><i class="fa-brands fa-x-twitter"></i></div><span>X</span></div>
-                <span class="status is-bind" id="s-X">綁定</span>
-            </div>
-            <div class="social-item" onclick="toggleBind(this, 'Threads')">
-                <div class="platform-info"><div class="brand-icon threads"><i class="fa-solid fa-at"></i></div><span>Threads</span></div>
-                <span class="status is-bind" id="s-Threads">綁定</span>
-            </div>
-            <div class="social-item" onclick="toggleBind(this, 'Facebook')">
-                <div class="platform-info"><div class="brand-icon fb"><i class="fa-brands fa-facebook-f"></i></div><span>Facebook</span></div>
-                <span class="status is-bind" id="s-Facebook">綁定</span>
+    <div class="phone">
+        <div class="container">
+            <header class="header">
+                <a href="profile.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+                <h1>社群帳號設定</h1>
+            </header>
+            <div class="social-box">
+                <div class="social-item" onclick="toggleBind(this, 'Facebook')">
+                    <div class="platform-info"><div class="brand-icon fb"><i class="fa-brands fa-facebook-f"></i></div><span>Facebook</span></div>
+                    <span class="status" id="s-Facebook"></span>
+                </div>
+                <div class="social-item" onclick="toggleBind(this, 'Instagram')">
+                    <div class="platform-info"><div class="brand-icon ig"><i class="fa-brands fa-instagram"></i></div><span>Instagram</span></div>
+                    <span class="status" id="s-Instagram"></span>
+                </div>
+                <div class="social-item" onclick="toggleBind(this, 'Threads')">
+                    <div class="platform-info"><div class="brand-icon threads"><i class="fa-solid fa-at"></i></div><span>Threads</span></div>
+                    <span class="status" id="s-Threads"></span>
+                </div>
+                <div class="social-item" onclick="toggleBind(this, 'X')">
+                    <div class="platform-info"><div class="brand-icon x-tw"><i class="fa-brands fa-x-twitter"></i></div><span>X</span></div>
+                    <span class="status" id="s-X"></span>
+                </div>
+                <div class="social-item" onclick="toggleBind(this, 'BlueSky')">
+                    <div class="platform-info"><div class="brand-icon bsky"><i class="fa-solid fa-republican"></i></div><span>BlueSky</span></div>
+                    <span class="status" id="s-BlueSky"></span>
+                </div>
             </div>
         </div>
     </div>
-
     <script>
-        // 初始化載入同步狀態
+        const platforms = ['Facebook', 'Instagram', 'Threads', 'X', 'BlueSky'];
         window.onload = function() {
-            ['Instagram', 'X', 'Threads', 'Facebook'].forEach(p => {
-                const saved = localStorage.getItem('social_' + p) || 'bind';
-                const el = document.getElementById('s-' + p);
-                if (saved === 'unbind') {
-                    el.innerText = '取消綁定'; el.className = 'status is-unbind';
-                } else {
-                    el.innerText = '綁定'; el.className = 'status is-bind';
-                }
+            platforms.forEach(p => {
+                const saved = localStorage.getItem('social_' + p) || 'unbind';
+                updateUI(p, saved);
             });
         };
-
-        function toggleBind(element, platform) {
-            const statusText = element.querySelector('.status');
-            const isNowBinding = statusText.innerText === '取消綁定';
-            
-            if (isNowBinding) {
-                statusText.innerText = '綁定'; statusText.className = 'status is-bind';
-                localStorage.setItem('social_' + platform, 'bind');
+        function updateUI(p, status) {
+            const el = document.getElementById('s-' + p);
+            if (status === 'bind') {
+                el.innerText = '已綁定'; el.className = 'status is-bind';
             } else {
-                statusText.innerText = '取消綁定'; statusText.className = 'status is-unbind';
-                localStorage.setItem('social_' + platform, 'unbind');
+                el.innerText = '未綁定'; el.className = 'status is-unbind';
             }
+        }
+        function toggleBind(element, p) {
+            const currentStatus = localStorage.getItem('social_' + p) || 'unbind';
+            const newStatus = currentStatus === 'bind' ? 'unbind' : 'bind';
+            localStorage.setItem('social_' + p, newStatus);
+            updateUI(p, newStatus);
         }
     </script>
 </body>
