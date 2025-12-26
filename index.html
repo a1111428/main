@@ -43,7 +43,7 @@
             z-index: 1;
         }
         
-        /* 搜尋欄 */
+        /* 搜尋欄 - 具備毛玻璃效果 */
         .search-bar {
             position: absolute;
             top: calc(env(safe-area-inset-top) + 15px);
@@ -66,13 +66,14 @@
         .search-bar input { border: none; background: transparent; margin: 0 8px; flex: 1; font-size: 16px; outline: none; }
         .search-bar i { font-size: 20px; color: #888; }
         
-        /* 底部導覽列 */
+        /* 底部導覽列 - 修正白底問題 */
         .bottom-nav {
             position: absolute;
             bottom: 0; left: 0;
             width: 100%;
             height: calc(65px + env(safe-area-inset-bottom)); 
-            background: white;
+            /* 修正：將純白改為半透明灰色並加上毛玻璃，使地圖背景隱約透出，解決生硬白塊感 */
+            background: rgba(248, 248, 248, 0.85); 
             border-top-left-radius: 20px;
             border-top-right-radius: 20px;
             display: flex;
@@ -81,6 +82,8 @@
             padding: 0 10px env(safe-area-inset-bottom) 10px;
             box-shadow: 0 -2px 15px rgba(0,0,0,0.08);
             z-index: 1000;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
         }
         
         .nav-item {
