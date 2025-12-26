@@ -217,29 +217,27 @@
 </head>
 <body>
     <div class="container">
-        <!-- 地圖滿版 -->
         <div id="mapid"></div>
         
-        <!-- 搜尋欄 + 麥克風 -->
         <div class="search-bar">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" placeholder="搜尋餐廳">
             <i class="fa-solid fa-microphone"></i>
         </div>
         
-        <!-- 底部導航列 -->
         <nav class="bottom-nav">
             <a href="home.html" class="nav-item active"><i class="fa-solid fa-house"></i></a>
-            <a href="ai write.html" class="nav-item"><i class="fa-solid fa-book"></i></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-camera"></i></a>
+            <a href="article-post.html" class="nav-item"><i class="fa-solid fa-book"></i></a>
+            <a href="#" class="nav-item" onclick="triggerCamera(event)"><i class="fa-solid fa-camera"></i></a>
             <a href="photo_album.html" class="nav-item"><i class="fa-solid fa-image"></i></a>
             <a href="#" onclick="checkLoginStatus()" class="nav-item"><i class="fa-solid fa-user"></i></a>
         </nav>
         
-        <!-- 返回目前位置按鈕 -->
         <div class="my-location-btn" onclick="flyToHome()">
             <i class="fa-solid fa-location-crosshairs"></i>
         </div>
+
+        <input type="file" id="input_camera" accept="image/*" capture="environment" style="display: none;">
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -305,6 +303,20 @@
                 window.location.href = 'personal.html';
             }
         }
+
+        // --- 僅針對 Camera 功能的新增腳本 ---
+        function triggerCamera(event) {
+            event.preventDefault(); // 防止網頁跳回頂部
+            document.getElementById('input_camera').click();
+        }
+
+        document.getElementById('input_camera').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // 這裡可以處理拍照後的動作，例如顯示檔名或跳轉至發佈頁面
+                console.log("照片選取成功:", file.name);
+            }
+        });
     </script>
 </body>
 </html>
