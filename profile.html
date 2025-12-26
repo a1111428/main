@@ -36,9 +36,9 @@
     <div class="phone">
         <div class="container">
             <header class="header">
-                <a href="home.html" class="circle-btn"><i class="fa-solid fa-chevron-left"></i></a>
+                <a href="index.html" class="circle-btn"><i class="fa-solid fa-chevron-left"></i></a>
                 <div class="circle-btn" style="background:#888; border:none; color:white;"><i class="fa-solid fa-plus"></i></div>
-                <a href="home.html" class="circle-btn" style="border:none; font-size:24px;"><i class="fa-solid fa-xmark"></i></a>
+                <a href="index.html" class="circle-btn" style="border:none; font-size:24px;"><i class="fa-solid fa-xmark"></i></a>
             </header>
 
             <div class="avatar-section">
@@ -84,7 +84,7 @@
         // 持久登入核心邏輯：只有手動點擊登出才會清除狀態
         function handleLogout() {
             localStorage.removeItem('isLoggedIn');
-            window.location.href = 'home.html';
+            window.location.href = 'index.html';
         }
 
         // 安全檢查：如果意外進入此頁但沒登入，自動踢回 personal.html
