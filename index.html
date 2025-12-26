@@ -2,8 +2,17 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Furry Café Map - 主畫面</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="FurryMap">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <link rel="apple-touch-icon" href="assets/logo/logo-1.png">
+    <link rel="icon" type="image/png" href="assets/logo/logo-1.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <style>
@@ -16,15 +25,14 @@
             -webkit-font-smoothing: antialiased; 
         }
         
-        /* 主容器：滿版布局 */
+        /* 修正：使用 100dvh 解決手機瀏覽器高度跑位問題 */
         .container {
             position: relative;
             width: 100vw;
-            height: 100vh;
+            height: 100dvh; 
             overflow: hidden;
         }
         
-        /* 地圖：永遠填滿整個畫面 */
         #mapid {
             position: absolute;
             top: 0; left: 0;
@@ -33,63 +41,47 @@
             z-index: 1;
         }
         
-        /* 搜尋欄：精確符合 452x968 設計規格（手機版） */
+        /* 修正：搜尋欄改為相對寬度 calc(100% - 60px) 避免手機跑位 */
         .search-bar {
             position: absolute;
-            top: 74px;                      /* 固定 top 74px */
-            left: 30px;                     /* 固定 left 30px */
-            width: 392px;                   /* 固定寬度 392px */
-            height: 50px;                   /* 固定高度 50px */
+            top: 60px;                      /* 稍微下調避開動態島 */
+            left: 30px;                     
+            width: calc(100% - 60px);       /* 改為相對寬度 */
+            max-width: 392px;               /* 桌面版維持最大寬度 */
+            height: 50px;                   
             background: #E9E9EA;
             border: 1px solid #000000;
             border-radius: 100px;
             display: flex;
             align-items: center;
-            padding: 0 16px;                /* 左右內距 12px */
+            padding: 0 16px;                
             box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
             z-index: 20;
             transition: all 0.3s ease;
         }
         
-        .search-bar i {
-            font-size: 22px;                /* 放大鏡與麥克風大小 */
-            color: #888;
-            flex-shrink: 0;
-        }
-        
-        .search-bar input {
-            border: none;
-            background: transparent;
-            margin: 0 8px;                  /* 與左右 icon 間距 8px */
-            flex: 1;
-            font-size: 16px;                /* 文字大小接近設計 */
-            outline: none;
-        }
-        
-        /* 麥克風圖示：可點擊提示 */
-        .search-bar .fa-microphone {
-            cursor: pointer;
-            transition: color 0.3s;
-        }
+        .search-bar i { font-size: 22px; color: #888; flex-shrink: 0; }
+        .search-bar input { border: none; background: transparent; margin: 0 8px; flex: 1; font-size: 16px; outline: none; }
+        .search-bar .fa-microphone { cursor: pointer; transition: color 0.3s; }
         .search-bar .fa-microphone:hover { color: #FF9800; }
         
-        /* 底部導航列：精確符合 452x968 設計規格（手機版） */
+        /* 修正：縮減 Navbar 高度至更精簡的 65px */
         .bottom-nav {
             position: absolute;
             bottom: 0; left: 0;
             width: 100%;
-            height: 104px;
+            height: calc(65px + env(safe-area-inset-bottom)); 
             background: white;
             border-top-left-radius: 24px;
             border-top-right-radius: 24px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 56px;
+            gap: clamp(20px, 10vw, 56px); 
             padding: 0 24px;
+            padding-bottom: env(safe-area-inset-bottom);
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             z-index: 30;
-            transition: all 0.3s ease;
         }
         
         .nav-item {
@@ -100,83 +92,26 @@
             color: #8E8E93;
             text-decoration: none;
             cursor: pointer;
-            transition: color 0.3s, transform 0.3s ease;
         }
-        
-        .nav-item i { 
-            font-size: clamp(24px, 6.5vw, 32px); 
-            transition: transform 0.3s ease;
-        }
-        
-        /* 懸浮效果：整體上浮 + icon 放大 */
-        .nav-item:hover {
-            color: #FF9800;
-            transform: translateY(-4px);
-        }
-        .nav-item:hover i { transform: scale(1.2); }
-        
-        /* 當前頁面高亮 */
+        .nav-item i { font-size: 26px; } 
         .nav-item.active { color: #FF9800; }
-        
-        /* active 底線指標 */
         .nav-item.active::after {
             content: '';
             position: absolute;
-            bottom: -12px;
+            bottom: -6px;
             left: 50%;
             transform: translateX(-50%);
-            width: 70%;
-            max-width: 40px;
-            height: 5px;
+            width: 20px;
+            height: 4px;
             background: #FF9800;
             border-radius: 18px;
-            opacity: 1;
-            transition: transform 0.3s ease;
         }
         
-        /* iPhone 底部安全區支援 */
-        @supports (padding-bottom: env(safe-area-inset-bottom)) {
-            .bottom-nav { padding-bottom: calc(2.48% + env(safe-area-inset-bottom)); }
-        }
-        
-        /* 大螢幕（web）優化：search-bar 置中放大，NavBar 適度放大 */
-        @media (min-width: 768px) {
-            .search-bar {
-                top: 5%;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 60%;
-                max-width: 600px;
-                height: clamp(56px, 5vh, 70px);
-                padding: 0 16px;            /* web 版內距稍大 */
-            }
-            .search-bar i { font-size: clamp(24px, 2.5vw, 32px); }
-            .search-bar input {
-                margin: 0 12px;
-                font-size: clamp(18px, 2vw, 24px);
-            }
-            
-            .bottom-nav {
-                height: 120px;
-                gap: 80px;
-                padding: 0 40px;
-                border-top-left-radius: 30px;
-                border-top-right-radius: 30px;
-            }
-            .nav-item i { font-size: clamp(36px, 4vw, 56px); }
-            .nav-item.active::after {
-                bottom: -16px;
-                height: 6px;
-                max-width: 56px;
-                border-radius: 20px;
-            }
-        }
-        
-        /* 目前位置按鈕（使用主題色） */
+        /* 目前位置按鈕修正位置 */
         .my-location-btn {
             position: absolute;
-            bottom: 144px;
-            right: 32px;
+            bottom: calc(65px + env(safe-area-inset-bottom) + 15px);
+            right: 24px;
             width: 48px;
             height: 48px;
             background: white;
@@ -187,31 +122,11 @@
             align-items: center;
             cursor: pointer;
             z-index: 10;
-            transition: all 0.3s ease;
         }
-        
-        .my-location-btn i {
-            font-size: 24px;
-            color: #FF9800;
-        }
-        
-        .my-location-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            background: #FFB352;
-        }
-        .my-location-btn:hover i {
-            color: white;
-        }
-        
+        .my-location-btn i { font-size: 24px; color: #FF9800; }
+
         @media (min-width: 768px) {
-            .my-location-btn {
-                width: 56px;
-                height: 56px;
-                bottom: 152px;
-                right: 40px;
-            }
-            .my-location-btn i { font-size: 28px; }
+            .search-bar { left: 50%; transform: translateX(-50%); }
         }
     </style>
 </head>
@@ -304,16 +219,14 @@
             }
         }
 
-        // --- 僅針對 Camera 功能的新增腳本 ---
         function triggerCamera(event) {
-            event.preventDefault(); // 防止網頁跳回頂部
+            event.preventDefault(); 
             document.getElementById('input_camera').click();
         }
 
         document.getElementById('input_camera').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                // 這裡可以處理拍照後的動作，例如顯示檔名或跳轉至發佈頁面
                 console.log("照片選取成功:", file.name);
             }
         });
