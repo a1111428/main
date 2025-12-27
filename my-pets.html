@@ -2,10 +2,11 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=452, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>我的寵物</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
+        /* --- 100% 保留原始樣式，確保不跑版 --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body {
             width: 452px;
@@ -26,10 +27,9 @@
             flex-direction: column;
             align-items: center;
             position: relative;
-            overflow-y: auto; /* 允許捲動以查看四張卡片 */
+            overflow-y: auto;
         }
 
-        /* 返回按鈕 */
         .back-btn {
             position: absolute;
             top: 60px;
@@ -48,7 +48,6 @@
             text-decoration: none;
         }
 
-        /* 新增按鈕 */
         .add-btn {
             position: absolute;
             top: 60px;
@@ -67,7 +66,6 @@
             text-decoration: none;
         }
 
-        /* 標題 */
         .title {
             font-size: 24px;
             font-weight: 700;
@@ -75,7 +73,6 @@
             margin: 20px 0 40px;
         }
 
-        /* 寵物卡片列表 */
         .pet-list {
             width: 372px;
             display: flex;
@@ -131,55 +128,83 @@
 <body>
     <div class="container">
         <a href="profile.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
-
-        <div class="add-btn"><i class="fa-solid fa-plus"></i></div>
-
+        <a href="add-pet.html" class="add-btn"><i class="fa-solid fa-plus"></i></a>
         <h1 class="title">我的寵物</h1>
 
-        <div class="pet-list">
-            <div class="pet-card" onclick="goToInfo('鬆鬆')">
+        <div class="pet-list" id="petListContainer">
+            <div class="pet-card" data-pet="鬆鬆" onclick="goToInfo('鬆鬆')">
                 <div class="pet-header">
                     <div class="pet-name">鬆鬆</div>
                     <button class="more-btn" onclick="goToEdit(event, '鬆鬆')"><i class="fa-solid fa-ellipsis"></i></button>
                 </div>
-                <img src="https://via.placeholder.com/332x180/FFB6C1/000000?text=鬆鬆" alt="鬆鬆" class="pet-photo">
+                <img src="https://via.placeholder.com/332x180/FFB6C1/000000?text=鬆鬆" class="pet-photo">
             </div>
 
-            <div class="pet-card" onclick="goToInfo('魯夫')">
+            <div class="pet-card" data-pet="魯夫" onclick="goToInfo('魯夫')">
                 <div class="pet-header">
                     <div class="pet-name">魯夫</div>
                     <button class="more-btn" onclick="goToEdit(event, '魯夫')"><i class="fa-solid fa-ellipsis"></i></button>
                 </div>
-                <img src="https://via.placeholder.com/332x180/F5DEB3/000000?text=魯夫" alt="魯夫" class="pet-photo">
+                <img src="https://via.placeholder.com/332x180/F5DEB3/000000?text=魯夫" class="pet-photo">
             </div>
 
-            <div class="pet-card" onclick="goToInfo('掰咖小鳥')">
+            <div class="pet-card" data-pet="掰咖小鳥" onclick="goToInfo('掰咖小鳥')">
                 <div class="pet-header">
                     <div class="pet-name">掰咖小鳥</div>
                     <button class="more-btn" onclick="goToEdit(event, '掰咖小鳥')"><i class="fa-solid fa-ellipsis"></i></button>
                 </div>
-                <img src="https://via.placeholder.com/332x180/90EE90/000000?text=掰咖小鳥" alt="掰咖小鳥" class="pet-photo">
+                <img src="https://via.placeholder.com/332x180/90EE90/000000?text=掰咖小鳥" class="pet-photo">
             </div>
 
-            <div class="pet-card" onclick="goToInfo('鬆鬆')">
-                <div class="pet-header">
-                    <div class="pet-name">鬆鬆</div>
-                    <button class="more-btn" onclick="goToEdit(event, '鬆鬆')"><i class="fa-solid fa-ellipsis"></i></button>
-                </div>
-                <img src="https://via.placeholder.com/332x180/FFB6C1/000000?text=鬆鬆" alt="鬆鬆" class="pet-photo">
-            </div>
+            <div id="extraPets"></div>
         </div>
     </div>
 
     <script>
-        // 跳轉至檢視頁面，帶上寵物名稱
+        window.onload = function() {
+            // 檢查並隱藏已被刪除的預設卡片
+            const staticCards = document.querySelectorAll('.pet-card[data-pet]');
+            staticCards.forEach(card => {
+                const name = card.getAttribute('data-pet');
+                if (localStorage.getItem('deleted_' + name) === 'true') {
+                    card.style.display = 'none';
+                }
+            });
+
+            renderExtraPets();
+        };
+
+        function renderExtraPets() {
+            const container = document.getElementById('extraPets');
+            // 此處清單不包含豬豬，因為豬豬已從靜態 HTML 移除
+            const defaultPets = ['鬆鬆', '魯夫', '掰咖小鳥'];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('petData_')) {
+                    const petName = key.replace('petData_', '');
+                    if (!defaultPets.includes(petName) && localStorage.getItem('deleted_' + petName) !== 'true') {
+                        const petData = JSON.parse(localStorage.getItem(key));
+                        container.innerHTML += `
+                            <div class="pet-card" style="margin-top: 24px;" onclick="goToInfo('${petData.name}')">
+                                <div class="pet-header">
+                                    <div class="pet-name">${petData.name}</div>
+                                    <button class="more-btn" onclick="goToEdit(event, '${petData.name}')"><i class="fa-solid fa-ellipsis"></i></button>
+                                </div>
+                                <img src="https://via.placeholder.com/332x180/FFE7C7/000000?text=${encodeURIComponent(petData.name)}" class="pet-photo">
+                            </div>
+                        `;
+                    }
+                }
+            }
+        }
+
         function goToInfo(name) {
             location.href = `pet-info.html?name=${encodeURIComponent(name)}`;
         }
 
-        // 跳轉至編輯頁面，帶上寵物名稱並防止冒泡
         function goToEdit(event, name) {
-            event.stopPropagation(); // 防止觸發 pet-card 的 onclick
+            event.stopPropagation();
             location.href = `pet-edit.html?name=${encodeURIComponent(name)}`;
         }
     </script>
