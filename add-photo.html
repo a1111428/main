@@ -6,136 +6,22 @@
     <title>新增照片 - Furry Café Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* --- 延用專案風格設定 --- */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
-        body, html { height: 100%; overflow: auto; background: #FFF2DF; } /* 背景對齊 profile.html */
-        
-        .phone { 
-            width: 100%; 
-            max-width: 452px; 
-            margin: 0 auto; 
-            aspect-ratio: 452 / 968; 
-            position: relative; 
-            background: #fff; 
-            border-radius: 16px; 
-            overflow: hidden; 
-            box-shadow: 0 12px 30px rgba(0,0,0,0.12); 
-        }
-
-        .container { 
-            position: absolute; 
-            inset: 0; 
-            width: 100%; 
-            height: 100%; 
-            padding: 8% 5.5%; 
-            display: flex; 
-            flex-direction: column; 
-            overflow-y: auto; 
-        }
-
-        /* 頂部導覽列 */
-        .header { 
-            width: 100%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 25px; 
-        }
-        
-        .circle-btn { 
-            width: 40px; 
-            height: 40px; 
-            border: 2px solid #333; 
-            border-radius: 50%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            color: #333; 
-            text-decoration: none; 
-            font-size: 20px; 
-        }
-
-        /* 右上角只保留一個 + 號圖標 */
-        .header-right { display: flex; align-items: center; }
-        .plus-btn {
-            width: 40px;
-            height: 40px;
-            background: #888;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            border: none;
-        }
-
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .section-label {
-            font-size: 16px;
-            font-weight: bold;
-            color: #888;
-            margin: 10px 0 15px 5px;
-            text-transform: uppercase;
-        }
-
-        /* 相簿列表卡片樣式 */
-        .album-list-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .album-card {
-            width: 100%;
-            background: #FFECCB; /* 米黃色背景對齊 my-pets.html */
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .album-card:active { background: #ffd8a8; }
-
-        .album-icon-box {
-            width: 60px;
-            height: 60px;
-            background: white;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-right: 15px;
-            font-size: 24px;
-            color: #FFB352;
-        }
-
+        body, html { height: 100%; overflow: auto; background: #FFF2DF; }
+        .phone { width: 100%; max-width: 452px; margin: 0 auto; aspect-ratio: 452 / 968; position: relative; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+        .container { position: absolute; inset: 0; width: 100%; height: 100%; padding: 8% 5.5%; display: flex; flex-direction: column; overflow-y: auto; }
+        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .circle-btn { width: 40px; height: 40px; border: 2px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #333; text-decoration: none; font-size: 20px; }
+        .plus-btn { width: 40px; height: 40px; background: #888; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 20px; cursor: pointer; border: none; }
+        .title { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 20px; }
+        .section-label { font-size: 16px; font-weight: bold; color: #888; margin: 10px 0 15px 5px; text-transform: uppercase; }
+        .album-list-container { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        .album-card { width: 100%; background: #FFECCB; border-radius: 18px; display: flex; align-items: center; padding: 12px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; }
+        .album-icon-box { width: 60px; height: 60px; background: white; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-right: 15px; font-size: 24px; color: #FFB352; }
         .album-details { flex: 1; }
         .album-name { font-size: 18px; font-weight: bold; color: #333; }
-        .album-count { font-size: 14px; color: #888; }
-
-        .orange-plus {
-            width: 32px;
-            height: 32px;
-            background: #FFAD4D;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 18px;
-        }
-
+        .album-meta-text { font-size: 12px; color: #888; margin-top: 2px; }
+        .orange-plus { width: 32px; height: 32px; background: #FFAD4D; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 18px; }
         #fileInput { display: none; }
     </style>
 </head>
@@ -144,54 +30,39 @@
         <div class="container">
             <header class="header">
                 <a href="javascript:history.back()" class="circle-btn"><i class="fa-solid fa-chevron-left"></i></a>
-                <div class="header-right">
-                    <button class="plus-btn" onclick="createNewAlbum()"><i class="fa-solid fa-plus"></i></button>
-                </div>
+                <div class="header-right"><button class="plus-btn" onclick="createNewAlbum()"><i class="fa-solid fa-plus"></i></button></div>
             </header>
-
             <h1 class="title">選擇相簿</h1>
             <p class="section-label">您的相簿列表</p>
-
-            <div class="album-list-container" id="albumContainer">
-                <p style="text-align: center; color: #888;">正在讀取相簿...</p>
-            </div>
-
+            <div class="album-list-container" id="albumContainer"></div>
             <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
         </div>
     </div>
 
     <script>
-        // 模擬當前選中的相簿名稱
         let targetAlbum = "";
+        const defaultAlbums = [
+            { name: 'Luffy Cafe 相簿', count: 62, date: '2025年12月1日' },
+            { name: '我的寵物回憶', count: 15, date: '2025年12月1日' },
+            { name: 'default', count: 0, date: '2025年12月1日' }
+        ];
 
-        window.onload = function() {
-            renderAlbums();
-        };
+        window.onload = renderAlbums;
 
         function renderAlbums() {
             const container = document.getElementById('albumContainer');
-            // 從 localStorage 獲取相簿清單
-            // 如果沒有資料，則顯示預設的相簿
-            const albums = JSON.parse(localStorage.getItem('albums')) || [
-                { name: 'Luffy Cafe 相簿', count: 62 },
-                { name: '我的寵物回憶', count: 15 },
-                { name: 'default', count: 0 }
-            ];
-
-            container.innerHTML = ''; // 清空讀取提示
-
+            const albums = JSON.parse(localStorage.getItem('albums')) || defaultAlbums;
+            container.innerHTML = '';
             albums.forEach(album => {
                 const card = document.createElement('div');
                 card.className = 'album-card';
-                card.onclick = () => triggerUpload(album.name);
-
+                card.onclick = () => { targetAlbum = album.name; document.getElementById('fileInput').click(); };
                 card.innerHTML = `
-                    <div class="album-icon-box">
-                        <i class="fa-regular fa-image"></i>
-                    </div>
+                    <div class="album-icon-box"><i class="fa-regular fa-image"></i></div>
                     <div class="album-details">
                         <div class="album-name">${album.name}</div>
-                        <div class="album-count">${album.count} 張照片</div>
+                        <div class="album-meta-text">更新時間 ${album.date}</div>
+                        <div class="album-meta-text">${album.count} 張照片</div>
                     </div>
                     <div class="orange-plus"><i class="fa-solid fa-plus"></i></div>
                 `;
@@ -199,35 +70,31 @@
             });
         }
 
-        // 觸發設備上傳功能
-        function triggerUpload(albumName) {
-            targetAlbum = albumName;
-            document.getElementById('fileInput').click();
-        }
-
-        // 處理照片選取後的動作
         function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                alert(`已選取照片：${file.name}\n正在存入相簿：「${targetAlbum}」`);
-                // 這裡可以導向成功畫面或返回
-                history.back();
+            if (event.target.files[0]) {
+                const now = new Date();
+                const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+                let albums = JSON.parse(localStorage.getItem('albums')) || defaultAlbums;
+                const idx = albums.findIndex(a => a.name === targetAlbum);
+                if (idx !== -1) {
+                    albums[idx].date = dateStr; // 更新為當前最新編輯時間
+                    albums[idx].count += 1;
+                    localStorage.setItem('albums', JSON.stringify(albums));
+                }
+                alert(`已新增照片至「${targetAlbum}」\n最後更新：${dateStr}`);
+                window.location.href = 'photo_album.html';
             }
         }
 
-        // 右上角 + 號的功能：新增相簿
         function createNewAlbum() {
             const newName = prompt("請輸入新相簿名稱：");
             if (newName) {
-                let albums = JSON.parse(localStorage.getItem('albums')) || [
-                    { name: 'Luffy Cafe 相簿', count: 62 },
-                    { name: '我的寵物回憶', count: 15 },
-                    { name: 'default', count: 0 }
-                ];
-                albums.push({ name: newName, count: 0 });
+                const now = new Date();
+                const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+                let albums = JSON.parse(localStorage.getItem('albums')) || defaultAlbums;
+                albums.push({ name: newName, count: 0, date: dateStr });
                 localStorage.setItem('albums', JSON.stringify(albums));
                 renderAlbums();
-                alert("相簿建立成功！");
             }
         }
     </script>
