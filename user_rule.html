@@ -18,7 +18,7 @@
 
         /* Logo 區域設定 */
         .logo-section { text-align: center; margin-bottom: 30px; }
-        .logo-img { width: 100px; height: auto; display: block; margin: 0 auto; } /* 調整 Logo 大小 */
+        .logo-img { width: 100px; height: auto; display: block; margin: 0 auto; } /* 修正為 .logo-img */
         .logo-section h2 { font-size: 26px; color: #000; margin-top: 10px; font-weight: bold; }
 
         .rules-list { width: 100%; background-color: #ffeccc; border-radius: 20px; overflow: hidden; }
@@ -32,10 +32,13 @@
 </head>
 <body>
     <div class="container">
-        <header class="header"><a href="personal.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a><h1>使用條款</h1></header>
+        <header class="header">
+            <a href="personal.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+            <h1>使用條款</h1>
+        </header>
         <div class="content-card">
             <div class="logo-section">
-                <img src="asessts/logo.png" alt="Furry Café Map Logo" class="logo-img">
+                <img src="assets//logo/logo.png" alt="Furry Café Map Logo" class="logo-img">
                 <h2>Furry Café Map</h2>
             </div>
             <div class="rules-list">

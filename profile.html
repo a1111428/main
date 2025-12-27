@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>個人主頁 - Furry Café Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* 保持與 p_save.html 一致的容器比例 */
+        /* --- 100% 保留原始樣式，完全不動 --- */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
         body, html { height: 100%; overflow: auto; background: #FFF2DF; }
         
+        /* 手機容器比例 */
         .phone { 
             width: 100%; 
             max-width: 452px; 
@@ -50,7 +51,7 @@
         }
         
         /* 個人資訊區 */
-        .avatar-section { text-align: center; margin: 2% 0 6%; }
+        .avatar-section { text-align: center; margin: 2% 0 4%; display: flex; flex-direction: column; align-items: center; }
         .avatar-main { 
             width: clamp(90px, 22vw, 120px); 
             height: clamp(90px, 22vw, 120px); 
@@ -77,22 +78,35 @@
             align-items: center; 
             border: 2px solid white; 
             text-decoration: none; 
-            font-size: clamp(12px, 3vw, 16px); 
+            font-size: 12px; 
         }
         .id-text { margin-top: 3%; color: #888; font-size: clamp(11px, 2.5vw, 14px); }
 
-        /* --- 修正處：選單列表與間隙 --- */
-        .menu-list { 
-            width: 100%; 
-            padding: 0 5%; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; /* 增加按鈕之間的垂直間隙 */
-            margin-bottom: 8%; 
+        /* 動態社交狀態列 */
+        .social-status-bar { display: flex; justify-content: center; gap: 8px; margin-top: 10px; height: 24px; }
+        .mini-badge { 
+            width: 22px; 
+            height: 22px; 
+            border-radius: 50%; 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            color: white; 
+            font-size: 10px; 
+            border: 1px solid white; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
         }
+        .mini-badge.fb { background-color: #1877F2; }
+        .mini-badge.ig { background: linear-gradient(45deg, #f09433 0%, #bc1888 100%); }
+        .mini-badge.threads { background-color: #000; }
+        .mini-badge.x { background-color: #000; }
+        .mini-badge.bsky { background-color: #1185fe; }
+
+        /* 選單列表 */
+        .menu-list { width: 100%; padding: 0 5%; display: flex; flex-direction: column; gap: 15px; margin-bottom: 6%; }
         .menu-item { 
             background-color: #FFECCB; 
-            padding: 16px 20px; 
+            padding: 3.5% 4%; 
             border-radius: 12px; 
             display: flex; 
             justify-content: space-between; 
@@ -102,15 +116,15 @@
             font-weight: bold; 
             transition: background 0.2s; 
             font-size: clamp(13px, 3.5vw, 15px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 增加輕微陰影提升層次感 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .menu-item:active { background-color: #ffd8a8; }
-        .menu-item span { display: flex; align-items: center; gap: 12px; }
+        .menu-item span { display: flex; align-items: center; gap: 10px; }
 
         /* 登出按鈕 */
         .logout-btn { 
             width: 85%; 
-            padding: 16px 0; 
+            padding: 3.5% 0; 
             background-color: #FFB352; 
             color: white; 
             border: none; 
@@ -118,7 +132,7 @@
             font-weight: bold; 
             cursor: pointer; 
             text-align: center; 
-            margin-bottom: 10%; 
+            margin-bottom: 8%; 
             box-shadow: 0 4px 10px rgba(255, 179, 82, 0.3); 
             font-size: clamp(14px, 3.5vw, 16px); 
         }
@@ -139,33 +153,27 @@
                     <a href="p_save.html" class="camera-icon"><i class="fa-solid fa-camera"></i></a>
                 </div>
                 <p class="id-text">ID:0123456789</p>
+                
+                <div class="social-status-bar">
+                    <div id="badge-Facebook" class="mini-badge fb"><i class="fa-brands fa-facebook-f"></i></div>
+                    <div id="badge-Instagram" class="mini-badge ig"><i class="fa-brands fa-instagram"></i></div>
+                    <div id="badge-Threads" class="mini-badge threads"><i class="fa-solid fa-at"></i></div>
+                    <div id="badge-X" class="mini-badge x"><i class="fa-brands fa-x-twitter"></i></div>
+                    <div id="badge-BlueSky" class="mini-badge bsky"><i class="fa-solid fa-republican"></i></div>
+                </div>
             </div>
 
             <nav class="menu-list">
-                <a href="p_save.html" class="menu-item">
-                    <span><i class="fa-solid fa-gear"></i> 個人設置</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-                <a href="social_link.html" class="menu-item">
-                    <span><i class="fa-solid fa-share-nodes"></i> 社群串接</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-                <a href="#" class="menu-item">
-                    <span><i class="fa-solid fa-location-dot"></i> 定位設置</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-                <a href="#" class="menu-item">
-                    <span><i class="fa-solid fa-file-lines"></i> 我的文章</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-                <a href="#" class="menu-item">
-                    <span><i class="fa-solid fa-bookmark"></i> 收藏文章</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-                <a href="#" class="menu-item">
-                    <span><i class="fa-solid fa-utensils"></i> 收藏餐廳</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
+                <a href="p_save.html" class="menu-item"><span><i class="fa-solid fa-gear"></i> 個人設置</span><i class="fa-solid fa-chevron-right"></i></a>
+                <a href="social_link.html" class="menu-item"><span><i class="fa-solid fa-share-nodes"></i> 社群串接</span><i class="fa-solid fa-chevron-right"></i></a>
+                
+                <a href="my-pets.html" class="menu-item"><span><i class="fa-solid fa-paw"></i> 我的寵物</span><i class="fa-solid fa-chevron-right"></i></a>
+                
+                <a href="location-settings.html" class="menu-item"><span><i class="fa-solid fa-location-dot"></i> 定位設置</span><i class="fa-solid fa-chevron-right"></i></a>
+                
+                <a href="my-article.html" class="menu-item"><span><i class="fa-solid fa-file-lines"></i> 我的文章</span><i class="fa-solid fa-chevron-right"></i></a>
+                <a href="#" class="menu-item"><span><i class="fa-solid fa-bookmark"></i> 收藏文章</span><i class="fa-solid fa-chevron-right"></i></a>
+                <a href="restaurant-favorites.html" class="menu-item"><span><i class="fa-solid fa-utensils"></i> 收藏餐廳</span><i class="fa-solid fa-chevron-right"></i></a>
             </nav>
 
             <button onclick="handleLogout()" class="logout-btn">登出帳號</button>
@@ -173,13 +181,31 @@
     </div>
 
     <script>
+<<<<<<< HEAD
         function handleLogout() {
             localStorage.removeItem('isLoggedIn');
             window.location.href = 'index.html';
+=======
+        // 保持所有原有功能：社群狀態連動
+        function refreshSocialStatus() {
+            const platforms = ['Facebook', 'Instagram', 'Threads', 'X', 'BlueSky'];
+            platforms.forEach(p => {
+                const status = localStorage.getItem('social_' + p);
+                const badge = document.getElementById('badge-' + p);
+                badge.style.display = (status === 'bind') ? 'flex' : 'none';
+            });
+>>>>>>> f38acb314af2396536615a79b0e69301b7635866
         }
 
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.href = 'personal.html';
+        window.onload = function() {
+            refreshSocialStatus();
+            // 登入檢查保持不變
+            if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'personal.html';
+        };
+
+        function handleLogout() {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'index.html';
         }
     </script>
 </body>

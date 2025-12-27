@@ -62,11 +62,10 @@
             scroll-snap-align: start;
         }
 
-        /* 返回按鈕：固定在畫面左上角，滾動時常駐 */
         .back-btn {
             position: fixed;
             top: 60px; 
-            left: calc(50% - 226px + 25px); /* 452px / 2 = 226px + left 25px */
+            left: calc(50% - 226px + 25px); 
             width: 43px;
             height: 43px;
             border: 1.5px solid #000000;
@@ -85,7 +84,7 @@
         }
         .back-btn:active { background: #FFAD4D; border-color: #FFAD4D; color: white; transform: scale(0.9); }
 
-        /* --- 2. 資訊區塊（標題 + 描述 + tab 固定在上半部） --- */
+        /* --- 2. 資訊區塊 --- */
         .info-header {
             position: sticky;
             top: 0;
@@ -122,7 +121,6 @@
 
         .description { font-size: 16px; line-height: 1.6; color: #000; margin-bottom: 25px; }
 
-        /* Tab 分頁（也固定在上半部） */
         .tabs-container {
             display: flex;
             border-bottom: 1px solid #E0E0E0;
@@ -151,13 +149,12 @@
         }
 
         /* --- 3. 分頁內容 --- */
-        .tab-content { padding: 0 25px 140px; } /* 底部留空間給 FAB */
+        .tab-content { padding: 0 25px 140px; } 
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 評論卡片 */
         .review-card {
             background: #FFFFFF;
             border-radius: 20px;
@@ -175,7 +172,6 @@
         .user-text .stars { color: #FFAD4D; font-size: 12px; }
         .review-date { font-size: 12px; color: #AAA; }
 
-        /* 文章卡片 */
         .article-card {
             background: #FFFFFF;
             padding: 20px;
@@ -189,7 +185,6 @@
         .article-card h3 { font-size: 18px; margin-bottom: 6px; color: #333; }
         .article-card p { font-size: 14px; color: #666; line-height: 1.5; }
 
-        /* 相片網格 */
         .photo-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -208,7 +203,6 @@
         }
         .grid-img-wrap:hover img { transform: scale(1.1); }
 
-        /* 浮動按鈕 (FAB) */
         .fab {
             position: fixed;
             bottom: 40px;
@@ -227,7 +221,6 @@
 <body>
     <div class="phone-window">
         <div class="scroll-container">
-            <!-- 照片區塊 -->
             <div class="header-gallery">
                 <a href="restaurant-favorites.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
                 <div class="photo-slider" id="mainSlider">
@@ -239,7 +232,6 @@
                 </div>
             </div>
 
-            <!-- 固定資訊區塊（標題 + 描述 + tab） -->
             <div class="info-header">
                 <div class="title-row">
                     <h1 class="restaurant-name">Luffy Café</h1>
@@ -268,7 +260,6 @@
                 </div>
             </div>
 
-            <!-- 分頁內容（可滾動） -->
             <div class="tab-content active" id="reviews">
                 <div class="review-card">
                     <div class="user-info"><div class="user-avatar"></div><div class="user-text"><div class="user-name">User 1</div><div class="stars">★★★★★</div><div class="review-date">2 days ago</div></div></div>
@@ -312,11 +303,23 @@
             </div>
         </div>
 
-        <!-- FAB -->
         <div class="fab"><i class="fa-solid fa-plus"></i></div>
     </div>
 
     <script>
+        // 1. 動態更換標題邏輯 (只增加這個，不影響原本功能)
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const name = urlParams.get('name');
+            if (name) {
+                const decodedName = decodeURIComponent(name);
+                const nameElement = document.querySelector('.restaurant-name');
+                if (nameElement) nameElement.innerText = decodedName;
+                document.title = '餐廳詳情 - ' + decodedName;
+            }
+        });
+
+        // 2. 原本的分頁切換功能
         function switchTab(event, tabId) {
             document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -324,6 +327,7 @@
             document.getElementById(tabId).classList.add('active');
         }
 
+        // 3. 原本的照片輪播功能
         const slider = document.getElementById('mainSlider');
         let scrollIndex = 0;
         const totalPhotos = 5;

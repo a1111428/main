@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>定位設置 - Furry Café Map</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* --- 100% 沿用您專案的基礎樣式 --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
+        body, html { height: 100%; overflow: auto; background: #FFF2DF; }
+        .phone { width: 100%; max-width: 452px; margin: 0 auto; aspect-ratio: 452 / 968; position: relative; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+        .container { position: absolute; inset: 0; width: 100%; height: 100%; padding: 8% 5.5%; display: flex; flex-direction: column; align-items: center; }
+
+        /* Header 頂部導覽 */
+        .header { width: 100%; display: flex; align-items: center; margin-bottom: 6%; }
+        .back-btn { font-size: 24px; color: #333; text-decoration: none; margin-right: 4%; }
+        .header h1 { font-size: 20px; color: #333; font-weight: bold; }
+
+        /* 列表樣式：參照 social_link.html */
+        .settings-list { width: 100%; display: flex; flex-direction: column; gap: 4%; }
+        .settings-item { 
+            width: 100%; 
+            padding: 4% 5%; 
+            background: #FFF9F0; 
+            border-radius: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .item-info { display: flex; align-items: center; gap: 12px; }
+        .item-info i { font-size: 20px; color: #FFB352; }
+        .item-label { font-size: 16px; font-weight: bold; color: #333; }
+
+        /* Switch 開關按鈕樣式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #FFB352; }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .description { 
+            margin-top: 6%; 
+            font-size: 13px; 
+            color: #888; 
+            line-height: 1.6; 
+            width: 100%; 
+            padding: 0 2%;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="container">
+            <header class="header">
+                <a href="profile.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+                <h1>定位設置</h1>
+            </header>
+
+            <div class="settings-list">
+                <div class="settings-item">
+                    <div class="item-info">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span class="item-label">定位服務</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="locationToggle" onchange="handleToggle()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <p class="description">
+                開啟定位服務後，我們將能根據您的所在位置推薦附近的寵物友善咖啡廳，並提供更精確的地圖導航功能。
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 頁面載入時讀取狀態
+        window.onload = function() {
+            const isEnabled = localStorage.getItem('locationEnabled') === 'true';
+            document.getElementById('locationToggle').checked = isEnabled;
+        };
+
+        // 處理開關切換
+        function handleToggle() {
+            const isChecked = document.getElementById('locationToggle').checked;
+            localStorage.setItem('locationEnabled', isChecked);
+            
+            if (isChecked) {
+                alert('定位服務已開啟');
+            } else {
+                alert('定位服務已關閉');
+            }
+        }
+    </script>
+</body>
+</html>

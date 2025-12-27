@@ -24,12 +24,12 @@
             height: 968px;
             background: linear-gradient(180deg, #FFE7C7 5.08%, #FFFFFF 23.64%);
             position: relative;
-            overflow-y: auto; /* 列表過長可捲動 */
+            overflow-y: auto; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             padding-bottom: 40px;
         }
 
-        /* Header 頂部導航 - 參照 personal.html 樣式 */
+        /* Header 頂部導航 */
         header {
             padding: 60px 25px 30px;
             display: flex;
@@ -73,9 +73,9 @@
             gap: 20px;
         }
 
-        /* 餐廳卡片 - 參照 restaurant-favorites.jpg 視覺 */
+        /* 餐廳卡片 */
         .item {
-            background: #FFF1DC; /* 淺橘色底 */
+            background: #FFF1DC; 
             border-radius: 15px;
             padding: 20px;
             display: flex;
@@ -89,7 +89,6 @@
             transform: scale(0.98);
         }
 
-        /* 收藏按鈕 (右上角書籤) */
         .bookmark-icon {
             position: absolute;
             top: 15px;
@@ -98,7 +97,6 @@
             color: #000;
         }
 
-        /* 文字資訊區 */
         .meta {
             flex: 1;
             display: flex;
@@ -118,7 +116,6 @@
             color: #333;
             line-height: 1.6;
             margin-bottom: 8px;
-            /* 模擬圖片中的排版 */
             display: -webkit-box;
             -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;
@@ -131,7 +128,6 @@
             font-weight: 600;
         }
 
-        /* 圖片區 */
         .thumb-container {
             width: 180px;
             height: 125px;
@@ -150,7 +146,7 @@
 
     <div class="phone-window">
         <header>
-            <a href="personal.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+            <a href="profile.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
             <div class="page-title">收藏餐廳</div>
             <button class="more-btn"><i class="fa-solid fa-ellipsis"></i></button>
         </header>
@@ -175,7 +171,7 @@
                 id: 2, 
                 name: 'Phoebe咖啡廳', 
                 img: 'sample/restaurant-info.png', 
-                desc: '氣氛放鬆的餐廳，寵物狗可以在主人旁邊一起享用牛排與義大利麵等美食。',
+                desc: '環境舒適安靜，店內歡迎攜帶寵物入內，提供專屬寵物餐點與手工甜點。',
                 status: '營業中 . . .'
             },
             {
@@ -187,9 +183,9 @@
             },
             {
                 id: 4, 
-                name: '可愛餐酒館', 
+                name: '毛孩餐酒館', 
                 img: 'sample/restaurant-info.png', 
-                desc: '氣氛放鬆的餐廳，寵物狗可以在主人旁邊一起享用牛排與義大利麵等美食。',
+                desc: '結合精緻餐點與友善環境，是您與毛孩共度週末的最佳去處。',
                 status: '營業中 . . .'
             }
         ];
@@ -212,10 +208,12 @@
                         <img class="thumb" src="${s.img}" alt="${s.name}">
                     </div>
                 `;
-                // 點擊導向詳情頁
+                
+                // 點擊導向詳情頁，傳遞 id 與 name 以供動態替換
                 el.addEventListener('click', () => {
-                    location.href = 'restaurant-info.html?id=' + s.id;
+                    location.href = `restaurant-info.html?id=${s.id}&name=${encodeURIComponent(s.name)}`;
                 });
+                
                 listContainer.appendChild(el);
             });
         }

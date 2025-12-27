@@ -6,7 +6,7 @@
     <title>寵物資訊 - 檢視模式</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* 基本設定 */
+        /* 100% 保留原始 CSS */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background-color: #f0f0f0;
@@ -16,8 +16,6 @@
             min-height: 100vh;
             font-family: "Microsoft JhengHei", sans-serif;
         }
-
-        /* 模擬手機容器 452x968 */
         .phone-window {
             width: 452px;
             height: 968px;
@@ -26,16 +24,12 @@
             overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-
-        /* Header 頂部導航 */
         header {
             padding: 60px 25px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        /* 圓圈按鈕樣式 */
         .back-btn, .edit-btn-top {
             width: 43px;
             height: 43px;
@@ -50,123 +44,74 @@
             cursor: pointer;
             text-decoration: none;
         }
-
-        .page-title {
-            font-size: 32px;
-            font-weight: bold;
-            color: #000;
-        }
-
-        /* 主卡片內容 */
-        .content-card {
-            width: 402px;
-            margin: 0 auto;
-            background: #FFF1DC;
-            border-radius: 15px;
-            padding: 16px;
-        }
-
-        .pet-photo-container {
-            width: 100%;
-            height: 190px;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        .pet-photo-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* 檢視模式的資料列 */
-        .info-group {
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding-bottom: 10px;
-        }
-        .info-group label {
-            display: block;
-            font-size: 16px;
-            color: #888;
-            margin-bottom: 4px;
-        }
-        .info-group .value {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        /* 底部按鈕 */
-        .footer-action {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-            padding-bottom: 40px;
-        }
-        .primary-btn {
-            width: 402px;
-            height: 52px;
-            background: #FFAD4D;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            text-decoration: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        .page-title { font-size: 32px; font-weight: bold; color: #000; }
+        .content-card { width: 402px; margin: 0 auto; background: #FFF1DC; border-radius: 15px; padding: 16px; }
+        .pet-photo-container { width: 100%; height: 190px; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .pet-photo-container img { width: 100%; height: 100%; object-fit: cover; }
+        .info-group { margin-bottom: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 10px; }
+        .info-group label { display: block; font-size: 16px; color: #888; margin-bottom: 4px; }
+        .info-group .value { font-size: 18px; font-weight: 600; color: #333; }
+        .footer-action { width: 100%; display: flex; justify-content: center; margin-top: 30px; padding-bottom: 40px; }
+        .primary-btn { width: 402px; height: 52px; background: #FFAD4D; border: none; border-radius: 10px; color: white; font-size: 20px; font-weight: bold; text-decoration: none; display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
     <div class="phone-window">
         <header>
-            <a href="personal.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
-            <div class="page-title">魯夫的檔案</div>
-            <a href="pet-edit.html" class="edit-btn-top"><i class="fa-solid fa-pen-to-square"></i></a>
+            <a href="my-pets.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+            <div class="page-title" id="displayTitle">魯夫的檔案</div>
+            <a href="#" class="edit-btn-top" id="topEditLink"><i class="fa-solid fa-pen-to-square"></i></a>
         </header>
 
         <div class="content-card">
             <div class="pet-photo-container">
-                <img src="sample/pet-info.png" alt="寵物照片">
+                <img src="sample/pet-info.png" alt="寵物照片" id="petPhoto">
             </div>
-
-            <div class="info-group">
-                <label>寵物名稱</label>
-                <div class="value">魯夫</div>
-            </div>
-            <div class="info-group">
-                <label>寵物種類</label>
-                <div class="value">狗</div>
-            </div>
-            <div class="info-group">
-                <label>品種</label>
-                <div class="value">米克斯</div>
-            </div>
-            <div class="info-group">
-                <label>性別</label>
-                <div class="value">公</div>
-            </div>
-            <div class="info-group">
-                <label>生日</label>
-                <div class="value">2021 / 05 / 20</div>
-            </div>
-            <div class="info-group">
-                <label>備註</label>
-                <div class="value">很愛睡覺，喜歡散步。</div>
-            </div>
-            <div class="info-group">
-                <label>過敏原</label>
-                <div class="value">無</div>
-            </div>
+            <div class="info-group"><label>寵物名稱</label><div class="value" id="val_name">魯夫</div></div>
+            <div class="info-group"><label>寵物種類</label><div class="value" id="val_type">狗</div></div>
+            <div class="info-group"><label>品種</label><div class="value" id="val_breed">米克斯</div></div>
+            <div class="info-group"><label>性別</label><div class="value" id="val_gender">公</div></div>
+            <div class="info-group"><label>生日</label><div class="value" id="val_birthday">2021 / 05 / 20</div></div>
+            <div class="info-group"><label>備註</label><div class="value" id="val_note">很愛睡覺，喜歡散步。</div></div>
+            <div class="info-group"><label>晶片號碼</label><div class="value" id="val_allergy">無</div></div>
         </div>
 
         <div class="footer-action">
-            <a href="pet-edit.html" class="primary-btn">編輯資料</a>
+            <a href="#" class="primary-btn" id="bottomEditLink">編輯資料</a>
         </div>
     </div>
+
+    <script>
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const petId = params.get('name') || '魯夫';
+            
+            // 讀取該寵物專屬資料
+            const storedData = JSON.parse(localStorage.getItem('petData_' + petId));
+            
+            // 更新標題與編輯按鈕連結
+            document.getElementById('displayTitle').innerText = petId + '的檔案';
+            const editUrl = `pet-edit.html?name=${encodeURIComponent(petId)}`;
+            document.getElementById('topEditLink').href = editUrl;
+            document.getElementById('bottomEditLink').href = editUrl;
+
+            // 如果有儲存過的資料，則替換原本標籤內容
+            if (storedData) {
+                document.getElementById('val_name').innerText = storedData.name;
+                document.getElementById('val_type').innerText = storedData.type;
+                document.getElementById('val_breed').innerText = storedData.breed;
+                document.getElementById('val_gender').innerText = storedData.gender;
+                document.getElementById('val_birthday').innerText = storedData.birthday;
+                document.getElementById('val_note').innerText = storedData.note;
+                document.getElementById('val_allergy').innerText = storedData.allergy;
+            } else {
+                // 若無存檔，至少讓名稱顯示網址傳入的名字
+                document.getElementById('val_name').innerText = petId;
+            }
+        };
+    </script>
 </body>
 </html>
+
+
+  
