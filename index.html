@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-title" content="FurryMap">
     <meta name="mobile-web-app-capable" content="yes">
 
-    <link rel="apple-touch-icon" href="assets/logo/logo.png">
-    <link rel="icon" type="image/png" href="assets/logo/logo.png">
+    <link rel="apple-touch-icon" href="assets/logo/logo-1.png">
+    <link rel="icon" type="image/png" href="assets/logo/logo-1.png">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
@@ -22,68 +22,64 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body, html { 
             height: 100%; 
+            width: 100%;
             font-family: "Microsoft JhengHei", sans-serif; 
             overflow: hidden; 
-            background: #f5f5f5; 
+            background: #ffffff; 
             -webkit-font-smoothing: antialiased; 
         }
         
+        /* 核心修正：解決畫面偏移與底部留白 */
         .container {
-            position: relative;
-            width: 100vw;
-            height: 100dvh; 
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%; 
             overflow: hidden;
         }
         
         #mapid {
             position: absolute;
             top: 0; left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             z-index: 1;
         }
         
-        /* 搜尋欄 - 具備毛玻璃效果 */
+        /* 搜尋欄 (樣式自 old_index.html) */
         .search-bar {
             position: absolute;
-            top: calc(env(safe-area-inset-top) + 15px);
-            left: 50%;
-            transform: translateX(-50%);
+            top: 60px;                      
+            left: 30px;                     
             width: calc(100% - 60px);       
             max-width: 392px;               
             height: 50px;                   
-            background: rgba(240, 240, 240, 0.9);
-            border: 1px solid rgba(0,0,0,0.2);
+            background: #E9E9EA;
+            border: 1px solid #000000;
             border-radius: 100px;
             display: flex;
             align-items: center;
             padding: 0 16px;                
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
             z-index: 20;
-            backdrop-filter: blur(5px);
         }
-        
+        .search-bar i { font-size: 22px; color: #888; flex-shrink: 0; }
         .search-bar input { border: none; background: transparent; margin: 0 8px; flex: 1; font-size: 16px; outline: none; }
-        .search-bar i { font-size: 20px; color: #888; }
         
-        /* 底部導覽列 - 修正白底問題 */
+        /* 導覽列 (樣式自 old_index.html) */
         .bottom-nav {
             position: absolute;
-            bottom: 0; left: 0;
-            width: 100%;
+            bottom: 0; left: 0; width: 100%;
             height: calc(65px + env(safe-area-inset-bottom)); 
-            /* 修正：將純白改為半透明灰色並加上毛玻璃，使地圖背景隱約透出，解決生硬白塊感 */
-            background: rgba(248, 248, 248, 0.85); 
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
+            background: white;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
             align-items: center;
-            padding: 0 10px env(safe-area-inset-bottom) 10px;
-            box-shadow: 0 -2px 15px rgba(0,0,0,0.08);
-            z-index: 1000;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            gap: clamp(20px, 10vw, 56px); 
+            padding: 0 24px;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 30;
         }
         
         .nav-item {
@@ -91,29 +87,25 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             color: #8E8E93;
             text-decoration: none;
-            width: 20%;
-            height: 100%;
-            transition: color 0.3s;
+            cursor: pointer;
         }
-        
-        .nav-item i { font-size: 24px; } 
-        .nav-item.active, .nav-item:hover { color: #FF9800; }
-        
-        /* 選取後的底線指標 */
-        .nav-item.active::after, .nav-item:hover::after {
+        .nav-item i { font-size: 26px; } 
+        .nav-item.active { color: #FF9800; }
+        .nav-item.active::after {
             content: '';
             position: absolute;
-            bottom: 10px; 
-            width: 18px;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
             height: 4px;
             background: #FF9800;
-            border-radius: 4px;
+            border-radius: 18px;
         }
         
-        /* 右側按鈕群組 */
+        /* 右側按鈕控制群組 */
         .map-controls-wrapper {
             position: absolute;
             right: 12px;
@@ -138,7 +130,6 @@
         }
         .my-location-btn i { font-size: 20px; color: #FF9800; }
 
-        /* 地圖縮放按鈕樣式 */
         .leaflet-control-zoom {
             margin: 0 !important;
             border: none !important;
@@ -154,27 +145,18 @@
             font-size: 20px !important;
             font-weight: bold !important;
         }
-        .leaflet-control-zoom-in {
-            border-top-left-radius: 10px !important;
-            border-top-right-radius: 10px !important;
-            border-bottom: 1px solid #f0f0f0 !important;
-        }
-        .leaflet-control-zoom-out {
-            border-bottom-left-radius: 10px !important;
-            border-bottom-right-radius: 10px !important;
-        }
+        .leaflet-control-zoom-in { border-top-left-radius: 10px !important; border-top-right-radius: 10px !important; border-bottom: 1px solid #f0f0f0 !important; }
+        .leaflet-control-zoom-out { border-bottom-left-radius: 10px !important; border-bottom-right-radius: 10px !important; }
 
-        /* 偶爾浮動動畫 - 使用 margin-top 避免覆蓋 transform */
+        /* 動畫：偶爾浮動且不干擾定位 */
         @keyframes floatIcon {
             0%, 80%, 100% { margin-top: 0; }
             90% { margin-top: -10px; }
         }
-
         .floating-icon {
             animation: floatIcon 6s ease-in-out infinite;
         }
 
-        /* 聚合圓圈主題化 */
         .marker-cluster-small, .marker-cluster-small div,
         .marker-cluster-medium, .marker-cluster-medium div,
         .marker-cluster-large, .marker-cluster-large div {
@@ -198,7 +180,7 @@
         </div>
         
         <div class="map-controls-wrapper">
-            <div class="my-location-btn" onclick="flyToHome()">
+            <div class="my-location-btn" onclick="locateUser()">
                 <i class="fa-solid fa-location-crosshairs"></i>
             </div>
             <div id="zoom-container"></div>
@@ -230,41 +212,34 @@
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-        // 高雄大學標記 (維持圓點)
-        L.circleMarker([22.7333, 120.2847], {
-            radius: 10,
-            fillColor: "#FFB352",
-            color: "#FF9800",
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.8
-        }).addTo(map).bindPopup('高雄大學 🎓<br>目前位置');
+        // 初始化「使用者標記」變數
+        let userMarker, userCircle;
 
-        // 自定義餐廳圖示
+        // 自定義圖示
         const restaurantIcon = L.icon({
             iconUrl: 'assets/icon/coordinates.png', 
             iconSize: [38, 38], 
             iconAnchor: [19, 38], 
-            popupAnchor: [0, -15], // 氣泡框位置下降
+            popupAnchor: [0, -15],
             className: 'floating-icon' 
         });
 
-        // 初始化聚合組
         const clusters = L.markerClusterGroup({
             showCoverageOnHover: false,
             spiderfyOnMaxZoom: true
         });
 
+        // 餐廳座標：完全保留您辛苦修正後的精確數據
         const locations = [
-            { name: "沐沐MUMU 茶飲", pos: [22.70350854455539, 120.30130446507042], info: "高雄市楠梓區宏毅一路6號<br>07-3630638<br>寵物：犬,貓,其他,不限" },
-            { name: "Bon appétit 葩那貝蒂", pos: [22.736657810967653, 120.32909822442647], info: "高雄市楠梓區土庫一路198號<br>07-3582280<br>寵物：犬,貓,其他" },
-            { name: "究鶴餐館", pos: [22.659232089345057, 120.30670308024811], info: "高雄市左營區富國路98號<br>07-5508648<br>寵物：犬,貓,其他,不限" },
-            { name: "鸚鵡螺餐酒館-富國店", pos: [22.660084586531575, 120.30648179558894], info: "高雄市左營區富國路101號<br>0986-868117<br>寵物：犬,貓,其他,不限" },
-            { name: "ROSA義大利餐廳", pos: [22.687341270147343, 120.31386639374334], info: "高雄市左營區華夏路1422號<br>07-3101950<br>寵物：犬,貓,其他,不限" },
-            { name: "貓之家俱樂部", pos: [22.66880977978303, 120.29994138209479], info: "高雄市左營區新勝街26號<br>07-5869745 / 09-63363038<br>寵物：犬,貓" },
-            { name: "萊Bar音樂餐酒館", pos: [22.67991127626432, 120.31122636675437], info: "高雄市左營區文自路５７１號<br>07-3450509<br>寵物：犬,貓" },
-            { name: "逅巷咖啡定食", pos: [22.669228579277874, 120.30437362257813], info: "高雄市左營區新上街307巷15號<br>09-89621756<br>寵物：犬,貓" },
-            { name: "心滿義廚", pos: [22.66626008061487, 120.30757376490757], info: "高雄市左營區立信路28號<br>07-5506865<br>寵物：犬,貓,其他" }
+            { name: "沐沐MUMU 茶飲", pos: [22.70350854455539, 120.30130446507042], info: "高雄市楠梓區宏毅一路6號" },
+            { name: "Bon appétit 葩那貝蒂", pos: [22.736657810967653, 120.32909822442647], info: "高雄市楠梓區土庫一路198號" },
+            { name: "究鶴餐館", pos: [22.659232089345057, 120.30670308024811], info: "高雄市左營區富國路98號" },
+            { name: "鸚鵡螺餐酒館-富國店", pos: [22.660084586531575, 120.30648179558894], info: "高雄市左營區富國路101號" },
+            { name: "ROSA義大利餐廳", pos: [22.687341270147343, 120.31386639374334], info: "高雄市左營區華夏路1422號" },
+            { name: "貓之家俱樂部", pos: [22.66880977978303, 120.29994138209479], info: "高雄市左營區新勝街26號" },
+            { name: "萊Bar音樂餐酒館", pos: [22.67991127626432, 120.31122636675437], info: "高雄市左營區文自路５７１號" },
+            { name: "逅巷咖啡定食", pos: [22.669228579277874, 120.30437362257813], info: "高雄市左營區新上街307巷15號" },
+            { name: "心滿義廚", pos: [22.66626008061487, 120.30757376490757], info: "高雄市立信路28號" }
         ];
 
         locations.forEach(loc => {
@@ -272,16 +247,27 @@
                             .bindPopup(`<b>${loc.name}</b><br>${loc.info}`);
             clusters.addLayer(marker);
 
-            // 隨機延遲使浮動更自然
             setTimeout(() => {
                 const iconImg = marker.getElement();
-                if (iconImg) {
-                    iconImg.style.animationDelay = `-${Math.random() * 10}s`;
-                }
+                if (iconImg) iconImg.style.animationDelay = `-${Math.random() * 10}s`;
             }, 100);
         });
 
         map.addLayer(clusters);
+
+        // 即時定位功能
+        function locateUser() {
+            map.locate({ setView: true, maxZoom: 17, enableHighAccuracy: true });
+        }
+
+        map.on('locationfound', function(e) {
+            const radius = e.accuracy / 2;
+            if (userMarker) { map.removeLayer(userMarker); map.removeLayer(userCircle); }
+            userCircle = L.circle(e.latlng, radius, { color: '#FF9800', fillOpacity: 0.1 }).addTo(map);
+            userMarker = L.circleMarker(e.latlng, {
+                radius: 10, fillColor: "#FF9800", color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.9
+            }).addTo(map).bindPopup("您目前的位置").openPopup();
+        });
 
         function flyToHome() {
             map.flyTo([22.7333, 120.2847], 17, { animate: true, duration: 1.5 });
