@@ -3,189 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寵物資訊 - 魯夫的檔案</title>
+    <title>寵物資訊 - 編輯模式</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* 基本設定 */
+        /* 100% 保留原始 CSS */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #f0f0f0; /* 外層背景 */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: "Microsoft JhengHei", sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* 模擬手機容器 452x968 */
-        .phone-window {
-            width: 452px;
-            height: 968px;
-            background: linear-gradient(180deg, #FFE7C7 5.08%, #FFFFFF 23.64%);
-            position: relative;
-            overflow-y: auto; /* 若內容過長可捲動 */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        /* Header 頂部導航 */
-        header {
-            padding: 60px 25px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* 參照 personal.html 的圓圈按鈕樣式 */
-        .back-btn, .save-btn {
-            width: 43px;
-            height: 43px;
-            border: 1.5px solid #000000;
-            background: transparent;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            color: #000;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .page-title {
-            font-size: 32px;
-            font-weight: bold;
-            color: #000;
-        }
-
-        /* 主卡片內容 */
-        .content-card {
-            width: 402px;
-            margin: 0 auto;
-            background: #FFF1DC; /* 淺橘色底框 */
-            border-radius: 15px;
-            padding: 16px;
-        }
-
-        /* 寵物照片 */
-        .pet-photo-container {
-            width: 100%;
-            height: 190px;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        .pet-photo-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* 表單樣式 */
-        .input-group {
-            margin-bottom: 15px;
-        }
-        .input-group label {
-            display: block;
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        .input-group input {
-            width: 100%;
-            height: 44px;
-            background: #FEF9F0; /* 極淺色輸入框 */
-            border: none;
-            border-radius: 10px;
-            padding: 0 15px;
-            font-size: 16px;
-            color: #555;
-            outline: none;
-        }
-
-        /* 底部橘色按鈕 */
-        .footer-action {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-            padding-bottom: 40px;
-        }
-        .submit-btn {
-            width: 402px;
-            height: 52px;
-            background: #FFAD4D; /* 橘色按鈕 */
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background 0.3s;
-        }
-        .submit-btn:hover {
-            background: #f59a23;
-        }
+        body { background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: "Microsoft JhengHei", sans-serif; }
+        .phone-window { width: 452px; height: 968px; background: linear-gradient(180deg, #FFE7C7 5.08%, #FFFFFF 23.64%); position: relative; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        header { padding: 60px 25px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .back-btn, .save-btn { width: 43px; height: 43px; border: 1.5px solid #000000; background: transparent; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #000; cursor: pointer; text-decoration: none; }
+        .page-title { font-size: 32px; font-weight: bold; color: #000; }
+        .content-card { width: 402px; margin: 0 auto; background: #FFF1DC; border-radius: 15px; padding: 16px; }
+        .pet-photo-container { width: 100%; height: 190px; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .pet-photo-container img { width: 100%; height: 100%; object-fit: cover; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        .input-group input { width: 100%; height: 44px; background: #FEF9F0; border: none; border-radius: 10px; padding: 0 15px; font-size: 16px; color: #555; outline: none; }
+        .footer-action { width: 100%; display: flex; justify-content: center; margin-top: 30px; padding-bottom: 40px; }
+        .submit-btn { width: 402px; height: 52px; background: #FFAD4D; border: none; border-radius: 10px; color: white; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
-
     <div class="phone-window">
         <header>
-            <a href="pet-info.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
-            <div class="page-title">魯夫的檔案</div>
-            <button class="save-btn"><i class="fa-solid fa-floppy-disk"></i></button>
+            <a href="javascript:history.back()" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+            <div class="page-title" id="editTitle">魯夫的檔案</div>
+            <button class="save-btn" onclick="saveData()"><i class="fa-solid fa-floppy-disk"></i></button>
         </header>
 
         <div class="content-card">
-            <div class="pet-photo-container">
-                <img src="sample/pet-info.png" alt="寵物照片">
-            </div>
-
-            <div class="input-group">
-                <label>寵物名稱</label>
-                <input type="text" value="魯夫">
-            </div>
-
-            <div class="input-group">
-                <label>寵物種類</label>
-                <input type="text" value="狗">
-            </div>
-
-            <div class="input-group">
-                <label>品種</label>
-                <input type="text" value="米克斯">
-            </div>
-
-            <div class="input-group">
-                <label>性別</label>
-                <input type="text" value="公">
-            </div>
-
-            <div class="input-group">
-                <label>生日</label>
-                <input type="text" placeholder="YYYY / MM / DD">
-            </div>
-
-            <div class="input-group">
-                <label>備註</label>
-                <input type="text" value="很愛睡覺">
-            </div>
-
-            <div class="input-group">
-                <label>過敏原</label>
-                <input type="text" placeholder="無">
-            </div>
+            <div class="pet-photo-container"><img src="sample/pet-info.png"></div>
+            <div class="input-group"><label>寵物名稱</label><input type="text" id="in_name"></div>
+            <div class="input-group"><label>寵物種類</label><input type="text" id="in_type" value="狗"></div>
+            <div class="input-group"><label>品種</label><input type="text" id="in_breed" value="米克斯"></div>
+            <div class="input-group"><label>性別</label><input type="text" id="in_gender" value="公"></div>
+            <div class="input-group"><label>生日</label><input type="text" id="in_birthday" placeholder="YYYY / MM / DD"></div>
+            <div class="input-group"><label>備註</label><input type="text" id="in_note"></div>
+            <div class="input-group"><label>晶片號碼</label><input type="text" id="in_allergy" placeholder="無"></div>
         </div>
 
         <div class="footer-action">
-            <button class="submit-btn">儲存修改</button>
+            <button class="submit-btn" onclick="saveData()">儲存修改</button>
         </div>
     </div>
 
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const petId = params.get('name') || '魯夫';
+
+        window.onload = function() {
+            document.getElementById('editTitle').innerText = petId + '的檔案';
+            // 讀取現有存檔填入
+            const stored = JSON.parse(localStorage.getItem('petData_' + petId));
+            if (stored) {
+                document.getElementById('in_name').value = stored.name;
+                document.getElementById('in_type').value = stored.type;
+                document.getElementById('in_breed').value = stored.breed;
+                document.getElementById('in_gender').value = stored.gender;
+                document.getElementById('in_birthday').value = stored.birthday;
+                document.getElementById('in_note').value = stored.note;
+                document.getElementById('in_allergy').value = stored.allergy;
+            } else {
+                document.getElementById('in_name').value = petId;
+            }
+        };
+
+        function saveData() {
+            const data = {
+                name: document.getElementById('in_name').value,
+                type: document.getElementById('in_type').value,
+                breed: document.getElementById('in_breed').value,
+                gender: document.getElementById('in_gender').value,
+                birthday: document.getElementById('in_birthday').value,
+                note: document.getElementById('in_note').value,
+                allergy: document.getElementById('in_allergy').value
+            };
+            // 使用原本的名字作為 ID 儲存，確保存檔不打架
+            localStorage.setItem('petData_' + petId, JSON.stringify(data));
+            alert('儲存成功！');
+            // 跳轉回檢視頁面，並傳入「新名稱」(以防使用者改了名字)
+            location.href = `pet-info.html?name=${encodeURIComponent(data.name)}`;
+        }
+    </script>
 </body>
 </html>
