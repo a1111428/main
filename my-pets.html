@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=452, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>我的寵物</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
@@ -26,6 +26,7 @@
             flex-direction: column;
             align-items: center;
             position: relative;
+            overflow-y: auto; /* 允許捲動以查看四張卡片 */
         }
 
         /* 返回按鈕 */
@@ -88,6 +89,7 @@
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
         }
 
         .pet-header {
@@ -128,53 +130,58 @@
 </head>
 <body>
     <div class="container">
-        <!-- 返回按鈕 -->
-        <a href="personal.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+        <a href="profile.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
 
-        <!-- 新增按鈕 -->
         <div class="add-btn"><i class="fa-solid fa-plus"></i></div>
 
-        <!-- 標題 -->
         <h1 class="title">我的寵物</h1>
 
-        <!-- 寵物卡片列表 -->
         <div class="pet-list">
-            <!-- 鬆鬆 -->
-            <div class="pet-card">
+            <div class="pet-card" onclick="goToInfo('鬆鬆')">
                 <div class="pet-header">
                     <div class="pet-name">鬆鬆</div>
-                    <button class="more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                    <button class="more-btn" onclick="goToEdit(event, '鬆鬆')"><i class="fa-solid fa-ellipsis"></i></button>
                 </div>
                 <img src="https://via.placeholder.com/332x180/FFB6C1/000000?text=鬆鬆" alt="鬆鬆" class="pet-photo">
             </div>
 
-            <!-- 魯夫 -->
-            <div class="pet-card">
+            <div class="pet-card" onclick="goToInfo('魯夫')">
                 <div class="pet-header">
                     <div class="pet-name">魯夫</div>
-                    <button class="more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                    <button class="more-btn" onclick="goToEdit(event, '魯夫')"><i class="fa-solid fa-ellipsis"></i></button>
                 </div>
                 <img src="https://via.placeholder.com/332x180/F5DEB3/000000?text=魯夫" alt="魯夫" class="pet-photo">
             </div>
 
-            <!-- 掰咖小鳥 -->
-            <div class="pet-card">
+            <div class="pet-card" onclick="goToInfo('掰咖小鳥')">
                 <div class="pet-header">
                     <div class="pet-name">掰咖小鳥</div>
-                    <button class="more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                    <button class="more-btn" onclick="goToEdit(event, '掰咖小鳥')"><i class="fa-solid fa-ellipsis"></i></button>
                 </div>
                 <img src="https://via.placeholder.com/332x180/90EE90/000000?text=掰咖小鳥" alt="掰咖小鳥" class="pet-photo">
             </div>
 
-            <!-- 另一隻鬆鬆 -->
-            <div class="pet-card">
+            <div class="pet-card" onclick="goToInfo('鬆鬆')">
                 <div class="pet-header">
                     <div class="pet-name">鬆鬆</div>
-                    <button class="more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                    <button class="more-btn" onclick="goToEdit(event, '鬆鬆')"><i class="fa-solid fa-ellipsis"></i></button>
                 </div>
                 <img src="https://via.placeholder.com/332x180/FFB6C1/000000?text=鬆鬆" alt="鬆鬆" class="pet-photo">
             </div>
         </div>
     </div>
+
+    <script>
+        // 跳轉至檢視頁面，帶上寵物名稱
+        function goToInfo(name) {
+            location.href = `pet-info.html?name=${encodeURIComponent(name)}`;
+        }
+
+        // 跳轉至編輯頁面，帶上寵物名稱並防止冒泡
+        function goToEdit(event, name) {
+            event.stopPropagation(); // 防止觸發 pet-card 的 onclick
+            location.href = `pet-edit.html?name=${encodeURIComponent(name)}`;
+        }
+    </script>
 </body>
 </html>
