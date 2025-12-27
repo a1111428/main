@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的文章 - Furry Café Map</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
+        body, html { height: 100%; overflow: auto; background: #FFF2DF; }
+        .phone { width: 100%; max-width: 452px; margin: 0 auto; min-height: 100vh; position: relative; background: #FFF2DF; }
+        .container { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
+
+        /* 頂部標題 */
+        .header { width: 100%; padding: 25px 20px 15px; display: flex; align-items: center; position: relative; }
+        .back-btn { width: 36px; height: 36px; border: 2px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #333; text-decoration: none; z-index: 10; }
+        .header h1 { position: absolute; left: 0; right: 0; text-align: center; font-size: 28px; font-weight: bold; }
+
+        /* 排序篩選列 */
+        .filter-bar { width: 90%; background-color: #FFCC8D; border-radius: 15px; display: flex; justify-content: space-around; padding: 10px 0; margin-bottom: 20px; font-weight: bold; position: relative; }
+        .filter-item { cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 16px; }
+        .filter-item.active { border-bottom: 3px solid #666; }
+
+        /* 下拉選單樣式 */
+        .dropdown-menu {
+            position: absolute; top: 45px; background: white; width: 150px; 
+            border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            display: none; flex-direction: column; z-index: 100; overflow: hidden;
+        }
+        .dropdown-option { padding: 12px 15px; font-size: 14px; color: #333; cursor: pointer; border-bottom: 1px solid #eee; }
+        .dropdown-option:hover { background-color: #f8f8f8; }
+        .dropdown-option:last-child { border-bottom: none; }
+
+        /* 文章卡片 */
+        .article-list { width: 92%; display: flex; flex-direction: column; gap: 15px; }
+        .article-card { background-color: #FFECCB; border-radius: 20px; padding: 15px; display: flex; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card-left { width: 130px; display: flex; flex-direction: column; gap: 10px; }
+        .cafe-img { width: 130px; height: 110px; border-radius: 15px; object-fit: cover; }
+        .edit-btn { background-color: #FFB352; color: white; border-radius: 20px; padding: 6px 0; font-weight: bold; text-align: center; font-size: 14px; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 5px; }
+        .card-right { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .cafe-name { font-size: 20px; font-weight: bold; }
+        .cafe-desc { font-size: 14px; color: #555; line-height: 1.4; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; }
+        .post-date { font-size: 13px; color: #666; font-weight: bold; }
+        .like-section { display: flex; align-items: center; gap: 5px; font-weight: bold; }
+        .like-section i { color: #C88E6B; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="container">
+            <header class="header">
+                <a href="profile.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+                <h1>我的文章</h1>
+            </header>
+
+            <div class="filter-bar">
+                <div class="filter-item" onclick="toggleMenu('sortMenu')">排序 <i class="fa-solid fa-chevron-down"></i></div>
+                <div class="filter-item active">個人內容</div>
+                <div class="filter-item" onclick="toggleMenu('filterMenu')">篩選 <i class="fa-solid fa-chevron-down"></i></div>
+                
+                <div id="sortMenu" class="dropdown-menu" style="left: 5%;">
+                    <div class="dropdown-option" onclick="applySort('postTime')">發佈時間 (最新)</div>
+                    <div class="dropdown-option" onclick="applySort('likes')">最多讚數</div>
+                </div>
+
+                <div id="filterMenu" class="dropdown-menu" style="right: 5%;">
+                    <div class="dropdown-option" onclick="applyFilter('all')">全部地區</div>
+                    <div class="dropdown-option" onclick="applyFilter('大安區')">大安區</div>
+                    <div class="dropdown-option" onclick="applyFilter('信義區')">信義區</div>
+                </div>
+            </div>
+
+            <div id="articleList" class="article-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // 修改後的數據：Phoebe(77), 毛孩(88), 咪咪貓貓(99)
+        const articles = [
+            { id: 1, name: "Phoebe咖啡廳", region: "大安區", img: "https://images.unsplash.com/photo-1548191265-cc70d3d45ba1?auto=format&fit=crop&w=300", desc: "Phoebe 咖啡廳環境舒適安靜，店內歡迎攜帶寵物入內。", postTime: "2024-04-20", likes: 105 },
+            { id: 2, name: "毛孩餐酒館", region: "信義區", img: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=300", desc: "店內歡迎攜帶寵物入內。飲品與甜點表現出色，是放鬆好去處。", postTime: "2024-05-20", likes: 73 },
+            { id: 3, name: "咪咪貓貓咖啡廳", region: "大安區", img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=300", desc: "以貓咪友善空間為特色，店內氛圍療癒溫暖，適合享受咖啡香。", postTime: "2025-11-28", likes: 99 }
+        ];
+
+        let currentData = [...articles];
+
+        function renderArticles(data) {
+            const list = document.getElementById('articleList');
+            list.innerHTML = data.map(item => `
+                <div class="article-card">
+                    <div class="card-left">
+                        <img src="${item.img}" class="cafe-img" alt="${item.name}">
+                        <a href="article-post.html" class="edit-btn"><i class="fa-solid fa-pen"></i> 編輯文章</a>
+                    </div>
+                    <div class="card-right">
+                        <h2 class="cafe-name">${item.name} (${item.region})</h2>
+                        <p class="cafe-desc">${item.desc}</p>
+                        <div class="card-footer">
+                            <span class="post-date">${item.postTime.replace(/-/g, ' / ')}</span>
+                            <div class="like-section"><i class="fa-solid fa-heart"></i> ${item.likes}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleMenu(id) {
+            const menu = document.getElementById(id);
+            const isShow = menu.style.display === 'flex';
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+            menu.style.display = isShow ? 'none' : 'flex';
+        }
+
+        function applySort(type) {
+            if (type === 'likes') {
+                currentData.sort((a, b) => b.likes - a.likes);
+            } else if (type === 'postTime') {
+                currentData.sort((a, b) => new Date(b.postTime) - new Date(a.postTime));
+            }
+            renderArticles(currentData);
+            document.getElementById('sortMenu').style.display = 'none';
+        }
+
+        function applyFilter(region) {
+            if (region === 'all') currentData = [...articles];
+            else currentData = articles.filter(a => a.region === region);
+            renderArticles(currentData);
+            document.getElementById('filterMenu').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.filter-item')) {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+            }
+        }
+
+        window.onload = () => renderArticles(articles);
+    </script>
+</body>
+</html>
