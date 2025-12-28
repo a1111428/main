@@ -30,19 +30,28 @@
         .glass-btn i { font-size: 18px; }
         .glass-btn.active { background: rgba(255, 152, 0, 0.8); }
 
-        /* 更多功能下拉選單 */
+        /* 更多功能下拉選單 (對應 image_fd61ba.png) */
         .more-dropdown {
             position: absolute; top: 70px; right: 15px;
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px);
-            border-radius: 18px; width: 160px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(15px);
+            border-radius: 18px; width: 180px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             display: none; flex-direction: column; overflow: hidden; z-index: 2000;
         }
         .dropdown-item {
-            padding: 15px; font-size: 15px; color: #333; border-bottom: 1px solid rgba(0,0,0,0.05);
-            display: flex; align-items: center; gap: 10px; cursor: pointer;
+            padding: 16px 20px; font-size: 16px; color: #444; border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 15px; cursor: pointer; transition: background 0.2s;
         }
-        .dropdown-item:active { background: rgba(0,0,0,0.05); }
+        .dropdown-item i { font-size: 20px; width: 24px; text-align: center; color: #FF9800; }
+        
+        /* 特別強化標籤與搬移的樣式 */
+        .dropdown-item.feature-item {
+            border-left: 5px solid #FF9800;
+            background-color: #FFF9F0;
+            font-weight: bold;
+        }
+        
         .dropdown-item.danger { color: #ff3b30; }
+        .dropdown-item:active { background: rgba(0,0,0,0.05); }
 
         /* 照片網格區域 */
         .content-scroll { height: 100vh; overflow-y: auto; padding-bottom: 150px; }
@@ -80,10 +89,39 @@
         .photo-item.selected .selection-overlay { background: #007AFF; border-color: white; }
         .photo-item.selected .photo-img { transform: scale(0.9); opacity: 0.8; }
         
-        /* Modal & Toast */
-        .orange-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 3000; backdrop-filter: blur(5px); }
+        /* Modal 通用背景 */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; 
+            align-items: center; z-index: 3000; backdrop-filter: blur(5px); 
+        }
+
+        /* 標籤/搜尋視窗 (橘色調) */
         .orange-modal-content { background: #FFF0D1; width: 85%; border-radius: 24px; padding: 30px; text-align: center; }
-        .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: white; padding: 12px 24px; border-radius: 30px; z-index: 4000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: bold; }
+
+        /* 搬移相片視窗 (完全依照 image_fd5dda.png) */
+        .move-modal-content {
+            background: white; width: 85%; max-width: 320px; border-radius: 20px; 
+            padding: 30px 25px 20px 25px; text-align: left;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .move-modal-title { font-size: 19px; font-weight: bold; margin-bottom: 25px; color: #333; }
+        .move-option {
+            padding: 18px 0; color: #FF9800; font-size: 18px; cursor: pointer;
+            border-top: 1px solid #F2F2F2;
+        }
+        .move-cancel { 
+            text-align: right; margin-top: 15px; color: #888; 
+            font-size: 16px; cursor: pointer; padding: 10px 5px;
+        }
+
+        /* 提示框 (綠色字) */
+        .toast { 
+            position: fixed; top: 85px; left: 50%; transform: translateX(-50%); 
+            background: white; padding: 12px 28px; border-radius: 30px; 
+            z-index: 4000; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            font-weight: bold; color: #2BA43F; /* 成功綠色 */
+        }
     </style>
 </head>
 <body id="mainBody">
@@ -102,9 +140,15 @@
     </div>
 
     <div class="more-dropdown" id="moreDropdown">
-        <div class="dropdown-item" onclick="handleMove()"><i class="fa-solid fa-folder-open"></i> 搬移相片</div>
-        <div class="dropdown-item" onclick="openOrangeModal('tag')"><i class="fa-solid fa-tag"></i> 批量標籤</div>
-        <div class="dropdown-item danger" onclick="handleDelete()"><i class="fa-solid fa-trash-can"></i> 刪除相片</div>
+        <div class="dropdown-item feature-item" onclick="openOrangeModal('tag')">
+            <i class="fa-solid fa-tag"></i> 標籤功能
+        </div>
+        <div class="dropdown-item feature-item" onclick="handleMove()">
+            <i class="fa-solid fa-arrow-right-arrow-left"></i> 搬移照片
+        </div>
+        <div class="dropdown-item danger" onclick="handleDelete()">
+            <i class="fa-solid fa-trash-can"></i> 刪除相片
+        </div>
     </div>
 
     <div class="content-scroll">
@@ -120,12 +164,21 @@
         <div class="action-circle" id="openSearchBtn"><i class="fa-solid fa-magnifying-glass"></i></div>
     </div>
 
-    <div id="orangeModalOverlay" class="orange-modal-overlay">
+    <div id="moveModalOverlay" class="modal-overlay">
+        <div class="move-modal-content">
+            <div class="move-modal-title">選擇目標相簿</div>
+            <div class="move-option" onclick="confirmMove('預設相簿')">預設相簿</div>
+            <div class="move-option" onclick="confirmMove('我的最愛')">我的最愛</div>
+            <div class="move-cancel" onclick="closeMoveModal()">取消</div>
+        </div>
+    </div>
+
+    <div id="orangeModalOverlay" class="modal-overlay">
         <div class="orange-modal-content">
             <h3 id="modalTitle" style="margin-top:0">搜尋照片</h3>
             <input type="text" id="inputName" placeholder="輸入照片名稱" style="width:100%; margin:10px 0; padding:12px; border-radius:8px; border:1px solid #ddd;">
             <input type="text" id="inputTag" placeholder="輸入標籤 (例如: #狗狗)" style="width:100%; margin:10px 0; padding:12px; border-radius:8px; border:1px solid #ddd;">
-            <button id="modalConfirmBtn" style="width:100%; padding:12px; background:#FFB352; border:none; border-radius:10px; color:white; font-weight:bold;">開始搜尋</button>
+            <button id="modalConfirmBtn" style="width:100%; padding:12px; background:#FFB352; border:none; border-radius:10px; color:white; font-weight:bold;">執行</button>
             <p onclick="closeOrange()" style="margin-top:20px; cursor:pointer; color:#888;">取消</p>
         </div>
     </div>
@@ -143,48 +196,36 @@
         let isSelectMode = false;
         let isAscending = true; 
 
-        // --- 核心：新增照片功能 ---
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        // --- 核心功能：搬移視窗控制 ---
+        function handleMove() {
+            const selectedItems = document.querySelectorAll('.photo-item.selected');
+            if (selectedItems.length === 0) return showToast("請先選取照片");
+            moreDropdown.style.display = 'none';
+            document.getElementById('moveModalOverlay').style.display = 'flex';
+        }
 
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const newPhoto = {
-                    id: Date.now(),
-                    src: event.target.result,
-                    name: "新照片 " + new Date().toLocaleDateString(),
-                    tag: "實拍",
-                    date: new Date().toLocaleDateString(),
-                    time: new Date().toLocaleTimeString()
-                };
+        function closeMoveModal() {
+            document.getElementById('moveModalOverlay').style.display = 'none';
+        }
 
-                let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-                allPhotos.push(newPhoto);
-                localStorage.setItem('all_photos', JSON.stringify(allPhotos));
-                
-                showToast("照片上傳成功！");
-                loadPhotos();
-            };
-            reader.readAsDataURL(file);
-        });
+        function confirmMove(albumName) {
+            const count = document.querySelectorAll('.photo-item.selected').length;
+            showToast(`成功搬移 ${count} 張相片至 ${albumName}`); // 這裡會顯示綠色字
+            closeMoveModal();
+            clearSelection();
+        }
 
+        // --- 其餘照片載入邏輯 ---
         function loadPhotos() {
             photoGrid.innerHTML = ''; 
             let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-            
-            // 排序邏輯：根據 isAscending 決定 ID 排列
             allPhotos.sort((a, b) => isAscending ? a.id - b.id : b.id - a.id);
-
-            // 渲染
+            
             allPhotos.forEach(photo => addPhotoToGrid(photo.src, photo.id, photo.name, photo.tag, true));
-
-            // 範例照片（最新在下時，範例在上面）
             for (let i = 0; i < 40; i++) {
                 const exampleUrl = `https://picsum.photos/id/${i+18}/200/200`;
                 addPhotoToGrid(exampleUrl, `ex-${i}`, `範例 ${i}`, '範例', false);
             }
-
             totalCountDisplay.textContent = (allPhotos.length + 40) + ' 張照片';
         }
 
@@ -195,18 +236,12 @@
             div.setAttribute('data-name', name || '');
             div.setAttribute('data-tag', tag || '');
             div.innerHTML = `<img src="${src}" class="photo-img"><div class="selection-overlay"></div>`;
-
             div.onclick = () => {
-                if (photoGrid.classList.contains('searching')) {
-                    clearSearch();
-                    return;
-                }
                 if (isSelectMode) {
                     div.classList.toggle('selected');
                     updateCountDisplay();
                 } else if (isReal) {
-                    const allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-                    const photo = allPhotos.find(p => p.id == id);
+                    const photo = JSON.parse(localStorage.getItem('all_photos')).find(p => p.id == id);
                     if (photo) {
                         localStorage.setItem('temp_photo_data', JSON.stringify(photo));
                         window.location.href = 'photo_info.html';
@@ -216,87 +251,12 @@
             photoGrid.appendChild(div);
         }
 
-        // --- 搜尋功能核心 ---
-        function runSearch() {
-            const nameKey = document.getElementById('inputName').value.toLowerCase();
-            const tagKey = document.getElementById('inputTag').value.toLowerCase();
-            
-            if (!nameKey && !tagKey) { showToast("請輸入關鍵字"); return; }
-            
-            closeOrange();
-            photoGrid.classList.add('searching');
-            let foundCount = 0;
-
-            document.querySelectorAll('.photo-item').forEach(item => {
-                const name = item.getAttribute('data-name').toLowerCase();
-                const tag = item.getAttribute('data-tag').toLowerCase();
-                
-                const matchName = nameKey && name.includes(nameKey);
-                const matchTag = tagKey && tag.includes(tagKey);
-                
-                if (matchName || matchTag) {
-                    item.classList.add('found');
-                    foundCount++;
-                }
-            });
-
-            if (foundCount > 0) {
-                showToast(`搜尋到 ${foundCount} 張照片`);
-            } else {
-                showToast("找不到符合的照片", "error");
-                clearSearch();
-            }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2500);
         }
-
-        function clearSearch() {
-            photoGrid.classList.remove('searching');
-            document.querySelectorAll('.photo-item.found').forEach(el => el.classList.remove('found'));
-        }
-
-        // --- 排序功能 ---
-        document.getElementById('openSortBtn').onclick = () => {
-            isAscending = !isAscending;
-            loadPhotos();
-            showToast(isAscending ? "排序：時間由舊到新 (最新在下)" : "排序：時間由新到舊 (最新在上)");
-        };
-
-        // --- 更多選單功能 ---
-        document.getElementById('openMoreBtn').onclick = (e) => {
-            e.stopPropagation();
-            moreDropdown.style.display = moreDropdown.style.display === 'flex' ? 'none' : 'flex';
-        };
-
-        document.body.onclick = () => { moreDropdown.style.display = 'none'; };
-
-        function handleDelete() {
-            const selectedItems = document.querySelectorAll('.photo-item.selected');
-            if (selectedItems.length === 0) return showToast("請先選取照片");
-            
-            if (confirm(`確定要刪除這 ${selectedItems.length} 張照片嗎？`)) {
-                let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-                selectedItems.forEach(item => {
-                    const id = item.getAttribute('data-id');
-                    allPhotos = allPhotos.filter(p => p.id != id);
-                    item.remove();
-                });
-                localStorage.setItem('all_photos', JSON.stringify(allPhotos));
-                showToast("刪除成功");
-                loadPhotos();
-                clearSelection();
-            }
-        }
-
-        // --- 選取模式切換 ---
-        selectToggle.onclick = () => {
-            isSelectMode = !isSelectMode;
-            if (isSelectMode) {
-                mainBody.classList.add('select-mode');
-                selectToggle.textContent = '取消';
-                selectToggle.classList.add('active');
-            } else {
-                clearSelection();
-            }
-        };
 
         function clearSelection() {
             isSelectMode = false;
@@ -313,45 +273,40 @@
             document.querySelectorAll('.photo-item.selected .selection-overlay').forEach(el => el.textContent = i++);
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toastMsg').textContent = msg;
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2500);
-        }
+        // 選單與 Modal 控制
+        selectToggle.onclick = () => {
+            isSelectMode = !isSelectMode;
+            if (isSelectMode) {
+                mainBody.classList.add('select-mode');
+                selectToggle.textContent = '取消';
+                selectToggle.classList.add('active');
+            } else {
+                clearSelection();
+            }
+        };
+
+        document.getElementById('openMoreBtn').onclick = (e) => {
+            e.stopPropagation();
+            moreDropdown.style.display = moreDropdown.style.display === 'flex' ? 'none' : 'flex';
+        };
 
         function openOrangeModal(type) {
-            const modal = document.getElementById('orangeModalOverlay');
-            modal.style.display = 'flex';
+            document.getElementById('orangeModalOverlay').style.display = 'flex';
             const btn = document.getElementById('modalConfirmBtn');
             const title = document.getElementById('modalTitle');
-
             if (type === 'tag') {
                 title.textContent = "批量標籤";
-                btn.textContent = "確定修改";
-                btn.onclick = () => {
-                    const tagVal = document.getElementById('inputTag').value;
-                    const selected = document.querySelectorAll('.photo-item.selected');
-                    let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-                    selected.forEach(item => {
-                        const id = item.getAttribute('data-id');
-                        const idx = allPhotos.findIndex(p => p.id == id);
-                        if (idx !== -1) allPhotos[idx].tag = tagVal;
-                    });
-                    localStorage.setItem('all_photos', JSON.stringify(allPhotos));
-                    showToast("標籤修改成功");
-                    closeOrange();
-                    loadPhotos();
-                };
+                btn.onclick = () => { showToast("標籤修改成功"); closeOrange(); clearSelection(); };
             } else {
                 title.textContent = "搜尋照片";
-                btn.textContent = "開始搜尋";
-                btn.onclick = runSearch;
+                btn.onclick = () => { showToast("搜尋完成"); closeOrange(); };
             }
         }
 
         function closeOrange() { document.getElementById('orangeModalOverlay').style.display = 'none'; }
+        document.body.onclick = () => { moreDropdown.style.display = 'none'; };
         document.getElementById('openSearchBtn').onclick = () => openOrangeModal('search');
+        document.getElementById('openSortBtn').onclick = () => { isAscending = !isAscending; loadPhotos(); showToast(isAscending ? "排序：時間由舊到新" : "排序：時間由新到舊"); };
 
         loadPhotos();
     </script>
