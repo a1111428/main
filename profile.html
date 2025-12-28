@@ -181,20 +181,9 @@
     </div>
 
     <script>
-<<<<<<< HEAD
         function handleLogout() {
             localStorage.removeItem('isLoggedIn');
             window.location.href = 'index.html';
-=======
-        // 保持所有原有功能：社群狀態連動
-        function refreshSocialStatus() {
-            const platforms = ['Facebook', 'Instagram', 'Threads', 'X', 'BlueSky'];
-            platforms.forEach(p => {
-                const status = localStorage.getItem('social_' + p);
-                const badge = document.getElementById('badge-' + p);
-                badge.style.display = (status === 'bind') ? 'flex' : 'none';
-            });
->>>>>>> f38acb314af2396536615a79b0e69301b7635866
         }
 
         window.onload = function() {
