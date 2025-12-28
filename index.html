@@ -45,10 +45,12 @@
             z-index: 1;
         }
         
+        /* 修正後的搜尋列樣式 */
         .search-bar {
             position: absolute;
             top: 60px;                      
-            left: 30px;                     
+            left: 50%;                      /* 從中間開始 */
+            transform: translateX(-50%);     /* 向左偏移自身寬度的一半來達成置中 */
             width: calc(100% - 60px);       
             max-width: 392px;               
             height: 50px;                   
@@ -160,10 +162,6 @@
             background-color: rgba(255, 152, 0, 0.6) !important;
             color: white !important;
         }
-
-        @media (min-width: 768px) {
-            .search-bar { left: 50%; transform: translateX(-50%); }
-        }
     </style>
 </head>
 <body>
@@ -197,6 +195,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
     <script>
+        // 地圖與定位邏輯保持不變
         const map = L.map('mapid', {
             center: [22.732775288093578, 120.2884383523927],
             zoom: 17,
@@ -283,14 +282,13 @@
             window.location.href = (localStorage.getItem('isLoggedIn') === 'true') ? 'profile.html' : 'personal.html';
         }
 
-        /* --- 相機功能修正處 --- */
+        /* 相機與儲存功能保持不變 */
         function triggerCamera() {
             if (!navigator.geolocation) {
                 alert("您的瀏覽器不支援定位功能，無法開啟相機。");
                 return;
             }
 
-            // 在背景更新定位（不阻礙相機開啟）
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     window.currentCapturePos = {
@@ -302,7 +300,6 @@
                 { enableHighAccuracy: true, timeout: 5000 }
             );
 
-            // 【關鍵修正】：立即觸發相機，避免被瀏覽器攔截彈窗
             document.getElementById('input_camera').click();
         }
 
@@ -354,7 +351,6 @@
         }
 
         function saveAndNavigate(dataUrl) {
-            // 【關鍵修正】：增加備援定位，若無座標則取地圖中心點
             const finalPos = window.currentCapturePos || {
                 lat: map.getCenter().lat,
                 lng: map.getCenter().lng
@@ -387,7 +383,6 @@
 
         document.getElementById('input_camera').addEventListener('change', async function(e) {
             const file = e.target.files[0];
-            // 【關鍵修正】：移除對 window.currentCapturePos 的強制檢查
             if (!file) return;
 
             const dataUrl = await processImage(file);
@@ -395,7 +390,6 @@
                 saveAndNavigate(dataUrl);
             }
         });
-        /* --- 相機修正結束 --- */
 
         const FIXED_PHOTO_LOCATION = [22.732775288093578, 120.2884383523927];
 
@@ -426,7 +420,7 @@
             if (recentPhotos.length === 0) {
                 popupContent += '<p style="color:#999;">尚未有照片</p>';
             } else {
-                popupContent += '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">';
+                popupContent += '<div style=\"display:flex;flex-wrap:wrap;gap:8px;justify-content:center;\">';
                 recentPhotos.forEach(photo => {
                     popupContent += `
                         <div style="width:80px;cursor:pointer;" onclick="openPhoto(${photo.id})">

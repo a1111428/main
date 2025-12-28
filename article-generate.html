@@ -10,36 +10,46 @@
         body { background-color: #FFECCB; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 450px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
         
-        /* 頂部導覽與標題 */
+        /* 頂部導覽 */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .back-btn { width: 36px; height: 36px; border: 2.3px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; color: #333; }
         .confirm-btn { background-color: #FFB352; color: white; padding: 8px 25px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; }
+        
         .title-section { display: flex; align-items: center; gap: 10px; font-size: 20px; color: #333; margin: 5px 0; }
 
-        /* 五大類別選單 */
+        /* 選單與標籤區 */
         .section-group { display: flex; flex-direction: column; gap: 10px; }
         .dropdown-box { background-color: white; border-radius: 10px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; }
         .dropdown-box span { font-weight: 500; color: #333; }
         .fa-chevron-down { transition: transform 0.3s; }
         .open .fa-chevron-down { transform: rotate(180deg); }
 
-        /* 選項標籤容器 */
         .options-wrapper { max-height: 0; overflow: hidden; display: flex; flex-wrap: wrap; gap: 8px; padding: 0 2px; transition: max-height 0.3s ease-out, padding 0.3s; }
         .section-container.open .options-wrapper { max-height: 300px; padding: 10px 2px; }
         
-        /* 選項標籤樣式 */
         .tag-option { padding: 6px 14px; background-color: #fff; border: 1.5px solid #FFD19A; border-radius: 20px; font-size: 14px; color: #555; cursor: pointer; transition: all 0.2s; }
         .tag-option.selected { background-color: #FFB352; border-color: #FFB352; color: white; box-shadow: 0 2px 4px rgba(255, 179, 82, 0.4); }
+
+        /* 讀取資料按鈕組 (視覺掩飾) */
+        .read-group { display: flex; gap: 10px; margin: 10px 0 5px 0; }
+        .read-btn { 
+            flex: 1; padding: 12px; background: white; 
+            border: 2px solid #FFB352; border-radius: 12px; 
+            color: #FFB352; font-weight: bold; cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .read-btn.active { background: #FFB352; color: white; }
 
         /* 生成按鈕 */
         .generate-btn { width: 100%; background-color: #FFB352; color: white; padding: 15px; border: none; border-radius: 12px; font-size: 24px; font-weight: bold; margin: 10px 0; cursor: pointer; }
         
-        /* 生成結果區塊 */
-        .result-area { background-color: white; border-radius: 20px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); min-height: 180px; }
-        .result-title { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
-        .result-placeholder { color: #AAA; font-size: 16px; }
+        /* 結果區域與打字機動畫 */
+        .result-area { background-color: white; border-radius: 20px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); min-height: 220px; }
+        .result-title { font-size: 22px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .result-content { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; }
+        .ai-status { font-size: 12px; color: #FF9800; font-weight: normal; display: none; }
 
-        /* 成功提示 (1秒消失) */
+        /* 成功提示 */
         .toast-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 3000; }
         .toast-box { background: white; padding: 25px 45px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
     </style>
@@ -48,13 +58,10 @@
     <div class="container">
         <header class="header">
             <a href="article-post.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
-            <button class="confirm-btn" onclick="showSuccessToast()">確認</button>
+            <button class="confirm-btn" onclick="saveAndExit()">確認</button>
         </header>
 
-        <div class="title-section">
-            <i class="fa-solid fa-pen-sparkles"></i>
-            <strong>AI 文章小幫手</strong>
-        </div>
+        <div class="title-section"><i class="fa-solid fa-pen-sparkles"></i><strong>AI 文章小幫手</strong></div>
 
         <div class="section-group">
             <div class="section-container">
@@ -113,11 +120,16 @@
             </div>
         </div>
 
-        <button class="generate-btn">生成</button>
+        <div class="read-group">
+            <button class="read-btn" onclick="this.classList.toggle('active')"><i class="fa-solid fa-image"></i> 讀取相片</button>
+            <button class="read-btn" onclick="this.classList.toggle('active')"><i class="fa-solid fa-file-lines"></i> 讀取原文章</button>
+        </div>
+
+        <button class="generate-btn" onclick="startGenerating()">生成</button>
 
         <div class="result-area">
-            <div class="result-title">生成結果</div>
-            <div class="result-placeholder">可編輯生成內容</div>
+            <div class="result-title">生成結果 <span id="aiStatus" class="ai-status"><i class="fa-solid fa-spinner fa-spin"></i> AI 思考中...</span></div>
+            <div id="resultContent" class="result-content" style="color:#AAA">可編輯生成內容</div>
         </div>
     </div>
 
@@ -129,26 +141,58 @@
     </div>
 
     <script>
-        // 選單展開/收合邏輯
-        function toggleSection(headerEl) {
-            headerEl.parentElement.classList.toggle('open');
+        const resultContent = document.getElementById('resultContent');
+        const aiStatus = document.getElementById('aiStatus');
+        let generatedText = "";
+
+        function toggleSection(headerEl) { headerEl.parentElement.classList.toggle('open'); }
+        function selectTag(event, tagEl) { event.stopPropagation(); tagEl.classList.toggle('selected'); }
+
+        // 修改：動態根據選取的標籤生成內容
+        function startGenerating() {
+            // 1. 抓取所有已選取的 Hashtag (位於第 5 個 section-container)
+            const hashtagContainer = document.querySelectorAll('.section-container')[4];
+            const selectedTags = Array.from(hashtagContainer.querySelectorAll('.tag-option.selected'))
+                                      .map(tag => tag.innerText);
+            
+            // 2. 格式化 Hashtag 部分 (分行且空格隔開)
+            const hashtagsPart = selectedTags.length > 0 ? "\n\n" + selectedTags.join(" ") : "";
+            
+            // 3. 組合完整文案
+            const baseText = "今天帶毛小孩來到這間超溫馨的寵物友善咖啡廳！陽光灑進老宅改建的空間，工業風裝潢有質感，氛圍文青又舒適。點了精緻的午茶，服務親切得像老朋友。看著毛孩在草地跑跳的快樂模樣，真的好治癒。環境乾淨無異味，這份物超所值的體驗絕對值得五星好評，已經開始期待下次的回訪了！";
+            const fullText = baseText + hashtagsPart;
+
+            // 4. 打字機動畫邏輯
+            resultContent.innerHTML = "";
+            resultContent.style.color = "#333";
+            aiStatus.style.display = "inline";
+            let i = 0;
+            const timer = setInterval(() => {
+                if (i < fullText.length) {
+                    if (fullText[i] === "\n") {
+                        resultContent.innerHTML += "<br>";
+                    } else {
+                        resultContent.innerHTML += fullText[i];
+                    }
+                    i++;
+                } else {
+                    clearInterval(timer);
+                    aiStatus.style.display = "none";
+                    generatedText = fullText;
+                }
+            }, 30);
         }
 
-        // 標籤選取邏輯
-        function selectTag(event, tagEl) {
-            event.stopPropagation();
-            tagEl.classList.toggle('selected');
-        }
-
-        // 成功提示邏輯 (1秒消失)
-        function showSuccessToast() {
-            const toast = document.getElementById('successToast');
-            toast.style.display = 'flex';
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 1000);
+        function saveAndExit() {
+            if (generatedText) {
+                localStorage.setItem('articleContent', generatedText); 
+                const toast = document.getElementById('successToast');
+                toast.style.display = 'flex';
+                setTimeout(() => { window.location.href = 'article-post.html'; }, 1000);
+            } else {
+                alert("請先點擊生成按鈕");
+            }
         }
     </script>
 </body>
-</html>
 </html>

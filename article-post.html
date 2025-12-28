@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>撰寫文章 - Furry Café Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
         body { background-color: #FFECCB; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
@@ -17,48 +18,73 @@
 
         .title-section { display: flex; align-items: center; gap: 10px; font-size: 22px; color: #333; margin-top: 5px; }
 
-        /* --- 改良後的社群圖示列 --- */
+        /* 社群圖示列 */
         .social-group { display: flex; gap: 12px; margin: 10px 0; overflow-x: auto; padding-bottom: 5px; }
-        .social-item { 
-            position: relative; 
-            width: 60px; 
-            height: 60px; 
-            flex-shrink: 0; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-        }
-
-        /* 未綁定狀態：黑白且半透明 */
-        .social-item.unbind {
-            filter: grayscale(100%);
-            opacity: 0.4;
-        }
-
-        /* 綁定狀態：彩色且正常透明度 */
-        .social-item.bind {
-            filter: grayscale(0%);
-            opacity: 1;
-            transform: scale(1.05); /* 稍微放大表示選中 */
-        }
-
+        .social-item { position: relative; width: 60px; height: 60px; flex-shrink: 0; cursor: pointer; transition: all 0.3s ease; }
+        .social-item.unbind { filter: grayscale(100%); opacity: 0.4; }
+        .social-item.bind { filter: grayscale(0%); opacity: 1; transform: scale(1.05); }
         .avatar { width: 100%; height: 100%; background-color: #999; border-radius: 50%; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 2px solid transparent; }
-        .social-item.bind .avatar { border-color: #FFB352; } /* 選中時增加橘色邊框 */
-        
+        .social-item.bind .avatar { border-color: #FFB352; }
         .avatar i { color: white; font-size: 35px; margin-top: 10px; } 
         .badge { position: absolute; bottom: 0; right: 0; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; font-size: 12px; color: white; }
-        
         .badge.fb { background-color: #1877F2; }
         .badge.ig { background: linear-gradient(45deg, #f09433 0%, #bc1888 100%); }
         .badge.threads { background-color: #000; }
         .badge.x { background-color: #000; }
-        .badge.bluesky { background-color: #0085ff; } /* */
+        .badge.bluesky { background-color: #0085ff; }
 
-        /* 其他區域樣式保持不變 */
-        .post-content-wrapper { background-color: white; border-radius: 20px; padding: 15px; display: flex; flex-direction: column; min-height: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        textarea { width: 100%; flex-grow: 1; border: none; outline: none; resize: none; font-size: 16px; color: #333; line-height: 1.5; background: transparent; }
-        .toolbar { display: flex; gap: 20px; padding-top: 10px; border-top: 1px solid #EEE; margin-top: 10px; }
+        /* 文章內容容器 */
+        .post-content-wrapper { 
+            background-color: white; 
+            border-radius: 20px; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 450px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+        }
+
+        /* 文字輸入區 (上方) */
+        textarea { 
+            width: 100%; 
+            min-height: 150px;
+            border: none; 
+            outline: none; 
+            resize: none; 
+            font-size: 17px; 
+            color: #333; 
+            line-height: 1.6; 
+            background: transparent;
+            margin-bottom: 15px;
+        }
+
+        /* 圖片預覽區 (下方) */
+        .image-preview-container { 
+            width: 100%; 
+            display: none; 
+            position: relative; 
+            margin-top: auto; /* 確保在有空間時推到下方 */
+            padding-top: 10px;
+        }
+        .preview-img { 
+            width: 100%; 
+            border-radius: 12px; 
+            object-fit: cover; 
+            max-height: 250px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .remove-img-btn {
+            position: absolute; top: 20px; right: 10px;
+            background: rgba(0,0,0,0.6); color: white;
+            border: none; border-radius: 50%; width: 28px; height: 28px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 工具列 */
+        .toolbar { display: flex; gap: 20px; padding-top: 15px; border-top: 1px solid #EEE; margin-top: 10px; }
         .tool-btn { font-size: 24px; color: #333; cursor: pointer; text-decoration: none; }
 
+        /* Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-box { background: white; width: 85%; max-width: 320px; border-radius: 25px; text-align: center; overflow: hidden; }
         .modal-body { padding: 30px 20px; }
@@ -102,15 +128,23 @@
         </div>
 
         <div class="post-content-wrapper">
-            <textarea id="articleContent" placeholder="寫點什麼吧"></textarea>
+            <textarea id="articleContent" placeholder="在此輸入文章內容..."></textarea>
+
+            <div id="imagePreviewContainer" class="image-preview-container">
+                <img id="previewImg" class="preview-img" src="">
+                <button class="remove-img-btn" onclick="removeImage()">✕</button>
+            </div>
+
             <div class="toolbar">
-                <div class="tool-btn"><i class="fa-regular fa-image"></i></div>
-                <div class="tool-btn"><i class="fa-solid fa-camera"></i></div>
+                <div class="tool-btn" onclick="goToAlbum()"><i class="fa-regular fa-image"></i></div>
+                <div class="tool-btn" onclick="triggerCamera()"><i class="fa-solid fa-camera"></i></div>
                 <a href="article-generate.html" class="tool-btn"><i class="fa-solid fa-list-check"></i></a>
                 <div class="tool-btn" onclick="resetContent()"><i class="fa-solid fa-rotate-left"></i></div>
             </div>
         </div>
     </div>
+
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
 
     <div id="publishModal" class="modal-overlay">
         <div class="modal-box">
@@ -125,37 +159,151 @@
     <script>
         const platforms = ['Facebook', 'Instagram', 'Threads', 'X', 'BlueSky'];
 
-        // 初始化：讀取狀態並套用黑白/彩色效果
+window.onload = () => {
+    initSocialIcons();
+    loadDraftPhoto(); 
+    loadDraftContent(); // 新增：頁面載入時讀取暫存的文章內容
+};
+
+function loadDraftContent() {
+    // 從 localStorage 取得剛才在 AI 小幫手生成並儲存的內容
+    const content = localStorage.getItem('articleContent');
+    if (content) {
+        // 將內容填入 textarea
+        document.getElementById('articleContent').value = content;
+    }
+}
+
+        // --- 圖片預覽與連動邏輯 ---
+        function loadDraftPhoto() {
+            const draft = localStorage.getItem('draft_photo');
+            if (draft) {
+                const photo = JSON.parse(draft);
+                showPreview(photo.src);
+            }
+        }
+
+        function showPreview(src) {
+            const container = document.getElementById('imagePreviewContainer');
+            const img = document.getElementById('previewImg');
+            img.src = src;
+            container.style.display = 'block';
+        }
+
+        function removeImage() {
+            localStorage.removeItem('draft_photo');
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+        }
+
+        function goToAlbum() {
+            window.location.href = 'photo.html';
+        }
+
+        // --- 相機與 HEIC 處理邏輯 ---
+        const cameraInput = document.getElementById('cameraInput');
+
+        function triggerCamera() {
+            cameraInput.click();
+        }
+
+        cameraInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            let blob = file;
+            // 如果是 HEIC 格式則進行轉換
+            if (file.type.includes("heic") || file.name.toLowerCase().endsWith(".heic")) {
+                try {
+                    blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.7 });
+                    if (Array.isArray(blob)) blob = blob[0];
+                } catch (err) {
+                    console.error("HEIC 轉換失敗", err);
+                }
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    // 壓縮圖片
+                    const canvas = document.createElement('canvas');
+                    const maxWidth = 1024;
+                    let w = img.width, h = img.height;
+                    if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    // 存入草稿並顯示預覽
+                    const newPhoto = { src: dataUrl, date: '今日', id: Date.now() };
+                    localStorage.setItem('draft_photo', JSON.stringify(newPhoto));
+                    showPreview(dataUrl);
+
+                    // 同步更新相簿
+                    let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+                    allPhotos.push(newPhoto);
+                    localStorage.setItem('all_photos', JSON.stringify(allPhotos));
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(blob);
+        });
+
+        // --- 社交平台狀態邏輯 ---
         function initSocialIcons() {
             platforms.forEach(p => {
                 const status = localStorage.getItem('social_' + p) || 'unbind';
                 const el = document.getElementById('post-' + p);
-                
-                if (status === 'bind') {
-                    el.classList.add('bind');
-                    el.classList.remove('unbind');
-                } else {
-                    el.classList.add('unbind');
-                    el.classList.remove('bind');
-                }
+                if (status === 'bind') { el.classList.add('bind'); el.classList.remove('unbind'); } 
+                else { el.classList.add('unbind'); el.classList.remove('bind'); }
             });
         }
 
-        // 點擊切換功能
         function togglePlatform(p) {
             const currentStatus = localStorage.getItem('social_' + p) || 'unbind';
-            const newStatus = (currentStatus === 'bind') ? 'unbind' : 'bind';
-            
-            localStorage.setItem('social_' + p, newStatus);
-            initSocialIcons(); // 重新整理視覺效果
+            localStorage.setItem('social_' + p, (currentStatus === 'bind') ? 'unbind' : 'bind');
+            initSocialIcons();
         }
 
-        window.onload = initSocialIcons;
-
+        // --- 發佈與 Modal ---
         function openModal() { document.getElementById('publishModal').classList.add('show'); }
         function closeModal() { document.getElementById('publishModal').classList.remove('show'); }
-        function confirmPublish() { alert('文章已同步發佈至選中平台！'); closeModal(); }
-        function resetContent() { if(confirm('確定清除內容？')) document.getElementById('articleContent').value = ''; } 
+        function confirmPublish() { 
+            alert('文章已同步發佈至選中平台！'); 
+            localStorage.removeItem('draft_photo');
+            window.location.href = 'index.html';
+        }
+        function resetContent() { 
+            if(confirm('確定清除內容與圖片？')) { 
+                document.getElementById('articleContent').value = ''; 
+                removeImage(); 
+            } 
+        }
+        function goToAIHelper() {
+    // 獲取目前文字框的內容
+    const content = document.getElementById('articleContent').value;
+    // 儲存到本地，讓 AI 小幫手能讀取
+    localStorage.setItem('articleContent', content);
+    window.location.href = 'article-generate.html';
+}
+// 修改 confirmPublish 函數
+function confirmPublish() { 
+    alert('文章已同步發佈至選中平台！'); 
+    localStorage.removeItem('draft_photo');
+    localStorage.removeItem('articleContent'); // 發佈後清除暫存內容
+    window.location.href = 'index.html';
+}
+
+// 修改 resetContent 函數
+function resetContent() { 
+    if(confirm('確定清除內容與圖片？')) { 
+        document.getElementById('articleContent').value = ''; 
+        localStorage.removeItem('articleContent'); // 清除文字框時也同步清除快取
+        removeImage(); 
+    } 
+}
+
     </script>
 </body>
 </html>
