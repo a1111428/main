@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
     
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body, html { 
@@ -184,7 +186,7 @@
         <nav class="bottom-nav">
             <a href="index.html" class="nav-item active"><i class="fa-solid fa-house"></i></a>
             <a href="article-post.html" class="nav-item"><i class="fa-solid fa-book"></i></a>
-            <a href="#" class="nav-item" onclick="triggerCamera(event)"><i class="fa-solid fa-camera"></i></a>
+            <a href="#" class="nav-item" onclick="triggerCamera()"><i class="fa-solid fa-camera"></i></a>
             <a href="photo_album.html" class="nav-item"><i class="fa-solid fa-image"></i></a>
             <a href="#" onclick="checkLoginStatus()" class="nav-item"><i class="fa-solid fa-user"></i></a>
         </nav>
@@ -208,6 +210,8 @@
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
 
         let userMarker, userCircle;
+        let lastKnownLocation = null;  
+        let hasLocated = false;        
 
         const restaurantIcon = L.icon({
             iconUrl: 'assets/icon/coordinates.png', 
@@ -247,8 +251,12 @@
 
         map.addLayer(clusters);
 
-        function locateUser(setView = true) {
-            map.locate({ setView: setView, maxZoom: 17, enableHighAccuracy: true });
+        function locateUser(forceRequest = false) {
+            if (lastKnownLocation && !forceRequest) {
+                map.flyTo(lastKnownLocation, 17);
+                return;
+            }
+            map.locate({ setView: false, maxZoom: 17, enableHighAccuracy: true });
         }
 
         map.on('locationfound', function(e) {
@@ -258,6 +266,9 @@
             userMarker = L.circleMarker(e.latlng, {
                 radius: 10, fillColor: "#FF9800", color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.9
             }).addTo(map).bindPopup("您目前的位置");
+
+            lastKnownLocation = e.latlng;
+            hasLocated = true;
             map.flyTo(e.latlng, 17);
         });
 
@@ -272,81 +283,119 @@
             window.location.href = (localStorage.getItem('isLoggedIn') === 'true') ? 'profile.html' : 'personal.html';
         }
 
-        function triggerCamera(event) {
-            event.preventDefault();
+        /* --- 相機功能修正處 --- */
+        function triggerCamera() {
             if (!navigator.geolocation) {
-                alert("瀏覽器不支援定位，無法拍照分類。");
+                alert("您的瀏覽器不支援定位功能，無法開啟相機。");
                 return;
             }
 
-            navigator.geolocation.getCurrentPosition((pos) => {
-                window.currentCapturePos = {
-                    lat: pos.coords.latitude,
-                    lng: pos.coords.longitude
-                };
-                document.getElementById('input_camera').click();
-            }, (err) => {
-                alert("拍照前必須開啟定位功能，請確認權限設定。");
-            }, { enableHighAccuracy: true });
+            // 在背景更新定位（不阻礙相機開啟）
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    window.currentCapturePos = {
+                        lat: pos.coords.latitude,
+                        lng: pos.coords.longitude
+                    };
+                },
+                null, 
+                { enableHighAccuracy: true, timeout: 5000 }
+            );
+
+            // 【關鍵修正】：立即觸發相機，避免被瀏覽器攔截彈窗
+            document.getElementById('input_camera').click();
         }
 
-        // --- 拍照與壓縮邏輯修正 ---
-        document.getElementById('input_camera').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file || !window.currentCapturePos) return;
+        async function processImage(file) {
+            let blob = file;
 
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    
-                    // 壓縮圖片：設定最大寬度為 1024px，避免 LocalStorage 溢位 (5MB限制)
-                    const maxWidth = 1024;
-                    let width = img.width;
-                    let height = img.height;
-                    
-                    if (width > maxWidth) {
-                        height = Math.round((height * maxWidth) / width);
-                        width = maxWidth;
-                    }
+            if (file.type === "image/heic" || file.type === "image/heif" || file.name.toLowerCase().endsWith('.heic')) {
+                try {
+                    blob = await heic2any({
+                        blob: file,
+                        toType: "image/jpeg",
+                        quality: 0.8
+                    });
+                    if (Array.isArray(blob)) blob = blob[0];
+                } catch (e) {
+                    console.error("HEIC 轉換失敗", e);
+                    alert("無法處理 HEIC 圖片，請稍後再試或改用 JPG。");
+                    return null;
+                }
+            }
 
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        const maxWidth = 1024;
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
 
-                    // 轉換為 JPEG 品質 0.7 (體積縮小但畫質足夠手機查看)
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    savePhotoData(compressedDataUrl);
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                    };
+                    img.src = event.target.result;
                 };
-                img.src = event.target.result;
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        function saveAndNavigate(dataUrl) {
+            // 【關鍵修正】：增加備援定位，若無座標則取地圖中心點
+            const finalPos = window.currentCapturePos || {
+                lat: map.getCenter().lat,
+                lng: map.getCenter().lng
             };
-            reader.readAsDataURL(file);
 
-            function savePhotoData(src) {
-                const photoData = {
-                    id: Date.now(),
-                    src: src,
-                    name: file.name.replace(/\.[^/.]+$/, "") + ".jpg",
-                    date: new Date().toLocaleDateString('zh-TW'),
-                    time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
-                    lat: window.currentCapturePos.lat,
-                    lng: window.currentCapturePos.lng
-                };
+            const photoData = {
+                id: Date.now(),
+                src: dataUrl,
+                name: "photo_" + Date.now() + ".jpg",
+                date: new Date().toLocaleDateString('zh-TW'),
+                time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
+                lat: finalPos.lat,
+                lng: finalPos.lng
+            };
 
-                // 儲存臨時資料
-                localStorage.setItem('temp_photo_data', JSON.stringify(photoData));
+            localStorage.setItem('temp_photo_data', JSON.stringify(photoData));
 
-                // 儲存進相簿
-                let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-                allPhotos.push(photoData);
-                localStorage.setItem('all_photos', JSON.stringify(allPhotos));
+            let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+            allPhotos.push(photoData);
+            localStorage.setItem('all_photos', JSON.stringify(allPhotos));
 
-                // 跳轉至資訊頁
+            updatePhotoMarker();
+
+            document.getElementById('input_camera').value = '';
+
+            setTimeout(() => {
                 window.location.href = 'photo_info.html';
+            }, 200);
+        }
+
+        document.getElementById('input_camera').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            // 【關鍵修正】：移除對 window.currentCapturePos 的強制檢查
+            if (!file) return;
+
+            const dataUrl = await processImage(file);
+            if (dataUrl) {
+                saveAndNavigate(dataUrl);
             }
         });
+        /* --- 相機修正結束 --- */
 
         const FIXED_PHOTO_LOCATION = [22.732775288093578, 120.2884383523927];
 
@@ -389,7 +438,11 @@
                 popupContent += '</div>';
             }
             popupContent += '</div>';
-            photoMarker.bindPopup(popupContent, { maxWidth: 320 });
+
+            photoMarker.bindPopup(popupContent, { 
+                maxWidth: 320,
+                offset: [0, -40]  
+            });
         }
 
         window.openPhoto = function(id) {
