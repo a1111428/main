@@ -45,14 +45,17 @@
             z-index: 1;
         }
         
-        /* 修正後的搜尋列樣式 */
-        .search-bar {
+        /* 搜尋列 */
+        .search-bar-container {
             position: absolute;
             top: 60px;                      
-            left: 50%;                      /* 從中間開始 */
-            transform: translateX(-50%);     /* 向左偏移自身寬度的一半來達成置中 */
+            left: 50%;
+            transform: translateX(-50%);
             width: calc(100% - 60px);       
-            max-width: 392px;               
+            max-width: 392px;
+            z-index: 20;
+        }
+        .search-bar {
             height: 50px;                   
             background: #E9E9EA;
             border: 1px solid #000000;
@@ -61,11 +64,105 @@
             align-items: center;
             padding: 0 16px;                
             box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
-            z-index: 20;
         }
         .search-bar i { font-size: 22px; color: #888; flex-shrink: 0; }
         .search-bar input { border: none; background: transparent; margin: 0 8px; flex: 1; font-size: 16px; outline: none; }
         
+        /* 搜尋結果選單 */
+        .search-results {
+            margin-top: 8px;
+            background: white;
+            border-radius: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+        }
+        .result-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .result-item:last-child { border-bottom: none; }
+        .result-item:hover { background: #FFF9F0; }
+        .result-item .res-name { font-weight: bold; display: block; color: #333; }
+        .result-item .res-addr { font-size: 12px; color: #888; }
+
+        /* 搜尋失敗彈窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .fail-modal {
+            width: 80%;
+            max-width: 320px;
+            background: #E0E0E0;
+            border-radius: 30px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .fail-modal h2 { font-size: 22px; margin-bottom: 10px; color: #000; }
+        .fail-modal p { font-size: 14px; color: #333; margin-bottom: 25px; }
+        .fail-modal .close-btn {
+            background: #FFAD4D;
+            color: #333; 
+            border: none;
+            padding: 10px 40px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 底部半視窗詳情面板 (像 Google Map) */
+        .detail-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: #FFF9F0;
+            border-radius: 30px 30px 0 0;
+            z-index: 1500;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            padding: 30px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-panel.active { transform: translateY(0); }
+        .panel-handle {
+            width: 50px;
+            height: 5px;
+            background: #D0D0D0;
+            border-radius: 5px;
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .panel-name { font-size: 28px; font-weight: 800; color: #000; margin-bottom: 10px; }
+        .panel-meta { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 16px; color: #333; }
+        .panel-desc { font-size: 15px; line-height: 1.6; color: #555; margin-bottom: 20px; flex: 1; overflow-y: auto; }
+        .panel-btn {
+            background: #FFAD4D;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
         .bottom-nav {
             position: absolute;
             bottom: 0; left: 0; width: 100%;
@@ -106,6 +203,27 @@
             border-radius: 18px;
         }
         
+        /* 氣泡框加大與文字調整 */
+        .custom-popup .leaflet-popup-content-wrapper { 
+            border-radius: 18px; 
+            padding: 10px; 
+            width: 240px; /* 加大寬度 */
+        }
+        .popup-content { padding: 5px; text-align: left; }
+        .popup-title { font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #333; display: block; }
+        .popup-info { font-size: 14px; color: #666; margin-bottom: 12px; line-height: 1.5; }
+        .popup-btn {
+            display: block;
+            background: #FF9800;
+            color: #ffffff !important; /* 改為白色文字 */
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
         .map-controls-wrapper {
             position: absolute;
             right: 12px;
@@ -130,11 +248,7 @@
         }
         .my-location-btn i { font-size: 20px; color: #FF9800; }
 
-        .leaflet-control-zoom {
-            margin: 0 !important;
-            border: none !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
-        }
+        .leaflet-control-zoom { margin: 0 !important; border: none !important; box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important; }
         .leaflet-control-zoom-in, .leaflet-control-zoom-out {
             background-color: white !important;
             color: #FF9800 !important;
@@ -148,19 +262,10 @@
         .leaflet-control-zoom-in { border-top-left-radius: 10px !important; border-top-right-radius: 10px !important; border-bottom: 1px solid #f0f0f0 !important; }
         .leaflet-control-zoom-out { border-bottom-left-radius: 10px !important; border-bottom-right-radius: 10px !important; }
 
-        @keyframes floatIcon {
-            0%, 80%, 100% { margin-top: 0; }
-            90% { margin-top: -10px; }
-        }
-        .floating-icon {
-            animation: floatIcon 6s ease-in-out infinite;
-        }
-
-        .marker-cluster-small, .marker-cluster-small div,
-        .marker-cluster-medium, .marker-cluster-medium div,
-        .marker-cluster-large, .marker-cluster-large div {
-            background-color: rgba(255, 152, 0, 0.6) !important;
-            color: white !important;
+        @keyframes floatIcon { 0%, 80%, 100% { margin-top: 0; } 90% { margin-top: -10px; } }
+        .floating-icon { animation: floatIcon 6s ease-in-out infinite; }
+        .marker-cluster-small, .marker-cluster-small div, .marker-cluster-medium, .marker-cluster-medium div, .marker-cluster-large, .marker-cluster-large div {
+            background-color: rgba(255, 152, 0, 0.6) !important; color: white !important;
         }
     </style>
 </head>
@@ -168,10 +273,36 @@
     <div class="container">
         <div id="mapid"></div>
         
-        <div class="search-bar">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="搜尋餐廳">
-            <i class="fa-solid fa-microphone"></i>
+        <div class="search-bar-container">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="搜尋餐廳">
+                <i class="fa-solid fa-microphone"></i>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <div class="modal-overlay" id="failModal">
+            <div class="fail-modal">
+                <h2>在地圖上找不到結果</h2>
+                <p>請嘗試變更搜尋內容。</p>
+                <button class="close-btn" onclick="closeFailModal()">關閉</button>
+            </div>
+        </div>
+
+        <div class="detail-panel" id="detailPanel">
+            <div class="panel-handle" onclick="closeDetailPanel()"></div>
+            <h1 class="panel-name" id="panelName">餐廳名稱</h1>
+            <div class="panel-meta">
+                <span id="panelRating">0.0 <i class="fa-solid fa-star"></i></span>
+                <span id="panelPrice">$000-000</span>
+                <span><i class="fa-solid fa-location-dot"></i> 0.7m</span>
+            </div>
+            <div class="panel-desc">
+                <p id="panelAddress">地址資訊載入中...</p>
+                <p style="margin-top: 8px;">這是一家寵物友善餐廳，提供舒適的環境與美味的餐點，非常適合帶著毛孩一起來享受時光。</p>
+            </div>
+            <a href="#" id="panelBtn" class="panel-btn">進入查看詳情</a>
         </div>
         
         <div class="map-controls-wrapper">
@@ -183,7 +314,7 @@
         
         <nav class="bottom-nav">
             <a href="index.html" class="nav-item active"><i class="fa-solid fa-house"></i></a>
-            <a href="article-post.html" class="nav-item"><i class="fa-solid fa-book"></i></a>
+            <a href="article.html" class="nav-item"><i class="fa-solid fa-book"></i></a>
             <a href="#" class="nav-item" onclick="triggerCamera()"><i class="fa-solid fa-camera"></i></a>
             <a href="photo_album.html" class="nav-item"><i class="fa-solid fa-image"></i></a>
             <a href="#" onclick="checkLoginStatus()" class="nav-item"><i class="fa-solid fa-user"></i></a>
@@ -195,7 +326,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
     <script>
-        // 地圖與定位邏輯保持不變
         const map = L.map('mapid', {
             center: [22.732775288093578, 120.2884383523927],
             zoom: 17,
@@ -205,56 +335,102 @@
         L.control.zoom({ position: 'bottomright' }).addTo(map);
         const zoomCtrl = document.querySelector('.leaflet-control-zoom');
         document.getElementById('zoom-container').appendChild(zoomCtrl);
-
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-        let userMarker, userCircle;
-        let lastKnownLocation = null;  
-        let hasLocated = false;        
-
+        let userMarker, userCircle, lastKnownLocation = null, hasLocated = false;        
         const restaurantIcon = L.icon({
-            iconUrl: 'assets/icon/coordinates.png', 
-            iconSize: [38, 38], 
-            iconAnchor: [19, 38], 
-            popupAnchor: [0, -15],
-            className: 'floating-icon' 
+            iconUrl: 'assets/icon/coordinates.png', iconSize: [38, 38], iconAnchor: [19, 38], popupAnchor: [0, -15], className: 'floating-icon' 
         });
-
-        const clusters = L.markerClusterGroup({
-            showCoverageOnHover: false,
-            spiderfyOnMaxZoom: true
-        });
+        const clusters = L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: true });
 
         const locations = [
-            { name: "沐沐MUMU 茶飲", pos: [22.70350854455539, 120.30130446507042], info: "高雄市楠梓區宏毅一路6號" },
-            { name: "Bon appétit 葩那貝蒂", pos: [22.736657810967653, 120.32909822442647], info: "高雄市楠梓區土庫一路198號" },
-            { name: "究鶴餐館", pos: [22.659232089345057, 120.30670308024811], info: "高雄市左營區富國路98號" },
-            { name: "鸚鵡螺餐酒館-富國店", pos: [22.660084586531575, 120.30648179558894], info: "高雄市左營區富國路101號" },
-            { name: "ROSA義大利餐廳", pos: [22.687341270147343, 120.31386639374334], info: "高雄市左營區華夏路1422號" },
-            { name: "貓之家俱樂部", pos: [22.66880977978303, 120.29994138209479], info: "高雄市左營區新勝街26號" },
-            { name: "萊Bar音樂餐酒館", pos: [22.67991127626432, 120.31122636675437], info: "高雄市左營區文自路５７１號" },
-            { name: "逅巷咖啡定食", pos: [22.669228579277874, 120.30437362257813], info: "高雄市左營區新上街307巷15號" },
-            { name: "心滿義廚", pos: [22.66626008061487, 120.30757376490757], info: "高雄市立信路28號" }
+            { name: "沐沐MUMU 茶飲", pos: [22.703508, 120.301304], info: "高雄市楠梓區宏毅一路6號", price: "$100-200", rating: "4.8" },
+            { name: "Bon appétit 葩那貝蒂", pos: [22.736657, 120.329098], info: "高雄市楠梓區土庫一路198號", price: "$300-500", rating: "4.5" },
+            { name: "究鶴餐館", pos: [22.659232, 120.306703], info: "高雄市左營區富國路98號", price: "$200-400", rating: "4.6" },
+            { name: "鸚鵡螺餐酒館-富國店", pos: [22.660084, 120.306481], info: "高雄市左營區富國路101號", price: "$600-800", rating: "4.9" },
+            { name: "ROSA義大利餐廳", pos: [22.687341, 120.313866], info: "高雄市左營區華夏路1422號", price: "$400-600", rating: "4.3" },
+            { name: "貓之家俱樂部", pos: [22.668809, 120.299941], info: "高雄市左營區新勝街26號", price: "$200-300", rating: "4.7" },
+            { name: "萊Bar音樂餐酒館", pos: [22.679911, 120.311226], info: "高雄市左營區文自路５７１號", price: "$500-700", rating: "4.4" },
+            { name: "逅巷咖啡定食", pos: [22.669228, 120.304374], info: "高雄市左營區新上街307巷15號", price: "$250-400", rating: "4.6" },
+            { name: "心滿義廚", pos: [22.666260, 120.307573], info: "高雄市立信路28號", price: "$300-500", rating: "4.5" }
         ];
 
+        const markerMap = {};
         locations.forEach(loc => {
-            const marker = L.marker(loc.pos, { icon: restaurantIcon })
-                            .bindPopup(`<b>${loc.name}</b><br>${loc.info}`);
+            const popupContent = `<div class="popup-content"><span class="popup-title">${loc.name}</span><div class="popup-info"><i class="fa-solid fa-star" style="color:#FF9800"></i> ${loc.rating} | ${loc.price}<br><i class="fa-solid fa-location-dot"></i> ${loc.info}</div><a href="restaurant-info.html?name=${encodeURIComponent(loc.name)}" class="popup-btn">進入查看詳情</a></div>`;
+            const marker = L.marker(loc.pos, { icon: restaurantIcon }).bindPopup(popupContent, { className: 'custom-popup' });
+            
+            // 點擊 Marker 時開啟面板
+            marker.on('click', function() {
+                openDetailPanel(loc);
+            });
+
             clusters.addLayer(marker);
-
-            setTimeout(() => {
-                const iconImg = marker.getElement();
-                if (iconImg) iconImg.style.animationDelay = `-${Math.random() * 10}s`;
-            }, 100);
+            markerMap[loc.name] = marker;
         });
-
         map.addLayer(clusters);
 
-        function locateUser(forceRequest = false) {
-            if (lastKnownLocation && !forceRequest) {
-                map.flyTo(lastKnownLocation, 17);
-                return;
+        // --- 面板邏輯 ---
+        function openDetailPanel(loc) {
+            document.getElementById('panelName').innerText = loc.name;
+            document.getElementById('panelRating').innerHTML = `${loc.rating} <i class="fa-solid fa-star"></i>`;
+            document.getElementById('panelPrice').innerText = loc.price;
+            document.getElementById('panelAddress').innerText = loc.info;
+            document.getElementById('panelBtn').href = `restaurant-info.html?name=${encodeURIComponent(loc.name)}`;
+            document.getElementById('detailPanel').classList.add('active');
+        }
+
+        function closeDetailPanel() {
+            document.getElementById('detailPanel').classList.remove('active');
+        }
+
+        // --- 搜尋邏輯 ---
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const failModal = document.getElementById('failModal');
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            if (!query) { searchResults.style.display = 'none'; return; }
+            const filtered = locations.filter(loc => loc.name.toLowerCase().includes(query) || loc.info.toLowerCase().includes(query));
+            if (filtered.length > 0) {
+                searchResults.innerHTML = filtered.map(loc => `<div class="result-item" onclick="goToRestaurant('${loc.name.replace(/'/g, "\\'")}')"><span class="res-name">${loc.name}</span><span class="res-addr">${loc.info}</span></div>`).join('');
+                searchResults.style.display = 'block';
+            } else { searchResults.style.display = 'none'; }
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim().toLowerCase();
+                const exists = locations.some(loc => loc.name.toLowerCase().includes(query));
+                if (!exists && query !== "") { showFailModal(); }
+                searchResults.style.display = 'none';
             }
+        });
+
+        window.goToRestaurant = function(name) {
+            const loc = locations.find(l => l.name === name);
+            if (loc) {
+                searchInput.value = name; searchResults.style.display = 'none';
+                map.flyTo(loc.pos, 18);
+                setTimeout(() => { 
+                    markerMap[name].openPopup(); 
+                    openDetailPanel(loc); // 搜尋成功直接開面板
+                }, 800);
+            }
+        };
+
+        function showFailModal() { failModal.style.display = 'flex'; }
+        window.closeFailModal = function() { failModal.style.display = 'none'; }
+        
+        map.on('click', () => { 
+            searchResults.style.display = 'none'; 
+            closeDetailPanel(); // 點擊地圖關閉面板
+        });
+
+        // --- 原有定位功能 ---
+        function locateUser(forceRequest = false) {
+            if (lastKnownLocation && !forceRequest) { map.flyTo(lastKnownLocation, 17); return; }
             map.locate({ setView: false, maxZoom: 17, enableHighAccuracy: true });
         }
 
@@ -262,86 +438,36 @@
             const radius = e.accuracy / 2;
             if (userMarker) { map.removeLayer(userMarker); map.removeLayer(userCircle); }
             userCircle = L.circle(e.latlng, radius, { color: '#FF9800', fillOpacity: 0.1 }).addTo(map);
-            userMarker = L.circleMarker(e.latlng, {
-                radius: 10, fillColor: "#FF9800", color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.9
-            }).addTo(map).bindPopup("您目前的位置");
-
-            lastKnownLocation = e.latlng;
-            hasLocated = true;
-            map.flyTo(e.latlng, 17);
+            userMarker = L.circleMarker(e.latlng, { radius: 10, fillColor: "#FF9800", color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.9 }).addTo(map).bindPopup("您目前的位置");
+            lastKnownLocation = e.latlng; hasLocated = true; map.flyTo(e.latlng, 17);
         });
 
-        map.on('locationerror', function(e) {
-            alert('無法取得您的位置，請檢查權限或稍後再試。\n將顯示預設地圖位置（高雄）。');
-            map.setView([22.7333, 120.2847], 17);
-        });
-
+        map.on('locationerror', function(e) { map.setView([22.7333, 120.2847], 17); });
         locateUser(true);
 
-        function checkLoginStatus() {
-            window.location.href = (localStorage.getItem('isLoggedIn') === 'true') ? 'profile.html' : 'personal.html';
-        }
-
-        /* 相機與儲存功能保持不變 */
+        function checkLoginStatus() { window.location.href = (localStorage.getItem('isLoggedIn') === 'true') ? 'profile.html' : 'personal.html'; }
+        
+        // --- 相機拍照與圖片處理 ---
         function triggerCamera() {
-            if (!navigator.geolocation) {
-                alert("您的瀏覽器不支援定位功能，無法開啟相機。");
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    window.currentCapturePos = {
-                        lat: pos.coords.latitude,
-                        lng: pos.coords.longitude
-                    };
-                },
-                null, 
-                { enableHighAccuracy: true, timeout: 5000 }
-            );
-
+            if (!navigator.geolocation) { alert("您的瀏覽器不支援定位功能。"); return; }
+            navigator.geolocation.getCurrentPosition((pos) => { window.currentCapturePos = { lat: pos.coords.latitude, lng: pos.coords.longitude }; }, null, { enableHighAccuracy: true, timeout: 5000 });
             document.getElementById('input_camera').click();
         }
 
         async function processImage(file) {
             let blob = file;
-
             if (file.type === "image/heic" || file.type === "image/heif" || file.name.toLowerCase().endsWith('.heic')) {
-                try {
-                    blob = await heic2any({
-                        blob: file,
-                        toType: "image/jpeg",
-                        quality: 0.8
-                    });
-                    if (Array.isArray(blob)) blob = blob[0];
-                } catch (e) {
-                    console.error("HEIC 轉換失敗", e);
-                    alert("無法處理 HEIC 圖片，請稍後再試或改用 JPG。");
-                    return null;
-                }
+                try { blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.8 }); if (Array.isArray(blob)) blob = blob[0]; } catch (e) { return null; }
             }
-
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const img = new Image();
                     img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        
-                        const maxWidth = 1024;
-                        let width = img.width;
-                        let height = img.height;
-                        
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-
+                        const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                        const maxWidth = 1024; let width = img.width, height = img.height;
+                        if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
+                        canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
                         resolve(canvas.toDataURL('image/jpeg', 0.7));
                     };
                     img.src = event.target.result;
@@ -351,62 +477,26 @@
         }
 
         function saveAndNavigate(dataUrl) {
-            const finalPos = window.currentCapturePos || {
-                lat: map.getCenter().lat,
-                lng: map.getCenter().lng
-            };
-
-            const photoData = {
-                id: Date.now(),
-                src: dataUrl,
-                name: "photo_" + Date.now() + ".jpg",
-                date: new Date().toLocaleDateString('zh-TW'),
-                time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
-                lat: finalPos.lat,
-                lng: finalPos.lng
-            };
-
+            const finalPos = window.currentCapturePos || { lat: map.getCenter().lat, lng: map.getCenter().lng };
+            const photoData = { id: Date.now(), src: dataUrl, name: "photo_" + Date.now() + ".jpg", date: new Date().toLocaleDateString('zh-TW'), time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }), lat: finalPos.lat, lng: finalPos.lng };
             localStorage.setItem('temp_photo_data', JSON.stringify(photoData));
-
-            let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-            allPhotos.push(photoData);
-            localStorage.setItem('all_photos', JSON.stringify(allPhotos));
-
-            updatePhotoMarker();
-
-            document.getElementById('input_camera').value = '';
-
-            setTimeout(() => {
-                window.location.href = 'photo_info.html';
-            }, 200);
+            let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]'); allPhotos.push(photoData); localStorage.setItem('all_photos', JSON.stringify(allPhotos));
+            updatePhotoMarker(); document.getElementById('input_camera').value = '';
+            setTimeout(() => { window.location.href = 'photo_info.html'; }, 200);
         }
 
         document.getElementById('input_camera').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const dataUrl = await processImage(file);
-            if (dataUrl) {
-                saveAndNavigate(dataUrl);
-            }
+            const file = e.target.files[0]; if (!file) return;
+            const dataUrl = await processImage(file); if (dataUrl) saveAndNavigate(dataUrl);
         });
 
+        // --- 相片堆疊地標功能 ---
         const FIXED_PHOTO_LOCATION = [22.732775288093578, 120.2884383523927];
-
         const photoStackIcon = L.divIcon({
             className: 'photo-stack-marker',
-            html: `
-                <div style="position:relative;">
-                    <i class="fa-solid fa-camera" style="font-size:32px;color:#FF9800;text-shadow:0 2px 8px rgba(0,0,0,0.3);"></i>
-                    <div style="position:absolute;top:-8px;right:-8px;background:#FF9800;color:white;width:20px;height:20px;border-radius:50%;font-size:12px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
-                        <span id="photoCount">0</span>
-                    </div>
-                </div>
-            `,
-            iconSize: [40, 40],
-            iconAnchor: [20, 40]
+            html: `<div style="position:relative;"><i class="fa-solid fa-camera" style="font-size:32px;color:#FF9800;text-shadow:0 2px 8px rgba(0,0,0,0.3);"></i><div style="position:absolute;top:-8px;right:-8px;background:#FF9800;color:white;width:20px;height:20px;border-radius:50%;font-size:12px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.3);"><span id="photoCount">0</span></div></div>`,
+            iconSize: [40, 40], iconAnchor: [20, 40]
         });
-
         let photoMarker = L.marker(FIXED_PHOTO_LOCATION, { icon: photoStackIcon }).addTo(map);
 
         function updatePhotoMarker() {
@@ -415,50 +505,28 @@
             const count = allPhotos.length;
             const countElement = document.getElementById('photoCount');
             if (countElement) countElement.textContent = count > 99 ? '99+' : count;
-
             let popupContent = '<div style="max-width:300px;text-align:center;padding:10px 0;">';
-            if (recentPhotos.length === 0) {
-                popupContent += '<p style="color:#999;">尚未有照片</p>';
-            } else {
+            if (recentPhotos.length === 0) { popupContent += '<p style="color:#999;">尚未有照片</p>'; } 
+            else {
                 popupContent += '<div style=\"display:flex;flex-wrap:wrap;gap:8px;justify-content:center;\">';
-                recentPhotos.forEach(photo => {
-                    popupContent += `
-                        <div style="width:80px;cursor:pointer;" onclick="openPhoto(${photo.id})">
-                            <img src="${photo.src}" style="width:100%;height:80px;object-fit:cover;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);">
-                            <div style="font-size:12px;margin-top:4px;color:#666;">${photo.date}</div>
-                        </div>
-                    `;
-                });
+                recentPhotos.forEach(photo => { popupContent += `<div style="width:80px;cursor:pointer;" onclick="openPhoto(${photo.id})"><img src="${photo.src}" style="width:100%;height:80px;object-fit:cover;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);"><div style="font-size:12px;margin-top:4px;color:#666;">${photo.date}</div></div>`; });
                 popupContent += '</div>';
             }
             popupContent += '</div>';
-
-            photoMarker.bindPopup(popupContent, { 
-                maxWidth: 320,
-                offset: [0, -40]  
-            });
+            photoMarker.bindPopup(popupContent, { maxWidth: 320, offset: [0, -40] });
         }
 
         window.openPhoto = function(id) {
             let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
             const photo = allPhotos.find(p => p.id === id);
-            if (photo) {
-                localStorage.setItem('temp_photo_data', JSON.stringify(photo));
-                window.location.href = 'photo_info.html';
-            }
+            if (photo) { localStorage.setItem('temp_photo_data', JSON.stringify(photo)); window.location.href = 'photo_info.html'; }
         };
 
         updatePhotoMarker();
-
         window.addEventListener('focus', updatePhotoMarker);
-        window.addEventListener('pageshow', function(e) { if (e.persisted) updatePhotoMarker(); });
-
         if (window.location.search.includes('focus=photo')) {
             history.replaceState({}, '', 'index.html');
-            setTimeout(() => {
-                map.flyTo(FIXED_PHOTO_LOCATION, 17, { animate: true, duration: 1.2 });
-                photoMarker.openPopup();
-            }, 600);
+            setTimeout(() => { map.flyTo(FIXED_PHOTO_LOCATION, 17); photoMarker.openPopup(); }, 600);
         }
     </script>
 </body>

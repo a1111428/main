@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>餐廳詳情 - Luffy Café</title>
+    <title>餐廳詳情 - Furry Café Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         /* 基本設定 */
@@ -18,7 +18,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* 模擬手機容器 452x968 */
+        /* 模擬手機容器 */
         .phone-window {
             width: 452px;
             height: 968px;
@@ -27,20 +27,14 @@
             overflow-y: auto; 
             overflow-x: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            scroll-behavior: smooth;
-        }
-
-        /* 滾動容器 */
-        .scroll-container {
-            position: relative;
         }
 
         /* --- 1. 照片區塊 --- */
         .header-gallery {
             width: 100%;
-            height: 645px; 
+            height: 500px; 
             position: relative;
-            background: #000;
+            background: #eee;
             overflow: hidden;
         }
 
@@ -53,7 +47,6 @@
             scrollbar-width: none; 
         }
         .photo-slider::-webkit-scrollbar { display: none; }
-
         .photo-slider img {
             width: 452px;
             height: 100%;
@@ -64,281 +57,274 @@
 
         .back-btn {
             position: fixed;
-            top: 60px; 
-            left: calc(50% - 226px + 25px); 
-            width: 43px;
-            height: 43px;
-            border: 1.5px solid #000000;
-            background: none;
+            top: 40px; 
+            left: calc(50% - 226px + 20px); 
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
-            color: #000;
-            cursor: pointer;
-            backdrop-filter: blur(4px);
-            z-index: 100;
-            transition: all 0.2s;
+            color: #FF9800; 
             text-decoration: none;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            font-size: 20px;
         }
-        .back-btn:active { background: #FFAD4D; border-color: #FFAD4D; color: white; transform: scale(0.9); }
 
         /* --- 2. 資訊區塊 --- */
         .info-header {
-            position: sticky;
-            top: 0;
+            position: relative;
             background: #FFF9F0;
             border-radius: 30px 30px 0 0;
             margin-top: -30px;
-            padding: 30px 30px 20px;
+            padding: 30px 30px 10px;
             z-index: 30;
-            box-shadow: 0 -10px 20px rgba(0,0,0,0.05);
         }
 
         .title-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
-        .restaurant-name { font-size: 36px; font-weight: 800; color: #000; }
+        .restaurant-name { font-size: 32px; font-weight: 800; color: #333; }
+        
+        /* 統一 Icon 顏色為品牌橘 */
         .action-icons i { 
-            font-size: 28px; color: #000; margin-left: 12px; cursor: pointer; transition: color 0.2s;
+            font-size: 26px; color: #FF9800; margin-left: 15px; cursor: pointer;
         }
-        .action-icons i:active { color: #FFAD4D; }
 
         .meta-row {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 20px;
             font-size: 16px;
-            color: #333;
+            color: #555;
         }
-        .rating { margin-left: auto; display: flex; align-items: center; font-weight: bold; }
-        .rating i { margin-left: 5px; color: #000; }
+        .meta-row i { color: #FF9800; width: 18px; text-align: center; }
+        .rating { margin-left: auto; display: flex; align-items: center; font-weight: bold; color: #333; }
+        .rating i { margin-left: 5px; color: #FF9800; }
 
-        .description { font-size: 16px; line-height: 1.6; color: #000; margin-bottom: 25px; }
+        .description { font-size: 16px; line-height: 1.7; color: #444; margin-bottom: 25px; }
 
         .tabs-container {
             display: flex;
             border-bottom: 1px solid #E0E0E0;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         .tab-item {
             flex: 1;
             text-align: center;
-            padding: 16px 0;
-            font-size: 18px;
+            padding: 15px 0;
+            font-size: 17px;
             font-weight: 600;
             color: #888;
             cursor: pointer;
             position: relative;
-            transition: all 0.2s;
         }
-        .tab-item:hover { color: #FFAD4D; }
-        .tab-item.active { color: #FFAD4D; }
+        .tab-item.active { color: #FF9800; }
         .tab-item.active::after {
             content: "";
             position: absolute;
             bottom: -1px; left: 50%;
             transform: translateX(-50%);
-            width: 50px; height: 3px;
-            background: #FFAD4D;
+            width: 45px; height: 3px;
+            background: #FF9800;
         }
 
         /* --- 3. 分頁內容 --- */
-        .tab-content { padding: 0 25px 140px; } 
-        .tab-content { display: none; }
+        .tab-content { padding: 0 25px 120px; display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
+        /* 評論卡片 */
         .review-card {
             background: #FFFFFF;
             border-radius: 20px;
-            padding: 20px;
+            padding: 18px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            transition: all 0.2s;
-            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
-        .review-card:active { transform: scale(0.98); background: #FFF7EB; }
-
         .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-        .user-avatar { width: 50px; height: 50px; border-radius: 50%; background: #FFE7C7; }
-        .user-text .user-name { font-weight: 700; font-size: 16px; }
-        .user-text .stars { color: #FFAD4D; font-size: 12px; }
-        .review-date { font-size: 12px; color: #AAA; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #FFE7C7; overflow: hidden; }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .stars { color: #FF9800; font-size: 12px; margin-top: 2px; }
+        .review-text { font-size: 15px; color: #555; line-height: 1.5; }
 
+        /* 文章卡片 */
         .article-card {
             background: #FFFFFF;
-            padding: 20px;
-            border-radius: 15px;
+            padding: 18px;
+            border-radius: 18px;
             margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: all 0.2s;
-            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border-left: 5px solid #FF9800;
         }
-        .article-card:active { transform: scale(0.98); background: #FFF7EB; }
-        .article-card h3 { font-size: 18px; margin-bottom: 6px; color: #333; }
+        .article-card h3 { font-size: 18px; color: #333; margin-bottom: 8px; }
         .article-card p { font-size: 14px; color: #666; line-height: 1.5; }
 
+        /* 相片網格 */
         .photo-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
         .grid-img-wrap {
-            width: 100%;
-            height: 150px;
-            overflow: hidden;
-            border-radius: 12px;
-            background: #EEE;
-            cursor: pointer;
+            width: 100%; height: 150px; overflow: hidden; border-radius: 15px; background: #eee;
         }
-        .grid-img-wrap img {
-            width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;
-        }
-        .grid-img-wrap:hover img { transform: scale(1.1); }
+        .grid-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
 
+        /* 底部按鈕 */
         .fab {
             position: fixed;
             bottom: 40px;
-            right: 40px;
-            width: 62px; height: 62px;
-            background: #000; color: #FFF;
+            right: calc(50% - 226px + 30px);
+            width: 65px; height: 65px;
+            background: #FF9800; color: #FFF;
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-size: 28px; box-shadow: 0 6px 15px rgba(255,152,0,0.35);
             cursor: pointer; z-index: 100;
-            transition: all 0.2s;
         }
-        .fab:active { transform: scale(0.9) rotate(45deg); background: #FFAD4D; }
     </style>
 </head>
 <body>
     <div class="phone-window">
-        <div class="scroll-container">
-            <div class="header-gallery">
-                <a href="restaurant-favorites.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
-                <div class="photo-slider" id="mainSlider">
-                    <img src="sample/pet1.png" alt="p1">
-                    <img src="sample/pet1.png" alt="p2">
-                    <img src="sample/pet1.png" alt="p3">
-                    <img src="sample/pet1.png" alt="p4">
-                    <img src="sample/pet1.png" alt="p5">
+        <div class="header-gallery">
+            <a href="index.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+            <div class="photo-slider" id="mainSlider">
+                </div>
+        </div>
+
+        <div class="info-header">
+            <div class="title-row">
+                <h1 class="restaurant-name" id="resName">載入中...</h1>
+                <div class="action-icons">
+                    <i class="fa-solid fa-circle-plus"></i>
+                    <i class="fa-solid fa-bookmark"></i>
+                    <i class="fa-solid fa-compass"></i>
                 </div>
             </div>
 
-            <div class="info-header">
-                <div class="title-row">
-                    <h1 class="restaurant-name">Luffy Café</h1>
-                    <div class="action-icons">
-                        <i class="fa-solid fa-circle-plus"></i>
-                        <i class="fa-solid fa-bookmark"></i>
-                        <i class="fa-solid fa-compass"></i>
-                    </div>
-                </div>
-
-                <div class="meta-row">
-                    <span><i class="fa-solid fa-location-dot"></i> 0.7m</span>
-                    <span>$100-300</span>
-                    <div class="rating">4.5 <i class="fa-solid fa-star"></i></div>
-                </div>
-
-                <div class="description">
-                    <p>Pet-friendly · Kaohsiung</p>
-                    <p style="margin-top: 10px;">氣氛放鬆的餐廳，寵物狗可以在主人旁邊一起享用牛排與義大利麵等美食。</p>
-                </div>
-
-                <div class="tabs-container">
-                    <div class="tab-item active" onclick="switchTab(event, 'reviews')">評論</div>
-                    <div class="tab-item" onclick="switchTab(event, 'articles')">文章</div>
-                    <div class="tab-item" onclick="switchTab(event, 'photos')">相片</div>
-                </div>
+            <div class="meta-row">
+                <span><i class="fa-solid fa-location-dot"></i> <span id="resAddr">地址載入中...</span></span>
+                <span><i class="fa-solid fa-tag"></i> <span id="resPrice">$$$</span></span>
+                <div class="rating"><span id="resRating">0.0</span> <i class="fa-solid fa-star"></i></div>
             </div>
 
-            <div class="tab-content active" id="reviews">
-                <div class="review-card">
-                    <div class="user-info"><div class="user-avatar"></div><div class="user-text"><div class="user-name">User 1</div><div class="stars">★★★★★</div><div class="review-date">2 days ago</div></div></div>
-                    <p class="review-content">餐點非常好吃，狗狗空間很大！店員非常親切。</p>
-                </div>
-                <div class="review-card">
-                    <div class="user-info"><div class="user-avatar"></div><div class="user-text"><div class="user-name">Emma</div><div class="stars">★★★★☆</div><div class="review-date">3 days ago</div></div></div>
-                    <p class="review-content">服務態度很好，會主動給寵物水碗，推薦給各位飼主。</p>
-                </div>
-                <div class="review-card">
-                    <div class="user-info"><div class="user-avatar"></div><div class="user-text"><div class="user-name">Alex</div><div class="stars">★★★★★</div><div class="review-date">1 week ago</div></div></div>
-                    <p class="review-content">這裡的寵物餐真的很精緻，環境非常放鬆。</p>
-                </div>
-                <div class="review-card">
-                    <div class="user-info"><div class="user-avatar"></div><div class="user-text"><div class="user-name">Sophia</div><div class="stars">★★★★☆</div><div class="review-date">2 weeks ago</div></div></div>
-                    <p class="review-content">週末人比較多，建議要先預約，位置很寬敞。</p>
-                </div>
-                <div class="review-card">
-                    <div class="user-info"><div class="user-avatar"></div><div class="user-text"><div class="user-name">Daniel</div><div class="stars">★★★★★</div><div class="review-date">1 month ago</div></div></div>
-                    <p class="review-content">這是我看過最友善狗狗的餐廳了，100分！</p>
-                </div>
+            <div class="description">
+                <p id="resDesc">正在準備您的精選餐點資訊...</p>
             </div>
 
-            <div class="tab-content" id="articles">
-                <div class="article-card"><h3>2025 高雄寵物友善地圖</h3><p>帶魯夫去 Luffy Café 的完整記錄，包含餐點推薦...</p></div>
-                <div class="article-card"><h3>如何訓練狗狗在餐廳乖乖坐好</h3><p>在 Luffy Café 實測成功的五個小撇步...</p></div>
-                <div class="article-card"><h3>寵物義大利麵營養分析</h3><p>這裡的狗狗餐點不僅好看，營養也非常均衡...</p></div>
-                <div class="article-card"><h3>高雄週末避暑好去處</h3><p>室內冷氣很強，狗狗不會熱到哈氣，空間規劃優...</p></div>
-                <div class="article-card"><h3>私藏餐廳名單：Luffy Café</h3><p>不想分享出來怕以後排不到隊的優質好店...</p></div>
+            <div class="tabs-container">
+                <div class="tab-item active" onclick="switchTab(event, 'reviews')">評論</div>
+                <div class="tab-item" onclick="switchTab(event, 'articles')">文章</div>
+                <div class="tab-item" onclick="switchTab(event, 'photos')">相片</div>
             </div>
+        </div>
 
-            <div class="tab-content" id="photos">
-                <div class="photo-grid">
-                    <div class="grid-img-wrap"><img src="sample/pet1.png"></div>
-                    <div class="grid-img-wrap"><img src="sample/pet-info.png"></div>
-                    <div class="grid-img-wrap"><img src="sample/restaurant-favorites.png"></div>
-                    <div class="grid-img-wrap"><img src="sample/restaurant-info.png"></div>
-                    <div class="grid-img-wrap"><img src="sample/pet1.png"></div>
-                    <div class="grid-img-wrap"><img src="sample/pet-info.png"></div>
-                </div>
-            </div>
+        <div class="tab-content active" id="reviews">
+            <div id="reviewList"></div>
+        </div>
+
+        <div class="tab-content" id="articles">
+            <div id="articleList"></div>
+        </div>
+
+        <div class="tab-content" id="photos">
+            <div class="photo-grid" id="photoGrid"></div>
         </div>
 
         <div class="fab"><i class="fa-solid fa-plus"></i></div>
     </div>
 
     <script>
-        // 1. 動態更換標題邏輯 (只增加這個，不影響原本功能)
+        const resData = {
+            "沐沐MUMU 茶飲": { price: "$100-200", rating: "4.8", addr: "高雄市楠梓區宏毅一路6號", desc: "這家店提供多樣的手工特調茶飲，店內氛圍靜謐，非常適合攜帶毛孩來喝杯涼爽的飲品休息。" },
+            "Bon appétit 葩那貝蒂": { price: "$300-500", rating: "4.5", addr: "高雄市楠梓區土庫一路198號", desc: "這裡的甜點與輕食非常有層次，店內的佈置充滿法式風情，是一間非常受毛爸媽歡迎的打卡店。" },
+            "究鶴餐館": { price: "$200-400", rating: "4.6", addr: "高雄市左營區富國路98號", desc: "空間寬敞的寵物友善餐館，主打健康的家常料理，食材新鮮，環境讓毛孩感到非常自在。" },
+            "鸚鵡螺餐酒館-富國店": { price: "$600-800", rating: "4.9", addr: "高雄市左營區富國路101號", desc: "精緻的西式餐酒，這裡的氣氛非常浪漫，夜晚帶著毛孩來小酌一番也是一種享受。" },
+            "ROSA義大利餐廳": { price: "$400-600", rating: "4.3", addr: "高雄市左營區華夏路1422號", desc: "道地的義大利麵與窯烤披薩，戶外座位區是狗狗的最佳去處，主廚還會不定期招待寵物點心。" },
+            "貓之家俱樂部": { price: "$200-300", rating: "4.7", addr: "高雄市左營區新勝街26號", desc: "雖然名為貓之家，但空間規劃對狗狗也非常友善，甜點精緻且富有創意，是下午茶的好所在。" },
+            "萊Bar音樂餐酒館": { price: "$500-700", rating: "4.4", addr: "高雄市左營區文自路５７１號", desc: "在這裡可以邊聽現場演奏邊享用美食，只要保持安靜，狗狗也可以一同享受這場音樂饗宴。" },
+            "逅巷咖啡定食": { price: "$250-400", rating: "4.6", addr: "高雄市左營區新上街307巷15號", desc: "日式風格的溫馨小店，定食分量足夠且價格親民，是平日帶毛孩一起享用午餐的好選擇。" },
+            "心滿義廚": { price: "$300-500", rating: "4.5", addr: "高雄市立信路28號", desc: "這家的義式燉飯口感豐富，店內環境乾淨清爽，是下班後帶著毛孩輕鬆用餐的完美據點。" }
+        };
+
+        const sampleReviews = [
+            { name: "美食家阿強", rate: "★★★★★", text: "餐點真的很好吃，尤其是主菜的調味非常到位，狗狗也坐得很舒服。" },
+            { name: "莉莉媽咪", rate: "★★★★☆", text: "這是我去過最溫馨的店，店員對狗狗很有禮貌，會主動給水碗。" },
+            { name: "週末懶散人", rate: "★★★★★", text: "甜點的表現完全超出預期，每一口都是驚喜，絕對會二訪。" },
+            { name: "柴犬波波", rate: "★★★★☆", text: "環境真的很乾淨，毛孩在地板上休息也很放心，大推！" },
+            { name: "老饕老王", rate: "★★★★★", text: "義大利麵的Q度剛剛好，醬汁濃郁，寵物餐也做得非常用心。" }
+        ];
+
+        const sampleArticles = [
+            { title: "週末私藏！五家必去的寵物友善咖啡廳", text: "今天介紹這家店真的是心頭好，不但餐點好吃，環境也很放鬆..." },
+            { title: "帶著狗狗去吃飯：餐廳禮儀小指南", text: "在造訪這家店時，我發現了一些讓狗狗保持乖巧的祕訣..." },
+            { title: "南台灣最強寵物餐點：雞肉慕斯實測", text: "這份餐點不僅外觀精美，營養也考慮得很全面，毛孩吃光光。" },
+            { title: "避暑首選：室內寬敞的友善餐館", text: "冷氣很涼，空間規劃得很棒，不會讓狗狗感到壓迫感。" },
+            { title: "我的高雄午茶地圖：與毛孩的甜蜜時光", text: "點一份下午茶套餐，看著窗外，與最愛的毛孩享受這寧靜片刻。" }
+        ];
+
         window.addEventListener('load', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const name = urlParams.get('name');
-            if (name) {
-                const decodedName = decodeURIComponent(name);
-                const nameElement = document.querySelector('.restaurant-name');
-                if (nameElement) nameElement.innerText = decodedName;
-                document.title = '餐廳詳情 - ' + decodedName;
+            const params = new URLSearchParams(window.location.search);
+            const name = params.get('name') || "沐沐MUMU 茶飲";
+            const data = resData[name] || resData["沐沐MUMU 茶飲"];
+
+            document.getElementById('resName').innerText = name;
+            document.getElementById('resAddr').innerText = data.addr;
+            document.getElementById('resPrice').innerText = data.price;
+            document.getElementById('resRating').innerText = data.rating;
+            document.getElementById('resDesc').innerText = data.desc;
+
+            // 使用 loremflickr 確保圖片都是美食與咖啡相關
+            const slider = document.getElementById('mainSlider');
+            for(let i=0; i<3; i++) {
+                // 使用美食(food)與咖啡廳(cafe)標籤，並加上隨機參數避免圖片重複
+                slider.innerHTML += `<img src="https://loremflickr.com/452/500/food,cafe,dessert?random=${i + 10}" alt="food">`;
+            }
+
+            const reviewDiv = document.getElementById('reviewList');
+            sampleReviews.forEach((rev, idx) => {
+                reviewDiv.innerHTML += `
+                    <div class="review-card">
+                        <div class="user-info">
+                            <div class="user-avatar"><img src="https://i.pravatar.cc/100?u=${idx + 50}"></div>
+                            <div>
+                                <div style="font-weight:700;">${rev.name}</div>
+                                <div class="stars">${rev.rate}</div>
+                            </div>
+                        </div>
+                        <p class="review-text">${rev.text}</p>
+                    </div>`;
+            });
+
+            const articleDiv = document.getElementById('articleList');
+            sampleArticles.forEach(art => {
+                articleDiv.innerHTML += `
+                    <div class="article-card">
+                        <h3>${art.title}</h3>
+                        <p>${art.text}</p>
+                        <div style="font-size:12px; color:#aaa; margin-top:5px;">2025年12月28日 · 閱讀時間 3 分鐘</div>
+                    </div>`;
+            });
+
+            const grid = document.getElementById('photoGrid');
+            for(let i=1; i<=6; i++) {
+                grid.innerHTML += `<div class="grid-img-wrap"><img src="https://loremflickr.com/300/300/meal,pasta,coffee?random=${i + 20}"></div>`;
             }
         });
 
-        // 2. 原本的分頁切換功能
         function switchTab(event, tabId) {
-            document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             event.currentTarget.classList.add('active');
             document.getElementById(tabId).classList.add('active');
         }
-
-        // 3. 原本的照片輪播功能
-        const slider = document.getElementById('mainSlider');
-        let scrollIndex = 0;
-        const totalPhotos = 5;
-        const photoWidth = 452;
-
-        setInterval(() => {
-            scrollIndex++;
-            if (scrollIndex >= totalPhotos) scrollIndex = 0;
-            slider.scrollTo({ left: scrollIndex * photoWidth, behavior: 'smooth' });
-        }, 3000);
     </script>
 </body>
 </html>
- 

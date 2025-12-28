@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Furry Café Map - 文章詳情</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { 
+            height: 100%; 
+            width: 100%;
+            font-family: "Microsoft JhengHei", sans-serif; 
+            background: #F8F1E7; 
+            -webkit-font-smoothing: antialiased; 
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 80px; 
+        }
+
+        /* 頂部導覽 */
+        .top-nav {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
+        }
+        .top-nav a {
+            color: white;
+            font-size: 20px;
+            text-decoration: none;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        /* 店家封面圖 - 鎖定美食主題 */
+        .cover-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            background-color: #ddd;
+        }
+
+        /* 文章內容區 */
+        .content-section {
+            padding: 24px 20px;
+            background: #F8F1E7;
+            margin-top: -30px; 
+            border-radius: 30px 30px 0 0;
+            position: relative;
+        }
+
+        .category-tags {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .tag {
+            background: #FFCC80;
+            color: #D35400;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .shop-name {
+            font-size: 26px;
+            font-weight: bold;
+        }
+        .heart-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #FF9800; /* 統一品牌橘 */
+            font-size: 18px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .info-row i { color: #FF9800; }
+
+        .divider {
+            height: 1px;
+            background: #E0D5C5;
+            margin: 20px 0;
+        }
+
+        .article-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #444;
+            text-align: justify;
+        }
+
+        /* 相片網格 - 鎖定美食主題 */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .photo-grid img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 15px;
+            background-color: #eee;
+        }
+
+        /* 底部操作列 */
+        .bottom-action-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            height: 60px;
+            background: white;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8E8E93;
+            font-size: 12px;
+            text-decoration: none;
+        }
+        .action-item i { font-size: 20px; margin-bottom: 2px; }
+        .action-item.active { color: #FF9800; }
+
+        .nav-btn {
+            background: #FF9800;
+            color: white !important;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <nav class="top-nav">
+        <a href="article.html"><i class="fa-solid fa-chevron-left"></i></a>
+        <a href="#"><i class="fa-solid fa-share-nodes"></i></a>
+    </nav>
+
+    <img id="coverImg" src="" class="cover-image" alt="food cover">
+
+    <div class="content-section">
+        <div class="category-tags">
+            <span class="tag" id="cityTag">高雄</span>
+            <span class="tag" id="priceTag">價格未定</span>
+        </div>
+
+        <div class="shop-header">
+            <h1 class="shop-name" id="shopName">載入中...</h1>
+            <div class="heart-stat">
+                <i class="fa-regular fa-heart"></i>
+                <span id="heartCount">0</span>
+            </div>
+        </div>
+
+        <div class="info-row">
+            <i class="fa-solid fa-location-dot"></i>
+            <span id="shopAddress">地址載入中...</span>
+        </div>
+        <div class="info-row">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span id="postDate">2025-12-28</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="article-text" id="articleBody">
+            這裡會顯示店家的詳細描述與訪談心得...
+        </div>
+
+        <div class="photo-grid">
+            <img src="https://loremflickr.com/300/300/food,cafe,dessert?random=201" alt="meal 1">
+            <img src="https://loremflickr.com/300/300/food,cafe,dessert?random=202" alt="meal 2">
+        </div>
+    </div>
+</div>
+
+<div class="bottom-action-bar">
+    <a href="#" class="action-item" onclick="toggleLike(this)">
+        <i class="fa-regular fa-heart"></i>
+        <span>收藏</span>
+    </a>
+    <a href="#" class="action-item">
+        <i class="fa-regular fa-comment"></i>
+        <span>評論</span>
+    </a>
+    <a href="#" id="mapLink" class="action-item nav-btn">
+        <i class="fa-solid fa-paper-plane"></i>
+        <span>開始導航</span>
+    </a>
+</div>
+
+<script>
+    const locations = [
+        { name: "沐沐MUMU 茶飲", pos: [22.703508, 120.301304], info: "高雄市楠梓區宏毅一路6號", price: "100-200", date: "2025年12月10日", heart: 156, desc: "這家茶飲店的環境非常放鬆，適合帶著毛孩一起來喝杯招牌水果茶。店內提供的輕食也是一大亮點，擺盤精緻且美味。" },
+        { name: "Bon appétit 葩那貝蒂", pos: [22.736657, 120.329098], info: "高雄市楠梓區土庫一路198號", price: "300-500", date: "2025年11月15日", heart: 242, desc: "這家店的法式甜點令人驚艷，口感細緻且層次豐富。環境佈置得非常有質感，每一盤上桌的料理都像是藝術品。" },
+        { name: "究鶴餐館", pos: [22.659232, 120.306703], info: "高雄市左營區富國路98號", price: "200-400", date: "2025年12月01日", heart: 189, desc: "餐點分量誠意十足，尤其是他們的私房定食，食材新鮮且味道恰到好處。這裡是很多家長聚會的首選餐廳。" },
+        { name: "鸚鵡螺餐酒館", pos: [22.660084, 120.306481], info: "高雄市左營區富國路101號", price: "600-800", date: "2025年10月20日", heart: 310, desc: "晚上的氣氛極佳，提供多樣化的西式餐酒。無論是主餐或是炸物小點，味道都在水準之上，非常適合放鬆時光。" },
+        { name: "ROSA義大利餐廳", pos: [22.687341, 120.313866], info: "高雄市左營區華夏路1422號", price: "400-600", date: "2025年12月05日", heart: 125, desc: "道地的義大利料理，手工披薩餅皮香 Q 誘人。戶外空間寬敞，用餐時還能感受到微風徐徐，非常愜意。" },
+        { name: "貓之家俱樂部", pos: [22.668809, 120.299941], info: "高雄市左營區新勝街26號", price: "200-300", date: "2025年11月28日", heart: 420, desc: "店內的鬆餅與特調咖啡是許多客人的最愛。環境乾淨溫馨，不僅適合貓奴，連狗狗在這裡也能得到很好的照顧。" },
+        { name: "萊Bar音樂餐酒館", pos: [22.679911, 120.311226], info: "高雄市左營區文自路571號", price: "500-700", date: "2025年12月12日", heart: 98, desc: "現場音樂伴隨美食，這裡的炸雞翅與調酒非常推薦。是帶著毛孩在週末夜晚放鬆心情、享受夜生活的好去處。" },
+        { name: "逅巷咖啡定食", pos: [22.669228, 120.304374], info: "高雄市左營區新上街307巷15號", price: "250-400", date: "2025年12月18日", heart: 175, desc: "藏身巷弄，提供健康營養的日式定食。店內氣氛寧靜，非常適合點一份午餐跟毛孩靜靜享受一段時光。" },
+        { name: "心滿義廚", pos: [22.666260, 120.307573], info: "高雄市立信路28號", price: "300-500", date: "2025年12月22日", heart: 132, desc: "他們的白醬燉飯香氣濃郁，每一口都能吃到主廚的用心。環境乾淨清爽，是下班後放鬆用餐的完美選擇。" }
+    ];
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const shopId = parseInt(urlParams.get('id')) || 0;
+    const shop = locations[shopId];
+
+    if (shop) {
+        document.getElementById('shopName').textContent = shop.name;
+        document.getElementById('shopAddress').textContent = shop.info;
+        document.getElementById('postDate').textContent = shop.date;
+        document.getElementById('heartCount').textContent = shop.heart;
+        document.getElementById('articleBody').textContent = shop.desc;
+        document.getElementById('priceTag').textContent = "NT$ " + shop.price;
+        document.getElementById('cityTag').textContent = shop.info.substring(0, 2);
+        
+        // 更新封面圖為餐點主題 (loremflickr 鎖定 food 關鍵字)
+        document.getElementById('coverImg').src = `https://loremflickr.com/600/400/food,cafe,meal?random=${shopId + 300}`;
+        
+        document.getElementById('mapLink').href = `index.html?lat=${shop.pos[0]}&lng=${shop.pos[1]}`;
+    }
+
+    function toggleLike(el) {
+        const icon = el.querySelector('i');
+        const span = el.querySelector('span');
+        if (icon.classList.contains('fa-regular')) {
+            icon.classList.replace('fa-regular', 'fa-solid');
+            icon.style.color = '#FF9800';
+            span.textContent = '已收藏';
+        } else {
+            icon.classList.replace('fa-solid', 'fa-regular');
+            icon.style.color = '#8E8E93';
+            span.textContent = '收藏';
+        }
+    }
+</script>
+
+</body>
+</html>
