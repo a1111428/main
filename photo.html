@@ -41,15 +41,23 @@
             padding: 15px; font-size: 15px; color: #333; border-bottom: 1px solid rgba(0,0,0,0.05);
             display: flex; align-items: center; gap: 10px; cursor: pointer;
         }
+        .dropdown-item.highlighted {
+            background-color: #FFF0D1;
+            color: #FF9800;
+            font-weight: bold;
+            border-left: 4px solid #FF9800;
+        }
         .dropdown-item:active { background: rgba(0,0,0,0.05); }
         .dropdown-item.danger { color: #ff3b30; }
 
         /* 照片網格區域 */
         .content-scroll { height: 100vh; overflow-y: auto; padding-bottom: 150px; }
         .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+        
+        /* 搜尋狀態樣式 */
         .photo-grid.searching .photo-item { opacity: 0.3; }
-        .photo-item { position: relative; padding-top: 100%; background: #eee; overflow: hidden; cursor: pointer; transition: opacity 0.3s; }
-        .photo-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s; }
+        .photo-item { position: relative; padding-top: 100%; background: #eee; overflow: hidden; cursor: pointer; transition: opacity 0.3s, transform 0.2s; }
+        .photo-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         
         /* 搜尋命中樣式 */
         .photo-item.found { opacity: 1 !important; outline: 3px solid #FF9800; z-index: 10; transform: scale(1.05); }
@@ -80,9 +88,20 @@
         .photo-item.selected .selection-overlay { background: #007AFF; border-color: white; }
         .photo-item.selected .photo-img { transform: scale(0.9); opacity: 0.8; }
         
-        /* Modal & Toast */
+        /* 彈出視窗樣式 */
         .orange-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 3000; backdrop-filter: blur(5px); }
         .orange-modal-content { background: #FFF0D1; width: 85%; border-radius: 24px; padding: 30px; text-align: center; }
+        
+        /* 搬移相簿樣式 */
+        .move-modal-content {
+            background: white; width: 80%; border-radius: 16px; padding: 25px; text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-height: 70vh; overflow-y: auto;
+        }
+        .move-modal-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333; }
+        .move-option { padding: 15px 0; color: #FF9800; font-size: 17px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .move-option:last-of-type { border-bottom: none; }
+        .move-cancel { text-align: right; margin-top: 15px; color: #666; font-size: 15px; cursor: pointer; }
+
         .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: white; padding: 12px 24px; border-radius: 30px; z-index: 4000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: bold; }
     </style>
 </head>
@@ -102,8 +121,8 @@
     </div>
 
     <div class="more-dropdown" id="moreDropdown">
-        <div class="dropdown-item" onclick="handleMove()"><i class="fa-solid fa-folder-open"></i> 搬移相片</div>
-        <div class="dropdown-item" onclick="openOrangeModal('tag')"><i class="fa-solid fa-tag"></i> 批量標籤</div>
+        <div class="dropdown-item highlighted" onclick="handleMove()"><i class="fa-solid fa-folder-open"></i> 搬移相片</div>
+        <div class="dropdown-item highlighted" onclick="openOrangeModal('tag')"><i class="fa-solid fa-tag"></i> 批量標籤</div>
         <div class="dropdown-item danger" onclick="handleDelete()"><i class="fa-solid fa-trash-can"></i> 刪除相片</div>
     </div>
 
@@ -125,9 +144,15 @@
             <h3 id="modalTitle" style="margin-top:0">搜尋照片</h3>
             <input type="text" id="inputName" placeholder="輸入照片名稱" style="width:100%; margin:10px 0; padding:12px; border-radius:8px; border:1px solid #ddd;">
             <input type="text" id="inputTag" placeholder="輸入標籤 (例如: #狗狗)" style="width:100%; margin:10px 0; padding:12px; border-radius:8px; border:1px solid #ddd;">
-            <button id="modalConfirmBtn" style="width:100%; padding:12px; background:#FFB352; border:none; border-radius:10px; color:white; font-weight:bold;">開始搜尋</button>
+            <button id="modalConfirmBtn" style="width:100%; padding:12px; background:#FFB352; border:none; border-radius:10px; color:white; font-weight:bold;">執行</button>
             <p onclick="closeOrange()" style="margin-top:20px; cursor:pointer; color:#888;">取消</p>
         </div>
+    </div>
+
+    <div id="moveModalOverlay" class="orange-modal-overlay">
+        <div class="move-modal-content" id="moveModalContent">
+            <div class="move-modal-title">選擇目標相簿</div>
+            </div>
     </div>
 
     <div id="toast" class="toast"><span id="toastMsg"></span></div>
@@ -143,26 +168,128 @@
         let isSelectMode = false;
         let isAscending = true; 
 
-        // --- 照片上傳功能 ---
+        // --- 1. 搬移功能實作 (整合舊版動態清單) ---
+        function handleMove() {
+            const selectedItems = document.querySelectorAll('.photo-item.selected');
+            if (selectedItems.length === 0) {
+                showToast("請先選取照片");
+                return;
+            }
+
+            // 讀取相簿清單
+            const albums = JSON.parse(localStorage.getItem('albums')) || [{name: '預設相簿'}, {name: '我的最愛'}];
+            const content = document.getElementById('moveModalContent');
+            
+            // 重建內容
+            content.innerHTML = '<div class="move-modal-title">選擇目標相簿</div>';
+            
+            albums.forEach(album => {
+                const div = document.createElement('div');
+                div.className = 'move-option';
+                div.textContent = album.name;
+                div.onclick = () => confirmMove(album.name);
+                content.appendChild(div);
+            });
+
+            const cancel = document.createElement('div');
+            cancel.className = 'move-cancel';
+            cancel.textContent = '取消';
+            cancel.onclick = closeMoveModal;
+            content.appendChild(cancel);
+
+            document.getElementById('moveModalOverlay').style.display = 'flex';
+        }
+
+        function closeMoveModal() {
+            document.getElementById('moveModalOverlay').style.display = 'none';
+        }
+
+        function confirmMove(albumName) {
+            const count = document.querySelectorAll('.photo-item.selected').length;
+            showToast(`已將 ${count} 張照片搬移至「${albumName}」`);
+            closeMoveModal();
+            clearSelection();
+        }
+
+        // --- 2. 搜尋與標籤功能 (修復並整合) ---
+        function openOrangeModal(type) {
+            const modal = document.getElementById('orangeModalOverlay');
+            const btn = document.getElementById('modalConfirmBtn');
+            const title = document.getElementById('modalTitle');
+            const inputName = document.getElementById('inputName');
+            const inputTag = document.getElementById('inputTag');
+            
+            inputName.value = '';
+            inputTag.value = '';
+            modal.style.display = 'flex';
+
+            if (type === 'tag') {
+                title.textContent = "批量標籤";
+                btn.textContent = "確定修改";
+                btn.onclick = () => {
+                    const selected = document.querySelectorAll('.photo-item.selected');
+                    if (selected.length === 0) { showToast("請先選取照片"); return; }
+                    
+                    selected.forEach(item => {
+                        item.setAttribute('data-name', inputName.value || item.getAttribute('data-name'));
+                        item.setAttribute('data-tag', inputTag.value);
+                    });
+                    showToast("標籤修改成功");
+                    closeOrange();
+                    clearSelection();
+                };
+            } else {
+                title.textContent = "搜尋照片";
+                btn.textContent = "開始搜尋";
+                btn.onclick = runSearch;
+            }
+        }
+
+        function runSearch() {
+            const nameKey = document.getElementById('inputName').value.toLowerCase();
+            const tagKey = document.getElementById('inputTag').value.toLowerCase();
+            
+            if (!nameKey && !tagKey) { showToast("請輸入關鍵字"); return; }
+            
+            let found = false;
+            document.querySelectorAll('.photo-item').forEach(item => {
+                const n = (item.getAttribute('data-name') || '').toLowerCase();
+                const t = (item.getAttribute('data-tag') || '').toLowerCase();
+                
+                if ((nameKey && n.includes(nameKey)) || (tagKey && t.includes(tagKey))) {
+                    item.classList.add('found');
+                    found = true;
+                } else {
+                    item.classList.remove('found');
+                }
+            });
+
+            if (found) {
+                photoGrid.classList.add('searching');
+                showToast("搜尋完成");
+                closeOrange();
+            } else {
+                showToast("找不到結果");
+            }
+        }
+
+        function clearSearch() {
+            photoGrid.classList.remove('searching');
+            document.querySelectorAll('.photo-item.found').forEach(el => el.classList.remove('found'));
+        }
+
+        function closeOrange() { document.getElementById('orangeModalOverlay').style.display = 'none'; }
+
+        // --- 3. 基礎載入與照片邏輯 ---
         fileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(event) {
-                const newPhoto = {
-                    id: Date.now(),
-                    src: event.target.result,
-                    name: "新照片 " + new Date().toLocaleDateString(),
-                    tag: "實拍",
-                    date: new Date().toLocaleDateString(),
-                    time: new Date().toLocaleTimeString()
-                };
-
+                const newPhoto = { id: Date.now(), src: event.target.result, name: "新照片 " + new Date().toLocaleDateString(), tag: "實拍", date: new Date().toLocaleDateString() };
                 let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
                 allPhotos.push(newPhoto);
                 localStorage.setItem('all_photos', JSON.stringify(allPhotos));
-                
                 showToast("照片上傳成功！");
                 loadPhotos();
             };
@@ -172,16 +299,16 @@
         function loadPhotos() {
             photoGrid.innerHTML = ''; 
             let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-            
             allPhotos.sort((a, b) => isAscending ? a.id - b.id : b.id - a.id);
-
+            
+            // 載入真實照片
             allPhotos.forEach(photo => addPhotoToGrid(photo.src, photo.id, photo.name, photo.tag, true));
-
+            
+            // 載入 40 張範例照片
             for (let i = 0; i < 40; i++) {
                 const exampleUrl = `https://picsum.photos/id/${i+18}/200/200`;
                 addPhotoToGrid(exampleUrl, `ex-${i}`, `範例 ${i}`, '範例', false);
             }
-
             totalCountDisplay.textContent = (allPhotos.length + 40) + ' 張照片';
         }
 
@@ -192,108 +319,34 @@
             div.setAttribute('data-name', name || '');
             div.setAttribute('data-tag', tag || '');
             div.innerHTML = `<img src="${src}" class="photo-img"><div class="selection-overlay"></div>`;
-
             div.onclick = () => {
-                if (photoGrid.classList.contains('searching')) {
-                    clearSearch();
-                    return;
-                }
-                if (isSelectMode) {
-                    div.classList.toggle('selected');
-                    updateCountDisplay();
-                } else if (isReal) {
+                if (photoGrid.classList.contains('searching')) { clearSearch(); return; }
+                if (isSelectMode) { div.classList.toggle('selected'); updateCountDisplay(); } 
+                else if (isReal) {
                     const allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
                     const photo = allPhotos.find(p => p.id == id);
-                    if (photo) {
-                        localStorage.setItem('temp_photo_data', JSON.stringify(photo));
-                        window.location.href = 'photo_info.html';
-                    }
+                    if (photo) { localStorage.setItem('temp_photo_data', JSON.stringify(photo)); window.location.href = 'photo_info.html'; }
                 }
             };
             photoGrid.appendChild(div);
         }
 
-        // --- 搜尋功能 ---
-        function runSearch() {
-            const nameKey = document.getElementById('inputName').value.toLowerCase();
-            const tagKey = document.getElementById('inputTag').value.toLowerCase();
-            
-            if (!nameKey && !tagKey) { showToast("請輸入關鍵字"); return; }
-            
-            closeOrange();
-            photoGrid.classList.add('searching');
-            let foundCount = 0;
-
-            document.querySelectorAll('.photo-item').forEach(item => {
-                const name = item.getAttribute('data-name').toLowerCase();
-                const tag = item.getAttribute('data-tag').toLowerCase();
-                
-                const matchName = nameKey && name.includes(nameKey);
-                const matchTag = tagKey && tag.includes(tagKey);
-                
-                if (matchName || matchTag) {
-                    item.classList.add('found');
-                    foundCount++;
-                }
-            });
-
-            if (foundCount > 0) {
-                showToast(`搜尋到 ${foundCount} 張照片`);
-            } else {
-                showToast("找不到符合的照片");
-                clearSearch();
-            }
-        }
-
-        function clearSearch() {
-            photoGrid.classList.remove('searching');
-            document.querySelectorAll('.photo-item.found').forEach(el => el.classList.remove('found'));
-        }
-
-        // --- 排序功能 ---
-        document.getElementById('openSortBtn').onclick = () => {
-            isAscending = !isAscending;
-            loadPhotos();
-            showToast(isAscending ? "排序：時間由舊到新" : "排序：時間由新到舊");
-        };
-
-        // --- 更多功能選單 ---
-        document.getElementById('openMoreBtn').onclick = (e) => {
-            e.stopPropagation();
-            moreDropdown.style.display = moreDropdown.style.display === 'flex' ? 'none' : 'flex';
-        };
-
-        document.body.onclick = () => { moreDropdown.style.display = 'none'; };
-
         function handleDelete() {
-            const selectedItems = document.querySelectorAll('.photo-item.selected');
-            if (selectedItems.length === 0) return showToast("請先選取照片");
-            
-            if (confirm(`確定要刪除這 ${selectedItems.length} 張照片嗎？`)) {
-                let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-                selectedItems.forEach(item => {
-                    const id = item.getAttribute('data-id');
-                    allPhotos = allPhotos.filter(p => p.id != id);
-                    item.remove();
-                });
-                localStorage.setItem('all_photos', JSON.stringify(allPhotos));
+            const selected = document.querySelectorAll('.photo-item.selected');
+            if (selected.length === 0) { showToast("請先選取照片"); return; }
+            if (confirm(`確定要刪除這 ${selected.length} 張照片嗎？`)) {
+                selected.forEach(item => item.remove());
                 showToast("刪除成功");
-                loadPhotos();
                 clearSelection();
             }
         }
 
-        // --- 選取模式切換 ---
-        selectToggle.onclick = () => {
-            isSelectMode = !isSelectMode;
-            if (isSelectMode) {
-                mainBody.classList.add('select-mode');
-                selectToggle.textContent = '取消';
-                selectToggle.classList.add('active');
-            } else {
-                clearSelection();
-            }
-        };
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2500);
+        }
 
         function clearSelection() {
             isSelectMode = false;
@@ -310,64 +363,16 @@
             document.querySelectorAll('.photo-item.selected .selection-overlay').forEach(el => el.textContent = i++);
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toastMsg').textContent = msg;
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2500);
-        }
+        selectToggle.onclick = () => {
+            isSelectMode = !isSelectMode;
+            if (isSelectMode) { mainBody.classList.add('select-mode'); selectToggle.textContent = '取消'; selectToggle.classList.add('active'); } 
+            else { clearSelection(); }
+        };
 
-        // --- 核心修改：標籤功能 (套用舊版邏輯) ---
-        function openOrangeModal(type) {
-            const modal = document.getElementById('orangeModalOverlay');
-            modal.style.display = 'flex';
-            const btn = document.getElementById('modalConfirmBtn');
-            const title = document.getElementById('modalTitle');
-            const nameInput = document.getElementById('inputName');
-            const tagInput = document.getElementById('inputTag');
-
-            nameInput.value = ''; tagInput.value = ''; // 開啟時清空
-
-            if (type === 'tag') {
-                title.textContent = "批量標籤";
-                btn.textContent = "確定修改";
-                btn.onclick = () => {
-                    const selected = document.querySelectorAll('.photo-item.selected');
-                    if (selected.length === 0) { showToast("請先選取照片"); return; }
-                    
-                    let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-                    
-                    selected.forEach(item => {
-                        const id = item.getAttribute('data-id');
-                        const newName = nameInput.value;
-                        const newTag = tagInput.value;
-
-                        // 更新當前頁面的屬性
-                        if(newName) item.setAttribute('data-name', newName);
-                        if(newTag) item.setAttribute('data-tag', newTag);
-
-                        // 更新 localStorage 中的持久資料
-                        const idx = allPhotos.findIndex(p => p.id == id);
-                        if (idx !== -1) {
-                            if(newName) allPhotos[idx].name = newName;
-                            if(newTag) allPhotos[idx].tag = newTag;
-                        }
-                    });
-
-                    localStorage.setItem('all_photos', JSON.stringify(allPhotos));
-                    showToast("標籤修改成功");
-                    closeOrange();
-                    clearSelection(); // 修改完後自動取消選取
-                };
-            } else {
-                title.textContent = "搜尋照片";
-                btn.textContent = "開始搜尋";
-                btn.onclick = runSearch;
-            }
-        }
-
-        function closeOrange() { document.getElementById('orangeModalOverlay').style.display = 'none'; }
+        document.getElementById('openMoreBtn').onclick = (e) => { e.stopPropagation(); moreDropdown.style.display = moreDropdown.style.display === 'flex' ? 'none' : 'flex'; };
+        document.body.onclick = () => { moreDropdown.style.display = 'none'; };
         document.getElementById('openSearchBtn').onclick = () => openOrangeModal('search');
+        document.getElementById('openSortBtn').onclick = () => { isAscending = !isAscending; loadPhotos(); showToast(isAscending ? "排序：舊到新" : "排序：新到舊"); };
 
         loadPhotos();
     </script>
