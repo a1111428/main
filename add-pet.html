@@ -63,7 +63,6 @@
             padding: 16px;
         }
 
-        /* 照片區域：點擊可模擬上傳照片 */
         .pet-photo-container {
             width: 100%;
             height: 190px;
@@ -192,12 +191,15 @@
 
     <script>
         function addNewPet() {
-            const petName = document.getElementById('add_name').value;
+            const petName = document.getElementById('add_name').value.trim();
             
             if (!petName) {
                 alert('請至少輸入寵物名稱！');
                 return;
             }
+
+            // 清除該名稱可能存在的「已刪除標記」
+            localStorage.removeItem('deleted_' + petName);
 
             const data = {
                 name: petName,
@@ -209,7 +211,7 @@
                 allergy: document.getElementById('add_allergy').value || '無'
             };
 
-            // 使用與 pet-info.html 一致的 key 格式儲存資料
+            // 儲存資料
             localStorage.setItem('petData_' + petName, JSON.stringify(data));
             
             alert('新增成功！已為您儲存 ' + petName + ' 的檔案。');
@@ -218,4 +220,3 @@
     </script>
 </body>
 </html>
- 
