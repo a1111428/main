@@ -176,27 +176,38 @@
 
         function renderExtraPets() {
             const container = document.getElementById('extraPets');
-            // 此處清單不包含豬豬，因為豬豬已從靜態 HTML 移除
+            container.innerHTML = ''; // 清空容器避免重複渲染
+            
             const defaultPets = ['鬆鬆', '魯夫', '掰咖小鳥'];
+            let htmlContent = '';
             
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                if (key.startsWith('petData_')) {
+                
+                // 只處理以 petData_ 開頭的資料
+                if (key && key.startsWith('petData_')) {
                     const petName = key.replace('petData_', '');
+                    
+                    // 如果不是預設寵物，且沒有被標記為刪除，則顯示
                     if (!defaultPets.includes(petName) && localStorage.getItem('deleted_' + petName) !== 'true') {
-                        const petData = JSON.parse(localStorage.getItem(key));
-                        container.innerHTML += `
-                            <div class="pet-card" style="margin-top: 24px;" onclick="goToInfo('${petData.name}')">
-                                <div class="pet-header">
-                                    <div class="pet-name">${petData.name}</div>
-                                    <button class="more-btn" onclick="goToEdit(event, '${petData.name}')"><i class="fa-solid fa-ellipsis"></i></button>
+                        try {
+                            const petData = JSON.parse(localStorage.getItem(key));
+                            htmlContent += `
+                                <div class="pet-card" style="margin-top: 24px;" onclick="goToInfo('${petData.name}')">
+                                    <div class="pet-header">
+                                        <div class="pet-name">${petData.name}</div>
+                                        <button class="more-btn" onclick="goToEdit(event, '${petData.name}')"><i class="fa-solid fa-ellipsis"></i></button>
+                                    </div>
+                                    <img src="https://via.placeholder.com/332x180/FFE7C7/000000?text=${encodeURIComponent(petData.name)}" class="pet-photo">
                                 </div>
-                                <img src="https://via.placeholder.com/332x180/FFE7C7/000000?text=${encodeURIComponent(petData.name)}" class="pet-photo">
-                            </div>
-                        `;
+                            `;
+                        } catch (e) {
+                            console.error("解析寵物資料錯誤:", e);
+                        }
                     }
                 }
             }
+            container.innerHTML = htmlContent;
         }
 
         function goToInfo(name) {
