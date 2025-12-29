@@ -20,9 +20,11 @@
         }
 
         .top-nav {
+            position: relative; 
             display: flex; justify-content: space-between; align-items: center;
             padding: 15px 20px; padding-top: calc(env(safe-area-inset-top) + 10px);
             background: #FFF9EB;
+            z-index: 1001;
         }
         .back-btn { font-size: 24px; color: #333; text-decoration: none; }
         .action-group { display: flex; gap: 12px; align-items: center; }
@@ -85,61 +87,49 @@
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.5);
             display: none; justify-content: center; align-items: center;
-            z-index: 1000; backdrop-filter: blur(5px);
+            z-index: 2000; backdrop-filter: blur(5px);
         }
 
-        .add-modal {
+        .add-modal, .search-modal {
             background: #FFF0D1; width: 90%; max-width: 380px; border-radius: 24px;
             position: relative; padding: 30px 25px; text-align: center;
-        }
-        .add-modal-close {
-            position: absolute; top: 15px; right: 15px; font-size: 24px; color: #666; cursor: pointer;
-        }
-        .add-modal-preview-area {
-            width: 180px; height: 180px; background: #f0f0f0; border-radius: 12px;
-            margin: 20px auto; display: flex; justify-content: center; align-items: center;
-            color: #aaa; font-size: 48px; cursor: pointer;
-        }
-        .add-modal-preview-img {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 12px;
-        }
-        .add-modal-title { font-size: 18px; margin-bottom: 10px; }
-        .add-modal-input {
-            width: 100%; padding: 14px; border-radius: 12px; border: none;
-            background: white; margin: 10px 0 30px 0; font-size: 16px;
-        }
-        .add-modal-save {
-            width: 100%; padding: 14px; background: #FFB352; color: white;
-            border: none; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer;
-        }
-
-        .search-modal {
-            background: #FFF0D1; width: 90%; max-width: 380px; border-radius: 24px;
-            position: relative; padding: 30px 25px; text-align: center;
-        }
-        .search-cancel {
-            position: absolute; top: 15px; right: 15px; font-size: 24px; color: #666; cursor: pointer;
         }
 
         .edit-menu {
-            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            background: white; border-radius: 20px; padding: 10px 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2); display: none; z-index: 100;
-            flex-direction: column; gap: 10px;
+            position: absolute; 
+            top: 70px; 
+            right: 20px; 
+            background: white; border-radius: 18px; padding: 8px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15); 
+            display: none; z-index: 1500;
+            flex-direction: column; min-width: 140px;
         }
-        .edit-menu button {
-            padding: 12px 20px; background: none; border: none; font-size: 16px; cursor: pointer;
+
+        .sort-menu {
+            position: absolute; 
+            bottom: 80px; 
+            left: 20px; 
+            background: white; border-radius: 18px; padding: 8px 0;
+            box-shadow: 0 -8px 25px rgba(0,0,0,0.15); 
+            display: none; z-index: 1500;
+            flex-direction: column; min-width: 160px;
         }
-        .edit-menu button:disabled {
-            color: #aaa; cursor: not-allowed;
+
+        .edit-menu button, .sort-menu button {
+            padding: 12px 20px; background: none; border: none; 
+            font-size: 15px; cursor: pointer; text-align: left;
+            width: 100%; border-bottom: 1px solid #f5f5f5;
         }
+        .edit-menu button:last-child, .sort-menu button:last-child { border-bottom: none; }
+        .edit-menu button:disabled { color: #ccc; cursor: not-allowed; }
         .edit-menu button.danger { color: #ff4444; }
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
-            padding: 12px 30px; padding-bottom: calc(env(safe-area-inset-bottom) + 15px);
+            padding: 12px 30px; padding-bottom: calc(env(safe-area-inset-top) + 15px);
             background: #FFF9EB; display: flex; justify-content: space-between; 
             align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
         }
         .bottom-icon-btn {
             background: #8E8E93; color: white; width: 48px; height: 48px; 
@@ -158,55 +148,59 @@
                 <div class="circle-btn" id="addBtn"><i class="fa-solid fa-plus"></i></div>
                 <div class="text-btn" id="selectBtn">選取</div>
             </div>
+            
+            <div class="edit-menu" id="editMenu">
+                <button id="menuRename">更改名稱</button>
+                <button id="menuChangeCover">更換封面</button>
+                <button class="danger" id="menuDelete">刪除相簿</button>
+            </div>
         </div>
 
         <div class="album-list" id="albumContainer"></div>
 
         <div class="no-result" id="noResult">
             <div>沒有結果</div>
-            <div style="font-size:14px;margin-top:8px;">沒有「[關鍵字]」的結果，請嘗試新的搜尋項目</div>
+            <div style="font-size:14px;margin-top:8px;" id="noResultText"></div>
         </div>
 
         <div class="bottom-bar">
-            <div class="bottom-icon-btn"><i class="fa-solid fa-arrow-up-wide-short"></i></div>
+            <div style="position: relative;">
+                <div class="bottom-icon-btn" id="openSortBtn"><i class="fa-solid fa-arrow-up-wide-short"></i></div>
+                <div class="sort-menu" id="sortMenu">
+                    <button onclick="handleSort(false)"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp;由新到舊</button>
+                    <button onclick="handleSort(true)"><i class="fa-solid fa-clock"></i> &nbsp;由舊到新</button>
+                </div>
+            </div>
             <div class="bottom-icon-btn" id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i></div>
         </div>
     </div>
 
-    <!-- 新增相簿彈窗 -->
     <div class="modal-overlay" id="addModal">
         <div class="add-modal">
-            <div class="add-modal-close" id="closeAdd">×</div>
-            <div class="add-modal-preview-area" id="previewArea">
-                <i class="fa-solid fa-plus"></i>
-                <img id="previewImg" class="add-modal-preview-img" style="display:none;">
+            <div class="add-modal-close" id="closeAdd" style="position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer;">×</div>
+            <div class="add-modal-preview-area" id="previewArea" style="width: 180px; height: 180px; background: #f0f0f0; border-radius: 12px; margin: 20px auto; display: flex; justify-content: center; align-items: center; cursor: pointer;">
+                <i class="fa-solid fa-plus" style="font-size: 40px; color: #ccc;"></i>
+                <img id="previewImg" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px; display: none;">
             </div>
-            <div class="add-modal-title">名稱</div>
-            <input type="text" id="newAlbumName" class="add-modal-input" placeholder="">
-            <button class="add-modal-save" id="confirmAdd">儲存</button>
+            <div style="font-size: 18px; margin-bottom: 10px;">名稱</div>
+            <input type="text" id="newAlbumName" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: white; margin-bottom: 20px;">
+            <button class="add-modal-save" id="confirmAdd" style="width: 100%; padding: 14px; background: #FFB352; color: white; border: none; border-radius: 30px; font-weight: bold; cursor: pointer;">儲存</button>
         </div>
     </div>
 
-    <!-- 搜尋彈窗 -->
     <div class="modal-overlay" id="searchModal">
         <div class="search-modal">
-            <div class="search-cancel" id="cancelSearch">×</div>
-            <div class="add-modal-title">搜尋相簿</div>
-            <input type="text" id="searchInput" class="add-modal-input" placeholder="">
-            <button class="add-modal-save" id="confirmSearch">搜尋</button>
+            <div style="position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer;" id="cancelSearch">×</div>
+            <div style="font-size: 18px; margin-bottom: 20px;">搜尋相簿</div>
+            <input type="text" id="searchInput" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: white; margin-bottom: 20px;">
+            <button class="add-modal-save" id="confirmSearch" style="width: 100%; padding: 14px; background: #FFB352; color: white; border: none; border-radius: 30px; font-weight: bold; cursor: pointer;">搜尋</button>
         </div>
-    </div>
-
-    <!-- 編輯選單 -->
-    <div class="edit-menu" id="editMenu">
-        <button id="menuRename">更改名稱</button>
-        <button id="menuChangeCover">更換封面</button>
-        <button class="danger" id="menuDelete">刪除相簿</button>
     </div>
 
     <script>
         let editMode = false;
         let selectedAlbums = [];
+        let isAscending = false; 
 
         document.addEventListener('DOMContentLoaded', () => {
             loadAlbums();
@@ -216,37 +210,40 @@
         function setupEventListeners() {
             document.getElementById('selectBtn').onclick = () => {
                 editMode = !editMode;
-                document.body.classList.toggle('edit-mode', editMode);
                 document.getElementById('selectBtn').textContent = editMode ? '取消' : '選取';
-                if (!editMode) {
-                    clearSelection();
-                }
+                if (!editMode) clearSelection();
             };
+
+            document.getElementById('openSortBtn').onclick = (e) => {
+                e.stopPropagation();
+                const menu = document.getElementById('sortMenu');
+                menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+            };
+
+            document.addEventListener('click', () => {
+                document.getElementById('sortMenu').style.display = 'none';
+                document.getElementById('editMenu').style.display = 'none';
+            });
 
             document.getElementById('addBtn').onclick = () => {
                 document.getElementById('addModal').style.display = 'flex';
                 document.getElementById('newAlbumName').value = '';
                 document.getElementById('previewImg').style.display = 'none';
                 document.querySelector('#previewArea i').style.display = 'flex';
-                window.tempCoverSrc = null;
             };
-            document.getElementById('closeAdd').onclick = () => {
-                document.getElementById('addModal').style.display = 'none';
-            };
+            document.getElementById('closeAdd').onclick = () => document.getElementById('addModal').style.display = 'none';
             document.getElementById('previewArea').onclick = chooseCover;
             document.getElementById('confirmAdd').onclick = createAlbum;
 
             document.getElementById('searchBtn').onclick = () => {
                 document.getElementById('searchModal').style.display = 'flex';
-                document.getElementById('searchInput').value = '';
             };
             document.getElementById('cancelSearch').onclick = () => {
                 document.getElementById('searchModal').style.display = 'none';
-                loadAlbums(); // 取消搜尋時恢復全部
+                loadAlbums();
             };
             document.getElementById('confirmSearch').onclick = () => {
-                const query = document.getElementById('searchInput').value.trim().toLowerCase();
-                loadAlbums(query);
+                loadAlbums(document.getElementById('searchInput').value.trim().toLowerCase());
                 document.getElementById('searchModal').style.display = 'none';
             };
 
@@ -255,104 +252,121 @@
             document.getElementById('menuDelete').onclick = deleteSelected;
         }
 
-        function loadAlbums(filter = '') {
-            const container = document.getElementById('albumContainer');
-            const noResult = document.getElementById('noResult');
-            container.innerHTML = '';
-
-            const allPhotos = JSON.parse(localStorage.getItem('all_photos')) || [];
-            const customAlbums = JSON.parse(localStorage.getItem('custom_albums')) || [];
-            const covers = JSON.parse(localStorage.getItem('album_covers')) || {};
-
-            // default
-            const defaultPhotos = allPhotos.filter(p => !p.restaurant && !p.customAlbum);
-            renderAlbum('default', defaultPhotos, 'default', covers['default']);
-
-            // 餐廳分類
-            const restaurantMap = {};
-            allPhotos.forEach(p => {
-                if (p.restaurant) {
-                    if (!restaurantMap[p.restaurant]) restaurantMap[p.restaurant] = [];
-                    restaurantMap[p.restaurant].push(p);
-                }
-            });
-            Object.entries(restaurantMap).forEach(([name, photos]) => {
-                renderAlbum(name, photos, 'restaurant', covers[name]);
-            });
-
-            // 自定義相簿
-            customAlbums.forEach(name => {
-                const photos = allPhotos.filter(p => p.customAlbum === name);
-                renderAlbum(name, photos, 'custom', covers[name]);
-            });
-
-            // 搜尋過濾
-            let visibleCount = 0;
-            document.querySelectorAll('.album-card').forEach(card => {
-                const title = card.querySelector('.album-title').textContent.toLowerCase();
-                const tags = (card.dataset.tags || '').toLowerCase();
-                const match = filter === '' || title.includes(filter) || tags.includes(filter);
-                card.style.display = match ? 'flex' : 'none';
-                if (match) visibleCount++;
-            });
-
-            const showNoResult = visibleCount === 0 && filter !== '';
-            noResult.classList.toggle('show', showNoResult);
-            if (showNoResult) {
-                noResult.querySelector('div:nth-child(2)').textContent = `沒有「${filter}」的結果，請嘗試新的搜尋項目`;
-            }
+        function handleSort(ascending) {
+            isAscending = ascending;
+            loadAlbums();
+            document.getElementById('sortMenu').style.display = 'none';
         }
 
-        function renderAlbum(name, photos, type, customCover) {
+        function loadAlbums(filter = '') {
+            const container = document.getElementById('albumContainer');
+            container.innerHTML = '';
+            const allPhotos = JSON.parse(localStorage.getItem('all_photos')) || [];
+            const customAlbums = JSON.parse(localStorage.getItem('custom_albums')) || [];
+            const albumDataMeta = JSON.parse(localStorage.getItem('album_data_meta')) || {};
+            const covers = JSON.parse(localStorage.getItem('album_covers')) || {};
+
+            let albumData = [];
+
+            // Default
+            const defPhotos = allPhotos.filter(p => !p.restaurant && !p.customAlbum);
+            albumData.push({ 
+                name: 'default', 
+                photos: defPhotos, 
+                type: 'default', 
+                cover: covers['default'],
+                createTime: albumDataMeta['default'] || '2025/01/01 00:00'
+            });
+
+            // Custom
+            customAlbums.forEach(name => {
+                const photos = allPhotos.filter(p => p.customAlbum === name);
+                albumData.push({ 
+                    name: name, 
+                    photos: photos, 
+                    type: 'custom', 
+                    cover: covers[name],
+                    createTime: albumDataMeta[name] || '----'
+                });
+            });
+
+            // --- 核心改進：根據畫面顯示的時間進行排序 ---
+            albumData.sort((a, b) => {
+                // 優先取最後照片的 id (timestamp)，若沒照片則轉換建立時間字串為時間戳
+                let valA = a.photos.length > 0 ? a.photos[a.photos.length - 1].id : new Date(a.createTime).getTime();
+                let valB = b.photos.length > 0 ? b.photos[b.photos.length - 1].id : new Date(b.createTime).getTime();
+                
+                // 處理可能出現的 NaN (例如建立時間為 ----)
+                if (isNaN(valA)) valA = 0;
+                if (isNaN(valB)) valB = 0;
+
+                return isAscending ? valA - valB : valB - valA;
+            });
+
+            let visibleCount = 0;
+            albumData.forEach(data => {
+                const match = filter === '' || data.name.toLowerCase().includes(filter);
+                if (match) {
+                    renderAlbum(data.name, data.photos, data.type, data.cover, data.createTime);
+                    visibleCount++;
+                }
+            });
+
+            const noRes = document.getElementById('noResult');
+            noRes.classList.toggle('show', visibleCount === 0 && filter !== '');
+        }
+
+        function renderAlbum(name, photos, type, customCover, createTime) {
             const container = document.getElementById('albumContainer');
             const card = document.createElement('div');
             card.className = 'album-card';
             card.dataset.name = name;
             card.dataset.type = type;
 
-            const allTags = [...new Set(photos.flatMap(p => p.tags || []))].join(' ');
-            card.dataset.tags = allTags;
-
             const thumbSrc = customCover || (photos.length > 0 ? photos[photos.length - 1].src : '');
             const thumb = thumbSrc 
-                ? `<img src="${thumbSrc}" class="album-thumb" onerror="this.src=''; this.parentNode.classList.add('default-icon'); this.outerHTML='<i class=fa-solid fa-image></i>'">`
+                ? `<img src="${thumbSrc}" class="album-thumb">`
                 : `<div class="album-thumb default-icon"><i class="fa-solid fa-image"></i></div>`;
+
+            let displayTimeStr = '';
+            let label = '最後更新';
+            
+            if (photos.length > 0) {
+                const lastPhoto = photos[photos.length - 1];
+                displayTimeStr = `${lastPhoto.date} ${lastPhoto.time.substring(0, 5)}`;
+            } else {
+                label = '建立時間';
+                displayTimeStr = createTime;
+            }
 
             card.innerHTML = `
                 <div class="check-overlay"><i class="fa-solid fa-check"></i></div>
                 ${thumb}
                 <div class="album-info">
                     <div class="album-title">${name}</div>
-                    <div class="album-meta">更新時間 ${photos.length > 0 ? photos[photos.length - 1].date : '----'}</div>
+                    <div class="album-meta">${label} ${displayTimeStr}</div> 
                     <div class="album-meta">共 ${photos.length} 張相片</div>
                 </div>
             `;
 
             card.onclick = (e) => {
+                e.stopPropagation();
                 if (editMode && type === 'custom') {
                     card.classList.toggle('selected');
                     updateEditMenu();
-                    e.stopPropagation();
                 } else if (!editMode) {
-                    openAlbum(name);
+                    window.location.href = `photo.html?album=${encodeURIComponent(name)}`;
                 }
             };
-
             container.appendChild(card);
-        }
-
-        function openAlbum(name) {
-            window.location.href = `photo.html?album=${encodeURIComponent(name)}`;
         }
 
         function updateEditMenu() {
             selectedAlbums = Array.from(document.querySelectorAll('.album-card.selected')).map(c => c.dataset.name);
             const menu = document.getElementById('editMenu');
             menu.style.display = selectedAlbums.length > 0 ? 'flex' : 'none';
-
-            const isSingle = selectedAlbums.length === 1;
-            document.getElementById('menuRename').disabled = !isSingle;
-            document.getElementById('menuChangeCover').disabled = !isSingle;
+            document.getElementById('menuRename').disabled = selectedAlbums.length !== 1;
+            document.getElementById('menuChangeCover').disabled = selectedAlbums.length !== 1;
         }
 
         function clearSelection() {
@@ -363,125 +377,92 @@
 
         function chooseCover() {
             const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
+            input.type = 'file'; input.accept = 'image/*';
             input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        document.getElementById('previewImg').src = ev.target.result;
-                        document.getElementById('previewImg').style.display = 'block';
-                        document.querySelector('#previewArea i').style.display = 'none';
-                        window.tempCoverSrc = ev.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    document.getElementById('previewImg').src = ev.target.result;
+                    document.getElementById('previewImg').style.display = 'block';
+                    document.querySelector('#previewArea i').style.display = 'none';
+                    window.tempCoverSrc = ev.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
             };
             input.click();
         }
 
         function createAlbum() {
             const name = document.getElementById('newAlbumName').value.trim();
-            if (!name) {
-                alert('請輸入相簿名稱');
-                return;
-            }
-
-            const custom = JSON.parse(localStorage.getItem('custom_albums')) || [];
-            if (custom.includes(name)) {
-                alert('相簿名稱已存在');
-                return;
-            }
+            if (!name) return alert('請輸入名稱');
+            let custom = JSON.parse(localStorage.getItem('custom_albums')) || [];
+            if (custom.includes(name)) return alert('名稱已存在');
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('zh-TW'); 
+            const timeStr = now.toLocaleTimeString('zh-TW', {hour12: false}).substring(0, 5); 
+            const createTimeFormatted = `${dateStr} ${timeStr}`;
 
             custom.push(name);
             localStorage.setItem('custom_albums', JSON.stringify(custom));
+            
+            let albumMeta = JSON.parse(localStorage.getItem('album_data_meta')) || {};
+            albumMeta[name] = createTimeFormatted;
+            localStorage.setItem('album_data_meta', JSON.stringify(albumMeta));
 
             if (window.tempCoverSrc) {
-                const covers = JSON.parse(localStorage.getItem('album_covers')) || {};
+                let covers = JSON.parse(localStorage.getItem('album_covers')) || {};
                 covers[name] = window.tempCoverSrc;
                 localStorage.setItem('album_covers', JSON.stringify(covers));
             }
-
             loadAlbums();
             document.getElementById('addModal').style.display = 'none';
         }
 
         function renameSelected() {
-            if (selectedAlbums.length !== 1) return;
             const oldName = selectedAlbums[0];
-            const newName = prompt('輸入新名稱：', oldName);
+            const newName = prompt('新名稱：', oldName);
             if (!newName || newName === oldName) return;
-            if (getAllAlbums().includes(newName)) {
-                alert('名稱已存在');
-                return;
-            }
-
-            let photos = JSON.parse(localStorage.getItem('all_photos')) || [];
-            photos.forEach(p => {
-                if (p.customAlbum === oldName) p.customAlbum = newName;
-            });
-            localStorage.setItem('all_photos', JSON.stringify(photos));
-
             let custom = JSON.parse(localStorage.getItem('custom_albums')) || [];
             custom = custom.map(n => n === oldName ? newName : n);
             localStorage.setItem('custom_albums', JSON.stringify(custom));
-
-            const covers = JSON.parse(localStorage.getItem('album_covers')) || {};
-            if (covers[oldName]) {
-                covers[newName] = covers[oldName];
-                delete covers[oldName];
-                localStorage.setItem('album_covers', JSON.stringify(covers));
+            let albumMeta = JSON.parse(localStorage.getItem('album_data_meta')) || {};
+            if (albumMeta[oldName]) {
+                albumMeta[newName] = albumMeta[oldName];
+                delete albumMeta[oldName];
+                localStorage.setItem('album_data_meta', JSON.stringify(albumMeta));
             }
-
-            loadAlbums();
-            clearSelection();
+            loadAlbums(); clearSelection();
         }
 
         function changeCoverSelected() {
-            if (selectedAlbums.length !== 1) return;
-            chooseCover();
-            if (window.tempCoverSrc) {
-                const name = selectedAlbums[0];
-                const covers = JSON.parse(localStorage.getItem('album_covers')) || {};
-                covers[name] = window.tempCoverSrc;
-                localStorage.setItem('album_covers', JSON.stringify(covers));
-                loadAlbums();
-            }
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = 'image/*';
+            input.onchange = (e) => {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    let covers = JSON.parse(localStorage.getItem('album_covers')) || {};
+                    covers[selectedAlbums[0]] = ev.target.result;
+                    localStorage.setItem('album_covers', JSON.stringify(covers));
+                    loadAlbums(); clearSelection();
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            };
+            input.click();
         }
 
         function deleteSelected() {
-            if (selectedAlbums.length === 0) return;
-            if (!confirm(`確定刪除 ${selectedAlbums.length} 個相簿？照片將回到 default`)) return;
-
+            if (!confirm(`確定刪除 ${selectedAlbums.length} 個相簿？`)) return;
             let custom = JSON.parse(localStorage.getItem('custom_albums')) || [];
-            let photos = JSON.parse(localStorage.getItem('all_photos')) || [];
-            let covers = JSON.parse(localStorage.getItem('album_covers')) || {};
-
-            selectedAlbums.forEach(name => {
-                custom = custom.filter(n => n !== name);
-                photos.forEach(p => {
-                    if (p.customAlbum === name) delete p.customAlbum;
-                });
-                delete covers[name];
+            let albumMeta = JSON.parse(localStorage.getItem('album_data_meta')) || {};
+            selectedAlbums.forEach(name => { 
+                custom = custom.filter(n => n !== name); 
+                delete albumMeta[name];
             });
-
             localStorage.setItem('custom_albums', JSON.stringify(custom));
-            localStorage.setItem('all_photos', JSON.stringify(photos));
-            localStorage.setItem('album_covers', JSON.stringify(covers));
-
-            loadAlbums();
-            clearSelection();
+            localStorage.setItem('album_data_meta', JSON.stringify(albumMeta));
+            loadAlbums(); clearSelection();
+            editMode = false; document.getElementById('selectBtn').textContent = '選取';
         }
-
-        function getAllAlbums() {
-            const photos = JSON.parse(localStorage.getItem('all_photos')) || [];
-            const restaurants = [...new Set(photos.map(p => p.restaurant).filter(Boolean))];
-            const custom = JSON.parse(localStorage.getItem('custom_albums')) || [];
-            return ['default', ...restaurants, ...custom];
-        }
-
-        loadAlbums();
     </script>
 </body>
 </html>
