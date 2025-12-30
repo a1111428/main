@@ -475,6 +475,13 @@
             const marker = L.marker(loc.pos, { icon: restaurantIcon }).bindPopup(popupContent, { className: 'custom-popup' });
             
             marker.on('click', function() {
+                // 移动地图到标记位置
+                map.flyTo(loc.pos, 18, {
+                    duration: 0.8,
+                    easeLinearity: 0.25
+                });
+                
+                // 打开详情面板
                 openDetailPanel(loc);
             });
 

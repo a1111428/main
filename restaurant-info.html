@@ -396,7 +396,7 @@
                 </div>
                 <div class="action-icons">
                     <i class="fa-solid fa-bookmark" id="bookmarkBtn" onclick="toggleBookmark()"></i>
-                    <i class="fa-solid fa-compass"></i>
+                    <i class="fa-solid fa-compass" id="compassBtn" onclick="openGoogleMapsNavigation()"></i>
                 </div>
             </div>
 
@@ -590,21 +590,40 @@
             document.getElementById('writeModal').classList.add('active');
         }
 
+        // 餐厅位置数据（用于导航和文章发布）
+        const restaurantPositions = {
+            "沐沐MUMU 茶飲": { pos: [22.703508, 120.301304], addr: "高雄市楠梓區宏毅一路6號" },
+            "Bon appétit 葩那貝蒂": { pos: [22.736657, 120.329098], addr: "高雄市楠梓區土庫一路198號" },
+            "究鶴餐館": { pos: [22.659232, 120.306703], addr: "高雄市左營區富國路98號" },
+            "鸚鵡螺餐酒館-富國店": { pos: [22.660084, 120.306481], addr: "高雄市左營區富國路101號" },
+            "ROSA義大利餐廳": { pos: [22.687341, 120.313866], addr: "高雄市左營區華夏路1422號" },
+            "貓之家俱樂部": { pos: [22.668809, 120.299941], addr: "高雄市左營區新勝街26號" },
+            "萊Bar音樂餐酒館": { pos: [22.679911, 120.311226], addr: "高雄市左營區文自路５７１號" },
+            "逅巷咖啡定食": { pos: [22.669228, 120.304374], addr: "高雄市左營區新上街307巷15號" },
+            "心滿義廚": { pos: [22.666260, 120.307573], addr: "高雄市立信路28號" }
+        };
+
+        function openGoogleMapsNavigation() {
+            const resName = document.getElementById('resName').innerText;
+            const resAddr = document.getElementById('resAddr').innerText;
+            const restaurant = restaurantPositions[resName];
+            
+            if (restaurant) {
+                const [lat, lng] = restaurant.pos;
+                // 使用 Google Maps 导航链接
+                const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                window.open(googleMapsUrl, '_blank');
+            } else {
+                // 如果没有位置信息，使用地址搜索
+                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(resAddr)}`;
+                window.open(googleMapsUrl, '_blank');
+            }
+        }
+
         function goToArticlePost() {
             const resName = document.getElementById('resName').innerText;
             const resAddr = document.getElementById('resAddr').innerText;
-            const resData = {
-                "沐沐MUMU 茶飲": { pos: [22.703508, 120.301304], addr: "高雄市楠梓區宏毅一路6號" },
-                "Bon appétit 葩那貝蒂": { pos: [22.736657, 120.329098], addr: "高雄市楠梓區土庫一路198號" },
-                "究鶴餐館": { pos: [22.659232, 120.306703], addr: "高雄市左營區富國路98號" },
-                "鸚鵡螺餐酒館-富國店": { pos: [22.660084, 120.306481], addr: "高雄市左營區富國路101號" },
-                "ROSA義大利餐廳": { pos: [22.687341, 120.313866], addr: "高雄市左營區華夏路1422號" },
-                "貓之家俱樂部": { pos: [22.668809, 120.299941], addr: "高雄市左營區新勝街26號" },
-                "萊Bar音樂餐酒館": { pos: [22.679911, 120.311226], addr: "高雄市左營區文自路５７１號" },
-                "逅巷咖啡定食": { pos: [22.669228, 120.304374], addr: "高雄市左營區新上街307巷15號" },
-                "心滿義廚": { pos: [22.666260, 120.307573], addr: "高雄市立信路28號" }
-            };
-            const restaurant = resData[resName] || { pos: [22.732775288093578, 120.2884383523927], addr: resAddr };
+            const restaurant = restaurantPositions[resName] || { pos: [22.732775288093578, 120.2884383523927], addr: resAddr };
             localStorage.setItem('article_restaurant', JSON.stringify({
                 name: resName,
                 addr: restaurant.addr,
