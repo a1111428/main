@@ -5,19 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Furry Café Map</title>
     <style>
-        /* 基礎設定 */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            background-color: #FFF9EB; /* 封面背景色 */
+            background-color: #FFF9EB;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
         }
 
-        /* 內容容器：包含淡入淡出動畫 */
         .splash-content {
             text-align: center;
             animation: fadeInOut 2.5s ease-in-out forwards;
@@ -36,8 +34,6 @@
             color: #000;
         }
 
-        /* 淡入淡出動畫邏輯 */
-        /* 0% 開始透明 -> 20% 完全顯現 -> 80% 開始變透明 -> 100% 完全消失 */
         @keyframes fadeInOut {
             0% { opacity: 0; transform: scale(0.95); }
             20% { opacity: 1; transform: scale(1); }
@@ -54,7 +50,6 @@
     </div>
 
     <script>
-        // 在 2500 毫秒（2.5秒）後跳轉到 2.html
         setTimeout(function() {
             window.location.href = "index.html";
         }, 2500);
@@ -62,5 +57,3 @@
 
 </body>
 </html>
-
-

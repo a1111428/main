@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
-        body, html { height: 100%; overflow: auto; background: #FFF2DF; }
-        .phone { width: 100%; max-width: 452px; margin: 0 auto; min-height: 100vh; position: relative; background: #FFF2DF; }
+        body, html { height: 100%; overflow: auto; background: #F8F1E7; }
+        .phone { width: 100%; max-width: 452px; margin: 0 auto; min-height: 100vh; position: relative; background: #F8F1E7; }
         .container { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
 
         /* 頂部標題 */
@@ -31,19 +31,103 @@
         .dropdown-option:hover { background-color: #f8f8f8; }
         .dropdown-option:last-child { border-bottom: none; }
 
-        /* 文章卡片 */
+        /* 文章卡片 - 与 article.html 保持一致 */
         .article-list { width: 92%; display: flex; flex-direction: column; gap: 15px; }
-        .article-card { background-color: #FFECCB; border-radius: 20px; padding: 15px; display: flex; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card-left { width: 130px; display: flex; flex-direction: column; gap: 10px; }
-        .cafe-img { width: 130px; height: 110px; border-radius: 15px; object-fit: cover; }
-        .edit-btn { background-color: #FFB352; color: white; border-radius: 20px; padding: 6px 0; font-weight: bold; text-align: center; font-size: 14px; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 5px; }
-        .card-right { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .cafe-name { font-size: 20px; font-weight: bold; }
-        .cafe-desc { font-size: 14px; color: #555; line-height: 1.4; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; }
-        .post-date { font-size: 13px; color: #666; font-weight: bold; }
-        .like-section { display: flex; align-items: center; gap: 5px; font-weight: bold; }
-        .like-section i { color: #C88E6B; font-size: 18px; }
+        .article-card { 
+            background-color: #FFF0D6; 
+            border-radius: 20px; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            cursor: pointer;
+        }
+        .card-top {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .cafe-img { 
+            width: 130px; 
+            height: 130px; 
+            border-radius: 15px; 
+            object-fit: cover; 
+            background: #eee;
+            flex-shrink: 0;
+        }
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 130px;
+        }
+        .shop-name-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .cafe-name { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #333;
+        }
+        .cafe-desc { 
+            font-size: 14px; 
+            color: #666; 
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1;
+            min-height: 60px;
+        }
+        .card-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+        .post-time {
+            font-size: 12px;
+            color: #888;
+        }
+        .heart-count {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            font-size: 13px;
+            color: #FF9800;
+        }
+        .heart-count i {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-post-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 85px;
+            width: 56px;
+            height: 56px;
+            background: #FF9800;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            text-decoration: none;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -60,14 +144,14 @@
                 <div class="filter-item" onclick="toggleMenu('filterMenu')">篩選 <i class="fa-solid fa-chevron-down"></i></div>
                 
                 <div id="sortMenu" class="dropdown-menu" style="left: 5%;">
-                    <div class="dropdown-option" onclick="applySort('postTime')">發佈時間 (最新)</div>
-                    <div class="dropdown-option" onclick="applySort('likes')">最多讚數</div>
+                    <div class="dropdown-option" onclick="applySort('postTimeDesc')">發佈時間 (最新)</div>
+                    <div class="dropdown-option" onclick="applySort('postTimeAsc')">發佈時間 (最舊)</div>
+                    <div class="dropdown-option" onclick="applySort('likesDesc')">收藏數 (最多)</div>
+                    <div class="dropdown-option" onclick="applySort('likesAsc')">收藏數 (最少)</div>
                 </div>
 
                 <div id="filterMenu" class="dropdown-menu" style="right: 5%;">
                     <div class="dropdown-option" onclick="applyFilter('all')">全部地區</div>
-                    <div class="dropdown-option" onclick="applyFilter('大安區')">大安區</div>
-                    <div class="dropdown-option" onclick="applyFilter('信義區')">信義區</div>
                 </div>
             </div>
 
@@ -75,34 +159,114 @@
         </div>
     </div>
 
+    <a href="article-post.html?from=my-article.html" class="add-post-btn">
+        <i class="fa-solid fa-plus"></i>
+    </a>
+
     <script>
-        // 修改後的數據：Phoebe(77), 毛孩(88), 咪咪貓貓(99)
-        const articles = [
-            { id: 1, name: "Phoebe咖啡廳", region: "大安區", img: "https://images.unsplash.com/photo-1548191265-cc70d3d45ba1?auto=format&fit=crop&w=300", desc: "Phoebe 咖啡廳環境舒適安靜，店內歡迎攜帶寵物入內。", postTime: "2024-04-20", likes: 105 },
-            { id: 2, name: "毛孩餐酒館", region: "信義區", img: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=300", desc: "店內歡迎攜帶寵物入內。飲品與甜點表現出色，是放鬆好去處。", postTime: "2024-05-20", likes: 73 },
-            { id: 3, name: "咪咪貓貓咖啡廳", region: "大安區", img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=300", desc: "以貓咪友善空間為特色，店內氛圍療癒溫暖，適合享受咖啡香。", postTime: "2025-11-28", likes: 99 }
-        ];
+        // 只显示发布的文章，不显示默认数据
+        let articles = [];
+
+        // 从内容中提取标题（支持 [xxx] 格式）
+        function extractTitle(content) {
+            if (!content) return '未命名文章';
+            const firstLine = content.split('\n')[0].trim();
+            // 匹配 [xxx] 格式，提取括号内的内容作为标题
+            const match = firstLine.match(/^\[([^\]]+)\]\s*(.*)$/);
+            if (match) {
+                // 如果有括号后的内容，使用括号后的内容作为标题
+                return match[2].trim() || match[1].trim() || '未命名文章';
+            }
+            // 如果没有匹配到，尝试移除 [title] 关键字
+            return firstLine.replace(/\[title\]/gi, '').trim() || '未命名文章';
+        }
+
+        // 加载发布的文章
+        function loadPublishedArticles() {
+            const allArticles = JSON.parse(localStorage.getItem('all_articles') || '[]');
+            allArticles.forEach(art => {
+                const title = extractTitle(art.content);
+                const contentLines = art.content.split('\n');
+                const desc = contentLines.slice(1).join('\n').trim() || art.content;
+                
+                // 从地址中提取区域
+                let region = '未知區域';
+                if (art.location && art.location.addr) {
+                    const addr = art.location.addr;
+                    // 匹配"XX市XX區"格式
+                    const match = addr.match(/([^市]+市)?([^區]+區)/);
+                    if (match && match[2]) {
+                        region = match[2];
+                    } else if (addr.includes('區')) {
+                        const parts = addr.split('區');
+                        if (parts.length > 0) {
+                            region = parts[0] + '區';
+                        }
+                    }
+                }
+                
+                const articleData = {
+                    id: art.id,
+                    name: title,
+                    region: region,
+                    address: art.location ? art.location.addr : '',
+                    img: art.photos && art.photos.length > 0 ? art.photos[0].src : `https://loremflickr.com/300/300/food,cafe?random=${art.id}`,
+                    desc: desc,
+                    postTime: new Date(art.time).toISOString().split('T')[0],
+                    date: new Date(art.time).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    time: art.time,
+                    likes: 0,
+                    isPublished: true
+                };
+                
+                const existingIndex = articles.findIndex(a => a.id === art.id);
+                if (existingIndex > -1) {
+                    articles[existingIndex] = articleData;
+                } else {
+                    articles.push(articleData);
+                }
+            });
+        }
+
+        // 获取文章收藏数
+        function getArticleHeart(articleId, defaultHeart) {
+            const stats = JSON.parse(localStorage.getItem('article_stats') || '{}');
+            return stats[articleId] ? stats[articleId].heart : defaultHeart;
+        }
 
         let currentData = [...articles];
 
         function renderArticles(data) {
             const list = document.getElementById('articleList');
-            list.innerHTML = data.map(item => `
-                <div class="article-card">
-                    <div class="card-left">
+            if (data.length === 0) {
+                list.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">還沒有發布任何文章</div>';
+                return;
+            }
+            
+            list.innerHTML = data.map(item => {
+                const heartCount = getArticleHeart(item.id, item.likes || 0);
+                return `
+                <div class="article-card" onclick="window.location.href='article-detail.html?id=${item.id}&from=my-article.html'">
+                    <div class="card-top">
                         <img src="${item.img}" class="cafe-img" alt="${item.name}">
-                        <a href="article-post.html" class="edit-btn"><i class="fa-solid fa-pen"></i> 編輯文章</a>
-                    </div>
-                    <div class="card-right">
-                        <h2 class="cafe-name">${item.name} (${item.region})</h2>
-                        <p class="cafe-desc">${item.desc}</p>
-                        <div class="card-footer">
-                            <span class="post-date">${item.postTime.replace(/-/g, ' / ')}</span>
-                            <div class="like-section"><i class="fa-solid fa-heart"></i> ${item.likes}</div>
+                        <div class="card-content">
+                            <div class="shop-name-row">
+                                <span class="cafe-name">${item.name}</span>
+                                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+                            </div>
+                            <p class="cafe-desc">${item.desc}</p>
+                            <div class="card-footer-row">
+                                <span class="post-time">${item.date || (item.postTime ? item.postTime.replace(/-/g, ' / ') : '')}</span>
+                                <div class="heart-count">
+                                    <i class="fa-solid fa-heart"></i>
+                                    <span>${heartCount}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function toggleMenu(id) {
@@ -113,20 +277,63 @@
         }
 
         function applySort(type) {
-            if (type === 'likes') {
-                currentData.sort((a, b) => b.likes - a.likes);
-            } else if (type === 'postTime') {
-                currentData.sort((a, b) => new Date(b.postTime) - new Date(a.postTime));
+            loadPublishedArticles();
+            currentData = [...articles];
+            
+            if (type === 'postTimeDesc') {
+                currentData.sort((a, b) => {
+                    const timeA = a.time ? new Date(a.time) : new Date(a.postTime);
+                    const timeB = b.time ? new Date(b.time) : new Date(b.postTime);
+                    return timeB - timeA;
+                });
+            } else if (type === 'postTimeAsc') {
+                currentData.sort((a, b) => {
+                    const timeA = a.time ? new Date(a.time) : new Date(a.postTime);
+                    const timeB = b.time ? new Date(b.time) : new Date(b.postTime);
+                    return timeA - timeB;
+                });
+            } else if (type === 'likesDesc') {
+                currentData.sort((a, b) => {
+                    const likesA = getArticleHeart(a.id, a.likes || 0);
+                    const likesB = getArticleHeart(b.id, b.likes || 0);
+                    return likesB - likesA;
+                });
+            } else if (type === 'likesAsc') {
+                currentData.sort((a, b) => {
+                    const likesA = getArticleHeart(a.id, a.likes || 0);
+                    const likesB = getArticleHeart(b.id, b.likes || 0);
+                    return likesA - likesB;
+                });
             }
             renderArticles(currentData);
             document.getElementById('sortMenu').style.display = 'none';
         }
 
         function applyFilter(region) {
-            if (region === 'all') currentData = [...articles];
-            else currentData = articles.filter(a => a.region === region);
+            loadPublishedArticles();
+            if (region === 'all') {
+                currentData = [...articles];
+            } else {
+                currentData = articles.filter(a => a.region === region);
+            }
             renderArticles(currentData);
             document.getElementById('filterMenu').style.display = 'none';
+        }
+
+        // 动态生成筛选菜单
+        function updateFilterMenu() {
+            loadPublishedArticles();
+            const filterMenu = document.getElementById('filterMenu');
+            const regions = [...new Set(articles.map(a => a.region).filter(r => r && r !== '未知區域'))];
+            
+            filterMenu.innerHTML = '<div class="dropdown-option" onclick="applyFilter(\'all\')">全部地區</div>';
+            regions.forEach(region => {
+                const option = document.createElement('div');
+                option.className = 'dropdown-option';
+                option.textContent = region;
+                option.onclick = () => applyFilter(region);
+                filterMenu.appendChild(option);
+            });
         }
 
         window.onclick = function(event) {
@@ -135,7 +342,12 @@
             }
         }
 
-        window.onload = () => renderArticles(articles);
+        window.onload = () => {
+            loadPublishedArticles();
+            currentData = [...articles];
+            updateFilterMenu();
+            renderArticles(currentData);
+        };
     </script>
 </body> 
 </html>

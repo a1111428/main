@@ -6,110 +6,135 @@
     <title>收藏文章 - Furry Café Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* --- 沿用 restaurant-favorites.html 的核心樣式 --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #f0f0f0; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: "Microsoft JhengHei", sans-serif;
-            -webkit-font-smoothing: antialiased;
+        /* --- 与 my-article.html 保持一致 --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
+        body, html {
+            height: 100%;
+            overflow: auto;
+            background: #F8F1E7;
         }
 
-        /* 模擬手機容器 452x968 */
+        /* 模擬手機容器 */
         .phone-window {
-            width: 452px;
-            height: 968px;
-            background: linear-gradient(180deg, #FFE7C7 5.08%, #FFFFFF 23.64%);
+            width: 100%;
+            max-width: 452px;
+            margin: 0 auto;
+            min-height: 100vh;
             position: relative;
-            overflow-y: auto; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: #F8F1E7;
             padding-bottom: 40px;
         }
 
         /* Header 頂部導航 */
         header {
-            padding: 60px 25px 30px;
+            width: 100%;
+            padding: 25px 20px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            background: transparent;
-            z-index: 10;
+            position: relative;
         }
 
         .back-btn, .more-btn {
-            width: 43px;
-            height: 43px;
-            border: 1.5px solid #000000;
+            width: 36px;
+            height: 36px;
+            border: 2px solid #333;
             background: transparent;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
-            color: #000;
+            font-size: 18px;
+            color: #333;
             cursor: pointer;
             text-decoration: none;
+            z-index: 10;
         }
 
         .page-title {
-            font-size: 32px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 28px;
             font-weight: bold;
             color: #000;
         }
 
+        /* 更多菜单 */
+        .more-menu {
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            overflow: hidden;
+            min-width: 150px;
+        }
+        .more-menu.show {
+            display: flex;
+        }
+        .more-menu-item {
+            padding: 12px 20px;
+            font-size: 15px;
+            color: #333;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+        .more-menu-item:last-child {
+            border-bottom: none;
+        }
+        .more-menu-item:hover {
+            background: #f5f5f5;
+        }
+        .more-menu-item.danger {
+            color: #ff4444;
+        }
+
         /* 列表容器 */
         .container {
-            padding: 0 20px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 30px;
         }
 
         .list {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-        }
-
-        /* 文章收藏卡片 (樣式參考餐廳收藏但針對文章優化) */
-        .item {
-            background: #FFF1DC; 
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column; /* 文章卡片改為垂直排列以突顯圖片與內容 */
-            position: relative;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-        }
-        .item:active {
-            transform: scale(0.98);
-        }
-
-        /* 收藏圖示 */
-        .bookmark-icon {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 20px;
-            color: #FF9800; /* 使用文章主題橘色 */
-            z-index: 5;
-        }
-
-        .card-top-content {
-            display: flex;
             gap: 15px;
-            margin-bottom: 12px;
+            width: 92%;
+            margin: 0 auto;
         }
 
+        /* 文章卡片 - 与 my-article.html 保持一致 */
+        .item {
+            background-color: #FFF0D6; 
+            border-radius: 20px; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            cursor: pointer;
+            position: relative;
+        }
+        .card-top {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
         .thumb-container {
-            width: 100px;
-            height: 100px;
-            border-radius: 12px;
+            width: 130px; 
+            height: 130px; 
+            border-radius: 15px; 
             overflow: hidden;
+            background: #eee;
             flex-shrink: 0;
         }
         .thumb {
@@ -117,55 +142,189 @@
             height: 100%;
             object-fit: cover;
         }
-
-        .meta {
+        .card-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding-right: 25px; /* 避開收藏圖示 */
+            min-height: 130px;
         }
-
-        .name {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #000;
-            line-height: 1.2;
-        }
-
-        .info-tags {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 4px;
-        }
-
-        .desc {
-            font-size: 14px;
-            color: #555;
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2; /* 縮減至兩行 */
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* 底部數據列 */
-        .card-bottom {
+        .shop-name-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            padding-top: 10px;
-            margin-top: 5px;
-            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        .name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1;
+            min-height: 60px;
+        }
+        .card-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+        .post-time {
+            font-size: 12px;
             color: #888;
         }
         .heart-count {
             display: flex;
             align-items: center;
+            justify-content: flex-end;
             gap: 4px;
+            font-size: 13px;
             color: #FF9800;
+        }
+        .heart-count i {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 排序篩選列 */
+        .filter-bar {
+            width: 90%;
+            background-color: #FFCC8D;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            margin: 20px auto;
             font-weight: bold;
+            position: relative;
+        }
+        .filter-item {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 16px;
+        }
+        .filter-item.active {
+            border-bottom: 3px solid #666;
+        }
+
+        /* 下拉選單樣式 */
+        .dropdown-menu {
+            position: absolute;
+            top: 45px;
+            background: white;
+            width: 150px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+            overflow: hidden;
+        }
+        .dropdown-option {
+            padding: 12px 15px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        .dropdown-option:hover {
+            background-color: #f8f8f8;
+        }
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+
+        /* 批次操作模式 */
+        .item.select-mode {
+            border: 2px solid #FF9800;
+        }
+        .item.selected {
+            background-color: #FFE0B2;
+            border: 2px solid #FF9800;
+        }
+        .item .select-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #FF9800;
+            border-radius: 4px;
+            background: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .item.select-mode .select-checkbox {
+            display: flex;
+        }
+        .item.selected .select-checkbox {
+            background: #FF9800;
+            color: white;
+        }
+        .item.select-mode {
+            cursor: default;
+        }
+        .item.select-mode .card-top {
+            pointer-events: none;
+        }
+
+        /* 批次操作工具栏 */
+        .batch-toolbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .batch-toolbar.show {
+            display: flex;
+        }
+        .batch-info {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        .batch-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .batch-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .batch-btn.remove {
+            background: #ff4444;
+            color: white;
+        }
+        .batch-btn.cancel {
+            background: #e0e0e0;
+            color: #333;
         }
     </style>
 </head>
@@ -175,64 +334,406 @@
         <header>
             <a href="profile.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
             <div class="page-title">收藏文章</div>
-            <button class="more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+            <button class="more-btn" id="moreBtn" onclick="toggleMoreMenu()"><i class="fa-solid fa-ellipsis"></i></button>
         </header>
+
+        <div class="more-menu" id="moreMenu">
+            <div class="more-menu-item" id="selectModeBtn" onclick="toggleSelectMode()">選取</div>
+            <div class="more-menu-item danger" id="removeFavoritesBtn" onclick="removeSelectedFavorites()" style="display: none;">移除收藏</div>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-item" onclick="toggleMenu('sortMenu')">排序 <i class="fa-solid fa-chevron-down"></i></div>
+            <div class="filter-item active">收藏文章</div>
+            <div class="filter-item" onclick="toggleMenu('filterMenu')">篩選 <i class="fa-solid fa-chevron-down"></i></div>
+            
+            <div id="sortMenu" class="dropdown-menu" style="left: 5%;">
+                <div class="dropdown-option" onclick="applySort('postTimeDesc')">發佈時間 (最新)</div>
+                <div class="dropdown-option" onclick="applySort('postTimeAsc')">發佈時間 (最舊)</div>
+                <div class="dropdown-option" onclick="applySort('likesDesc')">收藏數 (最多)</div>
+                <div class="dropdown-option" onclick="applySort('likesAsc')">收藏數 (最少)</div>
+            </div>
+
+            <div id="filterMenu" class="dropdown-menu" style="right: 5%;">
+                <div class="dropdown-option" onclick="applyFilter('all')">全部地區</div>
+            </div>
+        </div>
 
         <div class="container">
             <div class="list" id="articleFavoritesList">
                 </div>
         </div>
+
+        <div class="batch-toolbar" id="batchToolbar">
+            <div class="batch-info" id="batchInfo">已選取 0 項</div>
+            <div class="batch-actions">
+                <button class="batch-btn remove" onclick="removeSelectedFavorites()">移除收藏</button>
+                <button class="batch-btn cancel" onclick="cancelSelectMode()">取消</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 資料集：同步自 article.html 的 locations 資料
-        const articles = [
-            { id: 5, name: "貓之家俱樂部", price: "200-300", date: "2025年11月28日", heart: 420, desc: "這家的下午茶組合非常精緻，尤其是草莓塔與手沖咖啡。環境安靜且整潔，是與寵物共度靜謐時光的首選。", info: "高雄市左營區" },
-            { id: 1, name: "Bon appétit 葩那貝蒂", price: "300-500", date: "2025年11月15日", heart: 242, desc: "精緻的法式甜點與輕食餐點，每一盤都像藝術品一般。是週末帶著毛孩優雅聚餐的好地方。", info: "高雄市楠梓區" },
-            { id: 3, name: "鸚鵡螺餐酒館", price: "600-800", date: "2025年10月20日", heart: 310, desc: "很有氛圍的西式餐酒，無論是義大利麵或是炸物小點都在水準之上。晚上帶著毛孩來小酌一番也非常合適。", info: "高雄市左營區" }
+        // 默认文章数据
+        const defaultArticles = [
+            { id: 5, name: "貓之家俱樂部", price: "200-300", date: "2025年11月28日", heart: 0, desc: "這家的下午茶組合非常精緻，尤其是草莓塔與手沖咖啡。環境安靜且整潔，是與寵物共度靜謐時光的首選。", info: "高雄市左營區" },
+            { id: 1, name: "Bon appétit 葩那貝蒂", price: "300-500", date: "2025年11月15日", heart: 0, desc: "精緻的法式甜點與輕食餐點，每一盤都像藝術品一般。是週末帶著毛孩優雅聚餐的好地方。", info: "高雄市楠梓區" },
+            { id: 3, name: "鸚鵡螺餐酒館", price: "600-800", date: "2025年10月20日", heart: 0, desc: "很有氛圍的西式餐酒，無論是義大利麵或是炸物小點都在水準之上。晚上帶著毛孩來小酌一番也非常合適。", info: "高雄市左營區" }
         ];
 
         const listContainer = document.getElementById('articleFavoritesList');
 
+        // 获取所有文章数据（包括默认和发布的）
+        function getAllArticles() {
+            const allArticles = [];
+            
+            // 添加预设的九家餐厅文章（与 article.html 保持一致）
+            const defaultRestaurants = [
+                { id: 0, name: "沐沐MUMU 茶飲", pos: [22.703508, 120.301304], info: "高雄市楠梓區宏毅一路6號", price: "100-200", date: "2025年12月10日", heart: 0, desc: "這家茶飲店的環境非常放鬆，適合帶著毛孩一起來喝杯特調。推薦他們的招牌水果茶與現烤鬆餅！" },
+                { id: 1, name: "Bon appétit 葩那貝蒂", pos: [22.736657, 120.329098], info: "高雄市楠梓區土庫一路198號", price: "300-500", date: "2025年11月15日", heart: 0, desc: "精緻的法式甜點與輕食餐點，每一盤都像藝術品一般。是週末帶著毛孩優雅聚餐的好地方。" },
+                { id: 2, name: "究鶴餐館", pos: [22.659232, 120.306703], info: "高雄市左營區富國路98號", price: "200-400", date: "2025年12月01日", heart: 0, desc: "主打豐盛的家常美味定食，食材新鮮且味道紮實。空間寬敞明亮，毛孩可以落地活動，深受毛爸媽推薦。" },
+                { id: 3, name: "鸚鵡螺餐酒館", pos: [22.660084, 120.306481], info: "高雄市左營區富國路101號", price: "600-800", date: "2025年10月20日", heart: 0, desc: "很有氛圍的西式餐酒，無論是義大利麵或是炸物小點都在水準之上。晚上帶著毛孩來小酌一番也非常合適。" },
+                { id: 4, name: "ROSA義大利餐廳", pos: [22.687341, 120.313866], info: "高雄市左營區華夏路1422號", price: "400-600", date: "2025年12月05日", heart: 0, desc: "道地的義大利料理，手工窯烤披薩香氣誘人。戶外空間寬敞，用餐時還能感受到微風，非常愜意。" },
+                { id: 5, name: "貓之家俱樂部", pos: [22.668809, 120.299941], info: "高雄市左營區新勝街26號", price: "200-300", date: "2025年11月28日", heart: 0, desc: "這家的下午茶組合非常精緻，尤其是草莓塔與手沖咖啡。環境安靜且整潔，是與寵物共度靜謐時光的首選。" },
+                { id: 6, name: "萊Bar音樂餐酒館", pos: [22.679911, 120.311226], info: "高雄市左營區文自路571號", price: "500-700", date: "2025年12月12日", heart: 0, desc: "除了有現場音樂演奏，餐點的調味也極具創意。炸雞翅與調酒是必點組合，狗狗只要在籠內就能一同進店。" },
+                { id: 7, name: "逅巷咖啡定食", pos: [22.669228, 120.304374], info: "高雄市左營區新上街307巷15號", price: "250-400", date: "2025年12月18日", heart: 0, desc: "藏身巷弄，主打健康的日式定食。份量誠意十足，老闆對毛孩非常友善，會主動提供寵物專用水盆。" },
+                { id: 8, name: "心滿義廚", pos: [22.666260, 120.307573], info: "高雄市立信路28號", price: "300-500", date: "2025年12月22日", heart: 0, desc: "溫馨的居家裝潢，招牌奶油燉飯香氣四溢。每一盤料理都能感受到主廚的用心，是下班後帶著毛孩用餐的好去處。" }
+            ];
+            
+            defaultRestaurants.forEach(art => {
+                allArticles.push({
+                    id: art.id,
+                    name: art.name,
+                    desc: art.desc,
+                    date: art.date,
+                    heart: art.heart || 0,
+                    info: art.info,
+                    price: art.price,
+                    time: null,
+                    img: `https://loremflickr.com/200/200/food,meal,cafe?random=${art.id}`
+                });
+            });
+            
+            // 添加默认文章（保留原有的）
+            defaultArticles.forEach(art => {
+                allArticles.push({
+                    id: art.id,
+                    name: art.name,
+                    desc: art.desc,
+                    date: art.date,
+                    heart: art.heart || 0,
+                    info: art.info,
+                    price: art.price,
+                    time: null,
+                    img: `https://loremflickr.com/200/200/food,meal,cafe?random=${art.id}`
+                });
+            });
+            
+            // 从内容中提取标题（支持 [xxx] 格式）
+            function extractTitle(content) {
+                if (!content) return '未命名文章';
+                const firstLine = content.split('\n')[0].trim();
+                // 匹配 [xxx] 格式，提取括号内的内容作为标题
+                const match = firstLine.match(/^\[([^\]]+)\]\s*(.*)$/);
+                if (match) {
+                    // 如果有括号后的内容，使用括号后的内容作为标题
+                    return match[2].trim() || match[1].trim() || '未命名文章';
+                }
+                // 如果没有匹配到，尝试移除 [title] 关键字
+                return firstLine.replace(/\[title\]/gi, '').trim() || '未命名文章';
+            }
+
+            // 添加发布的文章
+            const publishedArticles = JSON.parse(localStorage.getItem('all_articles') || '[]');
+            publishedArticles.forEach(art => {
+                const title = extractTitle(art.content);
+                const contentLines = art.content.split('\n');
+                const desc = contentLines.slice(1).join('\n').trim() || art.content;
+                
+                allArticles.push({
+                    id: art.id,
+                    name: title,
+                    desc: desc,
+                    date: new Date(art.time).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    heart: 0,
+                    info: art.location ? art.location.addr : '照片位置',
+                    price: '',
+                    time: art.time,
+                    img: art.photos && art.photos.length > 0 ? art.photos[0].src : `https://loremflickr.com/200/200/food,meal,cafe?random=${art.id}`,
+                    isPublished: true
+                });
+            });
+            
+            return allArticles;
+        }
+
+        // 获取文章收藏数
+        function getArticleHeart(articleId, defaultHeart) {
+            const stats = JSON.parse(localStorage.getItem('article_stats') || '{}');
+            return stats[articleId] ? stats[articleId].heart : defaultHeart;
+        }
+        
+        // 更新收藏数显示的函数
+        function updateHeartCounts() {
+            const items = listContainer.querySelectorAll('.item');
+            items.forEach((item, idx) => {
+                if (idx < currentData.length) {
+                    const articleId = currentData[idx].id;
+                    const heartCount = getArticleHeart(articleId, currentData[idx].heart || 0);
+                    const heartCountSpan = item.querySelector('.heart-count span');
+                    if (heartCountSpan) {
+                        heartCountSpan.textContent = heartCount;
+                    }
+                }
+            });
+        }
+
         function renderArticles() {
             listContainer.innerHTML = '';
             
-            articles.forEach(art => {
-                const city = art.info.substring(0, 2);
+            if (currentData.length === 0) {
+                listContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">還沒有收藏任何文章</div>';
+                return;
+            }
+            
+            currentData.forEach(art => {
+                const city = art.info ? art.info.substring(0, 2) : '';
+                const heartCount = getArticleHeart(art.id, art.heart || 0);
                 const el = document.createElement('div');
                 el.className = 'item';
+                el.dataset.articleId = art.id;
                 el.innerHTML = `
-                    <div class="bookmark-icon"><i class="fa-solid fa-bookmark"></i></div>
-                    <div class="card-top-content">
+                    <div class="select-checkbox"><i class="fa-solid fa-check"></i></div>
+                    <div class="card-top">
                         <div class="thumb-container">
-                            <img class="thumb" src="https://loremflickr.com/200/200/food,meal,cafe?random=${art.id}" alt="${art.name}">
+                            <img class="thumb" src="${art.img}" alt="${art.name}">
                         </div>
-                        <div class="meta">
-                            <div class="name">${art.name}</div>
-                            <div class="info-tags">${city} | NT$ ${art.price}</div>
-                            <div class="desc">${art.desc}</div>
-                        </div>
-                    </div>
-                    <div class="card-bottom">
-                        <div class="date-info">發佈日期：${art.date}</div>
-                        <div class="heart-count">
-                            <i class="fa-solid fa-heart"></i>
-                            <span>${art.heart}</span>
+                        <div class="card-content">
+                            <div class="shop-name-row">
+                                <span class="name">${art.name}</span>
+                                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+                            </div>
+                            <p class="desc">${art.desc}</p>
+                            <div class="card-footer-row">
+                                <span class="post-time">${art.date || ''}</span>
+                                <div class="heart-count">
+                                    <i class="fa-solid fa-heart"></i>
+                                    <span>${heartCount}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
                 
-                // 點擊導向文章詳情頁 (參考 article.html 的跳轉邏輯)
-                el.addEventListener('click', () => {
-                    location.href = `article-detail.html?id=${art.id}`;
+                // 點擊導向文章詳情頁（非選取模式）
+                el.addEventListener('click', (e) => {
+                    if (!isSelectMode) {
+                        if (!e.target.closest('.select-checkbox')) {
+                            location.href = `article-detail.html?id=${art.id}&from=article-favorites.html`;
+                        }
+                    } else {
+                        // 選取模式：切換選取狀態
+                        if (e.target.closest('.select-checkbox') || e.target.closest('.item')) {
+                            toggleSelectItem(el);
+                        }
+                    }
                 });
                 
                 listContainer.appendChild(el);
             });
         } 
 
+        // 選取模式相關
+        let isSelectMode = false;
+        let selectedIds = new Set();
+        let currentData = [];
+        let currentSort = 'postTimeDesc';
+        let currentFilter = 'all';
+
+        function toggleMoreMenu() {
+            const menu = document.getElementById('moreMenu');
+            menu.classList.toggle('show');
+        }
+
+        function toggleSelectMode() {
+            isSelectMode = !isSelectMode;
+            const items = document.querySelectorAll('.item');
+            const batchToolbar = document.getElementById('batchToolbar');
+            const selectModeBtn = document.getElementById('selectModeBtn');
+            const removeFavoritesBtn = document.getElementById('removeFavoritesBtn');
+            
+            if (isSelectMode) {
+                items.forEach(item => item.classList.add('select-mode'));
+                batchToolbar.classList.add('show');
+                selectModeBtn.textContent = '取消選取';
+                removeFavoritesBtn.style.display = 'block';
+            } else {
+                items.forEach(item => {
+                    item.classList.remove('select-mode', 'selected');
+                });
+                batchToolbar.classList.remove('show');
+                selectModeBtn.textContent = '選取';
+                removeFavoritesBtn.style.display = 'none';
+                selectedIds.clear();
+                updateBatchInfo();
+            }
+            toggleMoreMenu();
+        }
+
+        function toggleSelectItem(itemEl) {
+            const articleId = parseInt(itemEl.dataset.articleId);
+            if (selectedIds.has(articleId)) {
+                selectedIds.delete(articleId);
+                itemEl.classList.remove('selected');
+            } else {
+                selectedIds.add(articleId);
+                itemEl.classList.add('selected');
+            }
+            updateBatchInfo();
+        }
+
+        function updateBatchInfo() {
+            const batchInfo = document.getElementById('batchInfo');
+            batchInfo.textContent = `已選取 ${selectedIds.size} 項`;
+        }
+
+        function removeSelectedFavorites() {
+            if (selectedIds.size === 0) {
+                alert('請先選取要移除的文章');
+                return;
+            }
+            
+            if (confirm(`確定要移除 ${selectedIds.size} 個收藏嗎？`)) {
+                let favorites = JSON.parse(localStorage.getItem('article_favorites') || '[]');
+                favorites = favorites.filter(id => !selectedIds.has(id));
+                localStorage.setItem('article_favorites', JSON.stringify(favorites));
+                
+                selectedIds.clear();
+                toggleSelectMode();
+                
+                // 重新加载数据
+                const favorites_new = JSON.parse(localStorage.getItem('article_favorites') || '[]');
+                const allArticles = getAllArticles();
+                currentData = allArticles.filter(art => favorites_new.includes(art.id));
+                updateFilterMenu();
+                applySort(currentSort);
+            }
+        }
+
+        function cancelSelectMode() {
+            toggleSelectMode();
+        }
+
+        function toggleMenu(id) {
+            const menu = document.getElementById(id);
+            const isShow = menu.style.display === 'flex';
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+            menu.style.display = isShow ? 'none' : 'flex';
+        }
+
+        function applySort(type) {
+            currentSort = type;
+            let sorted = [...currentData];
+            
+            if (type === 'postTimeDesc') {
+                sorted.sort((a, b) => {
+                    const timeA = a.time ? new Date(a.time) : (a.date ? new Date(a.date.replace(/年|月/g, '/').replace('日', '')) : new Date(0));
+                    const timeB = b.time ? new Date(b.time) : (b.date ? new Date(b.date.replace(/年|月/g, '/').replace('日', '')) : new Date(0));
+                    return timeB - timeA;
+                });
+            } else if (type === 'postTimeAsc') {
+                sorted.sort((a, b) => {
+                    const timeA = a.time ? new Date(a.time) : (a.date ? new Date(a.date.replace(/年|月/g, '/').replace('日', '')) : new Date(0));
+                    const timeB = b.time ? new Date(b.time) : (b.date ? new Date(b.date.replace(/年|月/g, '/').replace('日', '')) : new Date(0));
+                    return timeA - timeB;
+                });
+            } else if (type === 'likesDesc') {
+                sorted.sort((a, b) => {
+                    const likesA = getArticleHeart(a.id, a.heart || 0);
+                    const likesB = getArticleHeart(b.id, b.heart || 0);
+                    return likesB - likesA;
+                });
+            } else if (type === 'likesAsc') {
+                sorted.sort((a, b) => {
+                    const likesA = getArticleHeart(a.id, a.heart || 0);
+                    const likesB = getArticleHeart(b.id, b.heart || 0);
+                    return likesA - likesB;
+                });
+            }
+            
+            currentData = sorted;
+            renderArticles();
+            document.getElementById('sortMenu').style.display = 'none';
+        }
+
+        function applyFilter(region) {
+            currentFilter = region;
+            const allArticles = getAllArticles();
+            const favorites = JSON.parse(localStorage.getItem('article_favorites') || '[]');
+            let filtered = allArticles.filter(art => favorites.includes(art.id));
+            
+            if (region !== 'all') {
+                filtered = filtered.filter(art => {
+                    if (!art.info) return false;
+                    return art.info.includes(region);
+                });
+            }
+            
+            currentData = filtered;
+            applySort(currentSort);
+            document.getElementById('filterMenu').style.display = 'none';
+        }
+
+        function updateFilterMenu() {
+            const allArticles = getAllArticles();
+            const favorites = JSON.parse(localStorage.getItem('article_favorites') || '[]');
+            const favoritedArticles = allArticles.filter(art => favorites.includes(art.id));
+            const regionList = favoritedArticles.map(art => {
+                if (!art.info) return null;
+                const match = art.info.match(/([^市]+市)?([^區]+區)/);
+                return match && match[2] ? match[2] : null;
+            }).filter(r => r);
+            const regions = [...new Set(regionList)];
+            
+            const filterMenu = document.getElementById('filterMenu');
+            filterMenu.innerHTML = '<div class="dropdown-option" onclick="applyFilter(\'all\')">全部地區</div>';
+            regions.forEach(region => {
+                const option = document.createElement('div');
+                option.className = 'dropdown-option';
+                option.textContent = region;
+                option.onclick = () => applyFilter(region);
+                filterMenu.appendChild(option);
+            });
+        }
+
         // 初始化渲染
-        renderArticles();
+        const favorites = JSON.parse(localStorage.getItem('article_favorites') || '[]');
+        const allArticles = getAllArticles();
+        currentData = allArticles.filter(art => favorites.includes(art.id));
+        updateFilterMenu();
+        applySort('postTimeDesc');
+        
+        // 监听收藏变化
+        window.addEventListener('storage', () => {
+            const favorites = JSON.parse(localStorage.getItem('article_favorites') || '[]');
+            const allArticles = getAllArticles();
+            currentData = allArticles.filter(art => favorites.includes(art.id));
+            updateFilterMenu();
+            applySort(currentSort);
+            updateHeartCounts();
+        });
+        
+        // 监听收藏数更新事件
+        window.addEventListener('articleStatsUpdated', () => {
+            updateHeartCounts();
+        });
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.filter-item') && !event.target.closest('.more-btn')) {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+                document.getElementById('moreMenu').classList.remove('show');
+            }
+        };
     </script>
 </body>
 </html>

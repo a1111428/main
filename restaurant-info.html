@@ -6,7 +6,6 @@
     <title>餐廳詳情 - Furry Café Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* 基本設定 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background-color: #f0f0f0; 
@@ -18,7 +17,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* 模擬手機容器 */
         .phone-window {
             width: 452px;
             height: 968px;
@@ -29,7 +27,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        /* --- 1. 照片區塊 --- */
         .header-gallery {
             width: 100%;
             height: 500px; 
@@ -73,7 +70,6 @@
             font-size: 20px;
         }
 
-        /* --- 2. 資訊區塊 --- */
         .info-header {
             position: relative;
             background: #FFF9F0;
@@ -86,14 +82,60 @@
         .title-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .restaurant-name { font-size: 32px; font-weight: 800; color: #333; }
+        .title-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+        .restaurant-name { 
+            font-size: 32px; 
+            font-weight: 800; 
+            color: #333; 
+            margin: 0;
+            word-break: break-word;
+        }
+        .pet-friendly-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #FFF9F0;
+            color: #FF9800;
+            padding: 5px 10px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid #FFE0B2;
+            flex-shrink: 0;
+        }
+        .pet-friendly-badge i {
+            font-size: 13px;
+        }
         
-        /* 統一 Icon 顏色為品牌橘 */
+        .action-icons { 
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
         .action-icons i { 
-            font-size: 26px; color: #FF9800; margin-left: 15px; cursor: pointer;
+            font-size: 26px; 
+            color: #FF9800; 
+            cursor: pointer;
+            transition: transform 0.2s, color 0.2s;
+        }
+        .action-icons i:hover {
+            transform: scale(1.1);
+        }
+        .action-icons i.bookmarked {
+            color: #FF9800;
         }
 
         .meta-row {
@@ -103,9 +145,23 @@
             margin-bottom: 20px;
             font-size: 16px;
             color: #555;
+            flex-wrap: wrap;
         }
-        .meta-row i { color: #FF9800; width: 18px; text-align: center; }
-        .rating { margin-left: auto; display: flex; align-items: center; font-weight: bold; color: #333; }
+        .meta-row > span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        .meta-row i { color: #FF9800; width: 18px; text-align: center; flex-shrink: 0; }
+        .rating { 
+            margin-left: auto; 
+            display: flex; 
+            align-items: center; 
+            font-weight: bold; 
+            color: #333;
+            flex-shrink: 0;
+        }
         .rating i { margin-left: 5px; color: #FF9800; }
 
         .description { font-size: 16px; line-height: 1.7; color: #444; margin-bottom: 25px; }
@@ -135,12 +191,10 @@
             background: #FF9800;
         }
 
-        /* --- 3. 分頁內容 --- */
         .tab-content { padding: 0 25px 120px; display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 評論卡片 */
         .review-card {
             background: #FFFFFF;
             border-radius: 20px;
@@ -154,7 +208,6 @@
         .stars { color: #FF9800; font-size: 12px; margin-top: 2px; }
         .review-text { font-size: 15px; color: #555; line-height: 1.5; }
 
-        /* 文章卡片 */
         .article-card {
             background: #FFFFFF;
             padding: 18px;
@@ -166,7 +219,6 @@
         .article-card h3 { font-size: 18px; color: #333; margin-bottom: 8px; }
         .article-card p { font-size: 14px; color: #666; line-height: 1.5; }
 
-        /* 相片網格 */
         .photo-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -177,7 +229,6 @@
         }
         .grid-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 底部按鈕 */
         .fab {
             position: fixed;
             bottom: 40px;
@@ -188,6 +239,144 @@
             display: flex; justify-content: center; align-items: center;
             font-size: 28px; box-shadow: 0 6px 15px rgba(255,152,0,0.35);
             cursor: pointer; z-index: 100;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(255,152,0,0.5);
+        }
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .write-options {
+            position: fixed;
+            bottom: 120px;
+            right: calc(50% - 226px + 30px);
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 99;
+        }
+        .write-options.active {
+            display: flex;
+        }
+        .write-option-btn {
+            width: 140px;
+            padding: 15px 20px;
+            background: white;
+            color: #333;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .write-option-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .write-option-btn i {
+            font-size: 20px;
+            color: #FF9800;
+        }
+
+        .write-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .write-modal.active {
+            display: flex;
+        }
+        .write-modal-content {
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .write-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .write-modal-header h2 {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+        }
+        .write-modal-header .close-btn {
+            font-size: 24px;
+            color: #888;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .write-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .write-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: #f0f0f0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .write-tab.active {
+            background: #FF9800;
+            color: white;
+        }
+        .write-form {
+            display: none;
+        }
+        .write-form.active {
+            display: block;
+        }
+        .write-form textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        .write-form select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .write-form button {
+            width: 100%;
+            padding: 15px;
+            background: #FF9800;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -201,10 +390,12 @@
 
         <div class="info-header">
             <div class="title-row">
-                <h1 class="restaurant-name" id="resName">載入中...</h1>
+                <div class="title-left">
+                    <h1 class="restaurant-name" id="resName">載入中...</h1>
+                    <span class="pet-friendly-badge"><i class="fa-solid fa-paw"></i>寵物友善</span>
+                </div>
                 <div class="action-icons">
-                    <i class="fa-solid fa-circle-plus"></i>
-                    <i class="fa-solid fa-bookmark"></i>
+                    <i class="fa-solid fa-bookmark" id="bookmarkBtn" onclick="toggleBookmark()"></i>
                     <i class="fa-solid fa-compass"></i>
                 </div>
             </div>
@@ -238,7 +429,39 @@
             <div class="photo-grid" id="photoGrid"></div>
         </div>
 
-        <div class="fab"><i class="fa-solid fa-plus"></i></div>
+        <div class="write-options" id="writeOptions">
+            <div class="write-option-btn" onclick="openReviewModal()">
+                <i class="fa-solid fa-comment"></i>
+                <span>撰寫評論</span>
+            </div>
+            <div class="write-option-btn" onclick="goToArticlePost()">
+                <i class="fa-solid fa-pen"></i>
+                <span>撰寫文章</span>
+            </div>
+        </div>
+
+        <div class="fab" onclick="toggleWriteOptions()"><i class="fa-solid fa-plus"></i></div>
+
+        <div class="write-modal" id="writeModal">
+            <div class="write-modal-content">
+                <div class="write-modal-header">
+                    <h2>撰寫</h2>
+                    <button class="close-btn" onclick="closeWriteModal()"><i class="fa-solid fa-times"></i></button>
+                </div>
+                <div class="write-form active" id="reviewForm">
+                    <textarea placeholder="分享您的用餐體驗..."></textarea>
+                    <select>
+                        <option>請選擇評分</option>
+                        <option>★★★★★</option>
+                        <option>★★★★☆</option>
+                        <option>★★★☆☆</option>
+                        <option>★★☆☆☆</option>
+                        <option>★☆☆☆☆</option>
+                    </select>
+                    <button onclick="submitReview()">發布評論</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -281,10 +504,10 @@
             document.getElementById('resRating').innerText = data.rating;
             document.getElementById('resDesc').innerText = data.desc;
 
-            // 使用 loremflickr 確保圖片都是美食與咖啡相關
+            checkBookmarkStatus();
+
             const slider = document.getElementById('mainSlider');
             for(let i=0; i<3; i++) {
-                // 使用美食(food)與咖啡廳(cafe)標籤，並加上隨機參數避免圖片重複
                 slider.innerHTML += `<img src="https://loremflickr.com/452/500/food,cafe,dessert?random=${i + 10}" alt="food">`;
             }
 
@@ -325,6 +548,101 @@
             event.currentTarget.classList.add('active');
             document.getElementById(tabId).classList.add('active');
         }
+
+        function toggleBookmark() {
+            const bookmarkBtn = document.getElementById('bookmarkBtn');
+            const resName = document.getElementById('resName').innerText;
+            let favorites = JSON.parse(localStorage.getItem('favoriteRestaurants') || '[]');
+            const index = favorites.indexOf(resName);
+            
+            if (index > -1) {
+                favorites.splice(index, 1);
+                bookmarkBtn.classList.remove('bookmarked');
+                bookmarkBtn.style.color = '#FF9800';
+                alert('已移除收藏');
+            } else {
+                favorites.push(resName);
+                bookmarkBtn.classList.add('bookmarked');
+                bookmarkBtn.style.color = '#FF9800';
+                alert('已加入收藏');
+            }
+            localStorage.setItem('favoriteRestaurants', JSON.stringify(favorites));
+        }
+
+        function checkBookmarkStatus() {
+            const bookmarkBtn = document.getElementById('bookmarkBtn');
+            const resName = document.getElementById('resName').innerText;
+            let favorites = JSON.parse(localStorage.getItem('favoriteRestaurants') || '[]');
+            
+            if (favorites.includes(resName)) {
+                bookmarkBtn.classList.add('bookmarked');
+                bookmarkBtn.style.color = '#FF9800';
+            }
+        }
+
+        function toggleWriteOptions() {
+            const writeOptions = document.getElementById('writeOptions');
+            writeOptions.classList.toggle('active');
+        }
+
+        function openReviewModal() {
+            document.getElementById('writeOptions').classList.remove('active');
+            document.getElementById('writeModal').classList.add('active');
+        }
+
+        function goToArticlePost() {
+            const resName = document.getElementById('resName').innerText;
+            const resAddr = document.getElementById('resAddr').innerText;
+            const resData = {
+                "沐沐MUMU 茶飲": { pos: [22.703508, 120.301304], addr: "高雄市楠梓區宏毅一路6號" },
+                "Bon appétit 葩那貝蒂": { pos: [22.736657, 120.329098], addr: "高雄市楠梓區土庫一路198號" },
+                "究鶴餐館": { pos: [22.659232, 120.306703], addr: "高雄市左營區富國路98號" },
+                "鸚鵡螺餐酒館-富國店": { pos: [22.660084, 120.306481], addr: "高雄市左營區富國路101號" },
+                "ROSA義大利餐廳": { pos: [22.687341, 120.313866], addr: "高雄市左營區華夏路1422號" },
+                "貓之家俱樂部": { pos: [22.668809, 120.299941], addr: "高雄市左營區新勝街26號" },
+                "萊Bar音樂餐酒館": { pos: [22.679911, 120.311226], addr: "高雄市左營區文自路５７１號" },
+                "逅巷咖啡定食": { pos: [22.669228, 120.304374], addr: "高雄市左營區新上街307巷15號" },
+                "心滿義廚": { pos: [22.666260, 120.307573], addr: "高雄市立信路28號" }
+            };
+            const restaurant = resData[resName] || { pos: [22.732775288093578, 120.2884383523927], addr: resAddr };
+            localStorage.setItem('article_restaurant', JSON.stringify({
+                name: resName,
+                addr: restaurant.addr,
+                lat: restaurant.pos[0],
+                lng: restaurant.pos[1]
+            }));
+            window.location.href = 'article-post.html';
+        }
+
+        function closeWriteModal() {
+            document.getElementById('writeModal').classList.remove('active');
+        }
+
+        function submitReview() {
+            alert('評論已發布！');
+            closeWriteModal();
+        }
+
+        window.addEventListener('load', function() {
+            const writeModal = document.getElementById('writeModal');
+            if (writeModal) {
+                writeModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeWriteModal();
+                    }
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                const writeOptions = document.getElementById('writeOptions');
+                const fab = document.querySelector('.fab');
+                if (writeOptions && writeOptions.classList.contains('active')) {
+                    if (!writeOptions.contains(e.target) && !fab.contains(e.target)) {
+                        writeOptions.classList.remove('active');
+                    }
+                }
+            });
+        });
     </script>
 </body>
 </html>

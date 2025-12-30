@@ -43,6 +43,49 @@
             text-decoration: none;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
+        .top-nav button {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        
+        /* 更多菜单 */
+        .more-menu {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            overflow: hidden;
+            min-width: 150px;
+        }
+        .more-menu.show {
+            display: flex;
+        }
+        .more-menu-item {
+            padding: 12px 20px;
+            font-size: 15px;
+            color: #333;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+        .more-menu-item:last-child {
+            border-bottom: none;
+        }
+        .more-menu-item:hover {
+            background: #f5f5f5;
+        }
+        .more-menu-item.danger {
+            color: #ff4444;
+        }
 
         /* 店家封面圖 - 鎖定美食主題 */
         .cover-image {
@@ -70,7 +113,7 @@
         }
         .tag {
             background: #FFCC80;
-            color: #D35400;
+            color: #ffffff;
             padding: 4px 12px;
             border-radius: 12px;
             font-size: 13px;
@@ -131,6 +174,35 @@
             object-fit: cover;
             border-radius: 15px;
             background-color: #eee;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .photo-grid img:hover {
+            transform: scale(1.02);
+        }
+
+        /* 照片预览模态框 */
+        .photo-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            cursor: pointer;
+        }
+        .photo-modal.show {
+            display: flex;
+        }
+        .photo-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
         }
 
         /* 底部操作列 */
@@ -139,16 +211,18 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: calc(100% - 40px);
-            max-width: 400px;
+            width: auto;
+            max-width: 350px;
             height: 60px;
             background: white;
             border-radius: 30px;
             display: flex;
             align-items: center;
-            justify-content: space-around;
+            justify-content: center;
+            gap: 30px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             z-index: 1000;
+            padding: 0 30px;
         }
         .action-item {
             display: flex;
@@ -157,6 +231,7 @@
             color: #8E8E93;
             font-size: 12px;
             text-decoration: none;
+            cursor: pointer;
         }
         .action-item i { font-size: 20px; margin-bottom: 2px; }
         .action-item.active { color: #FF9800; }
@@ -164,12 +239,22 @@
         .nav-btn {
             background: #FF9800;
             color: white !important;
-            padding: 10px 25px;
-            border-radius: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+        }
+        .nav-btn span {
+            display: none;
+        }
+        .nav-btn i {
+            font-size: 20px;
+            margin: 0;
         }
     </style>
 </head>
@@ -177,18 +262,18 @@
 
 <div class="container">
     <nav class="top-nav">
-        <a href="article.html"><i class="fa-solid fa-chevron-left"></i></a>
-        <a href="#"><i class="fa-solid fa-share-nodes"></i></a>
+        <a href="#" id="backBtn"><i class="fa-solid fa-chevron-left"></i></a>
+        <button onclick="toggleMoreMenu()"><i class="fa-solid fa-ellipsis"></i></button>
     </nav>
+
+    <div class="more-menu" id="moreMenu">
+        <div class="more-menu-item" onclick="reportArticle()">檢舉</div>
+        <div class="more-menu-item danger" id="deleteBtn" onclick="deleteArticle()" style="display: none;">刪除文章</div>
+    </div>
 
     <img id="coverImg" src="" class="cover-image" alt="food cover">
 
     <div class="content-section">
-        <div class="category-tags">
-            <span class="tag" id="cityTag">高雄</span>
-            <span class="tag" id="priceTag">價格未定</span>
-        </div>
-
         <div class="shop-header">
             <h1 class="shop-name" id="shopName">載入中...</h1>
             <div class="heart-stat">
@@ -206,13 +291,18 @@
             <span id="postDate">2025-12-28</span>
         </div>
 
+        <div class="category-tags" id="articleTags" style="margin-top: 10px;">
+            <span class="tag">美食</span>
+            <span class="tag">寵物友善</span>
+        </div>
+
         <div class="divider"></div>
 
         <div class="article-text" id="articleBody">
             這裡會顯示店家的詳細描述與訪談心得...
         </div>
 
-        <div class="photo-grid">
+        <div class="photo-grid" id="photoGrid">
             <img src="https://loremflickr.com/300/300/food,cafe,dessert?random=201" alt="meal 1">
             <img src="https://loremflickr.com/300/300/food,cafe,dessert?random=202" alt="meal 2">
         </div>
@@ -224,61 +314,308 @@
         <i class="fa-regular fa-heart"></i>
         <span>收藏</span>
     </a>
-    <a href="#" class="action-item">
-        <!-- <i class="fa-regular fa-comment"></i> -->
-        <!-- <span>評論</span> -->
-    </a>
-    <a href="#" id="mapLink" class="action-item nav-btn">
+    <a href="#" id="mapLink" class="action-item nav-btn" onclick="openGoogleMaps(event)">
         <i class="fa-solid fa-paper-plane"></i>
         <span>開始導航</span>
     </a>
 </div>
 
+<div class="photo-modal" id="photoModal" onclick="closePhotoModal()">
+    <img id="modalPhoto" src="" alt="预览">
+</div>
+
 <script>
     const locations = [
-        { name: "沐沐MUMU 茶飲", pos: [22.703508, 120.301304], info: "高雄市楠梓區宏毅一路6號", price: "100-200", date: "2025年12月10日", heart: 156, desc: "這家茶飲店的環境非常放鬆，適合帶著毛孩一起來喝杯招牌水果茶。店內提供的輕食也是一大亮點，擺盤精緻且美味。" },
-        { name: "Bon appétit 葩那貝蒂", pos: [22.736657, 120.329098], info: "高雄市楠梓區土庫一路198號", price: "300-500", date: "2025年11月15日", heart: 242, desc: "這家店的法式甜點令人驚艷，口感細緻且層次豐富。環境佈置得非常有質感，每一盤上桌的料理都像是藝術品。" },
-        { name: "究鶴餐館", pos: [22.659232, 120.306703], info: "高雄市左營區富國路98號", price: "200-400", date: "2025年12月01日", heart: 189, desc: "餐點分量誠意十足，尤其是他們的私房定食，食材新鮮且味道恰到好處。這裡是很多家長聚會的首選餐廳。" },
-        { name: "鸚鵡螺餐酒館", pos: [22.660084, 120.306481], info: "高雄市左營區富國路101號", price: "600-800", date: "2025年10月20日", heart: 310, desc: "晚上的氣氛極佳，提供多樣化的西式餐酒。無論是主餐或是炸物小點，味道都在水準之上，非常適合放鬆時光。" },
-        { name: "ROSA義大利餐廳", pos: [22.687341, 120.313866], info: "高雄市左營區華夏路1422號", price: "400-600", date: "2025年12月05日", heart: 125, desc: "道地的義大利料理，手工披薩餅皮香 Q 誘人。戶外空間寬敞，用餐時還能感受到微風徐徐，非常愜意。" },
-        { name: "貓之家俱樂部", pos: [22.668809, 120.299941], info: "高雄市左營區新勝街26號", price: "200-300", date: "2025年11月28日", heart: 420, desc: "店內的鬆餅與特調咖啡是許多客人的最愛。環境乾淨溫馨，不僅適合貓奴，連狗狗在這裡也能得到很好的照顧。" },
-        { name: "萊Bar音樂餐酒館", pos: [22.679911, 120.311226], info: "高雄市左營區文自路571號", price: "500-700", date: "2025年12月12日", heart: 98, desc: "現場音樂伴隨美食，這裡的炸雞翅與調酒非常推薦。是帶著毛孩在週末夜晚放鬆心情、享受夜生活的好去處。" },
-        { name: "逅巷咖啡定食", pos: [22.669228, 120.304374], info: "高雄市左營區新上街307巷15號", price: "250-400", date: "2025年12月18日", heart: 175, desc: "藏身巷弄，提供健康營養的日式定食。店內氣氛寧靜，非常適合點一份午餐跟毛孩靜靜享受一段時光。" },
-        { name: "心滿義廚", pos: [22.666260, 120.307573], info: "高雄市立信路28號", price: "300-500", date: "2025年12月22日", heart: 132, desc: "他們的白醬燉飯香氣濃郁，每一口都能吃到主廚的用心。環境乾淨清爽，是下班後放鬆用餐的完美選擇。" }
+        { id: 0, name: "沐沐MUMU 茶飲", pos: [22.703508, 120.301304], info: "高雄市楠梓區宏毅一路6號", price: "100-200", date: "2025年12月10日", heart: 0, desc: "這家茶飲店的環境非常放鬆，適合帶著毛孩一起來喝杯特調。推薦他們的招牌水果茶與現烤鬆餅！" },
+        { id: 1, name: "Bon appétit 葩那貝蒂", pos: [22.736657, 120.329098], info: "高雄市楠梓區土庫一路198號", price: "300-500", date: "2025年11月15日", heart: 0, desc: "精緻的法式甜點與輕食餐點，每一盤都像藝術品一般。是週末帶著毛孩優雅聚餐的好地方。" },
+        { id: 2, name: "究鶴餐館", pos: [22.659232, 120.306703], info: "高雄市左營區富國路98號", price: "200-400", date: "2025年12月01日", heart: 0, desc: "主打豐盛的家常美味定食，食材新鮮且味道紮實。空間寬敞明亮，毛孩可以落地活動，深受毛爸媽推薦。" },
+        { id: 3, name: "鸚鵡螺餐酒館", pos: [22.660084, 120.306481], info: "高雄市左營區富國路101號", price: "600-800", date: "2025年10月20日", heart: 0, desc: "很有氛圍的西式餐酒，無論是義大利麵或是炸物小點都在水準之上。晚上帶著毛孩來小酌一番也非常合適。" },
+        { id: 4, name: "ROSA義大利餐廳", pos: [22.687341, 120.313866], info: "高雄市左營區華夏路1422號", price: "400-600", date: "2025年12月05日", heart: 0, desc: "道地的義大利料理，手工窯烤披薩香氣誘人。戶外空間寬敞，用餐時還能感受到微風，非常愜意。" },
+        { id: 5, name: "貓之家俱樂部", pos: [22.668809, 120.299941], info: "高雄市左營區新勝街26號", price: "200-300", date: "2025年11月28日", heart: 0, desc: "這家的下午茶組合非常精緻，尤其是草莓塔與手沖咖啡。環境安靜且整潔，是與寵物共度靜謐時光的首選。" },
+        { id: 6, name: "萊Bar音樂餐酒館", pos: [22.679911, 120.311226], info: "高雄市左營區文自路571號", price: "500-700", date: "2025年12月12日", heart: 0, desc: "除了有現場音樂演奏，餐點的調味也極具創意。炸雞翅與調酒是必點組合，狗狗只要在籠內就能一同進店。" },
+        { id: 7, name: "逅巷咖啡定食", pos: [22.669228, 120.304374], info: "高雄市左營區新上街307巷15號", price: "250-400", date: "2025年12月18日", heart: 0, desc: "藏身巷弄，主打健康的日式定食。份量誠意十足，老闆對毛孩非常友善，會主動提供寵物專用水盆。" },
+        { id: 8, name: "心滿義廚", pos: [22.666260, 120.307573], info: "高雄市立信路28號", price: "300-500", date: "2025年12月22日", heart: 0, desc: "溫馨的居家裝潢，招牌奶油燉飯香氣四溢。每一盤料理都能感受到主廚的用心，是下班後帶著毛孩用餐的好去處。" }
     ];
+
+    // 从内容中提取标题（支持 [xxx] 格式）
+    function extractTitle(content) {
+        if (!content) return '未命名文章';
+        const firstLine = content.split('\n')[0].trim();
+        // 匹配 [xxx] 格式，提取括号内的内容作为标题
+        const match = firstLine.match(/^\[([^\]]+)\]\s*(.*)$/);
+        if (match) {
+            // 如果有括号后的内容，使用括号后的内容作为标题
+            return match[2].trim() || match[1].trim() || '未命名文章';
+        }
+        // 如果没有匹配到，尝试移除 [title] 关键字
+        return firstLine.replace(/\[title\]/gi, '').trim() || '未命名文章';
+    }
+
+    // 加载发布的文章
+    function loadPublishedArticles() {
+        const allArticles = JSON.parse(localStorage.getItem('all_articles') || '[]');
+        allArticles.forEach(art => {
+            const title = extractTitle(art.content);
+            const contentLines = art.content.split('\n');
+            const desc = contentLines.slice(1).join('\n').trim() || art.content;
+            
+            const articleData = {
+                id: art.id,
+                name: title,
+                desc: desc,
+                content: art.content,
+                photos: art.photos || [],
+                pos: art.location ? [art.location.lat, art.location.lng] : [22.703508, 120.301304],
+                info: art.location ? art.location.addr : '照片位置',
+                date: new Date(art.time).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' }),
+                heart: 0,
+                isPublished: true
+            };
+            
+            const existingIndex = locations.findIndex(loc => loc.id === art.id);
+            if (existingIndex > -1) {
+                locations[existingIndex] = articleData;
+            } else {
+                locations.push(articleData);
+            }
+        });
+    }
+
+    // 获取收藏状态
+    function isArticleFavorited(articleId) {
+        const favorites = JSON.parse(localStorage.getItem('article_favorites') || '[]');
+        return favorites.includes(articleId);
+    }
+
+    // 获取文章收藏数
+    function getArticleHeart(articleId, defaultHeart) {
+        const stats = JSON.parse(localStorage.getItem('article_stats') || '{}');
+        if (stats[articleId] && stats[articleId].heart !== undefined) {
+            return stats[articleId].heart;
+        }
+        return defaultHeart;
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const shopId = parseInt(urlParams.get('id')) || 0;
-    const shop = locations[shopId];
+    const fromPage = urlParams.get('from') || 'article.html'; // 获取来源页面，默认为 article.html
+    
+    // 设置返回按钮的链接
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        backBtn.onclick = (e) => {
+            e.preventDefault();
+            window.location.href = fromPage;
+        };
+    }
+    
+    loadPublishedArticles();
+    const shop = locations.find(loc => loc.id === shopId) || locations[shopId];
 
     if (shop) {
+        const isFavorited = isArticleFavorited(shop.id);
+        const heartCount = getArticleHeart(shop.id, shop.heart || 0);
+        
         document.getElementById('shopName').textContent = shop.name;
         document.getElementById('shopAddress').textContent = shop.info;
         document.getElementById('postDate').textContent = shop.date;
-        document.getElementById('heartCount').textContent = shop.heart;
-        document.getElementById('articleBody').textContent = shop.desc;
-        document.getElementById('priceTag').textContent = "NT$ " + shop.price;
-        document.getElementById('cityTag').textContent = shop.info.substring(0, 2);
+        document.getElementById('heartCount').textContent = heartCount;
+        document.getElementById('articleBody').textContent = shop.desc || shop.content || '';
         
-        // 更新封面圖為餐點主題 (loremflickr 鎖定 food 關鍵字)
-        document.getElementById('coverImg').src = `https://loremflickr.com/600/400/food,cafe,meal?random=${shopId + 300}`;
+        // 检查是否是自己的文章
+        const allArticles = JSON.parse(localStorage.getItem('all_articles') || '[]');
+        const isMyArticle = allArticles.some(art => art.id === shop.id);
+        if (isMyArticle) {
+            document.getElementById('deleteBtn').style.display = 'block';
+        }
         
-        document.getElementById('mapLink').href = `index.html?lat=${shop.pos[0]}&lng=${shop.pos[1]}`;
+        // 更新封面圖
+        if (shop.photos && shop.photos.length > 0) {
+            document.getElementById('coverImg').src = shop.photos[0].src;
+        } else {
+            document.getElementById('coverImg').src = `https://loremflickr.com/600/400/food,cafe,meal?random=${shopId + 300}`;
+        }
+        
+        // 更新照片网格
+        const photoGrid = document.getElementById('photoGrid');
+        if (shop.photos && shop.photos.length > 0) {
+            photoGrid.innerHTML = shop.photos.slice(0, 4).map((photo, idx) => 
+                `<img src="${photo.src}" alt="meal ${idx + 1}" onclick="openPhotoModal(event, '${photo.src}')">`
+            ).join('');
+        } else {
+            // 默认照片也添加点击事件
+            const defaultPhotos = photoGrid.querySelectorAll('img');
+            defaultPhotos.forEach((img) => {
+                img.onclick = (e) => openPhotoModal(e, img.src);
+            });
+        }
+        
+        // 存储位置信息供导航使用
+        window.articleLocation = shop.pos;
+        
+        // 更新收藏按钮状态
+        const likeBtn = document.querySelector('.action-item');
+        const likeIcon = likeBtn.querySelector('i');
+        const likeSpan = likeBtn.querySelector('span');
+        if (isFavorited) {
+            likeIcon.classList.replace('fa-regular', 'fa-solid');
+            likeIcon.style.color = '#FF9800';
+            likeSpan.textContent = '已收藏';
+            likeBtn.classList.add('active');
+        }
     }
 
     function toggleLike(el) {
+        const shopId = parseInt(new URLSearchParams(window.location.search).get('id')) || 0;
+        const shop = locations.find(loc => loc.id === shopId) || locations[shopId];
+        if (!shop) return;
+        
         const icon = el.querySelector('i');
         const span = el.querySelector('span');
-        if (icon.classList.contains('fa-regular')) {
-            icon.classList.replace('fa-regular', 'fa-solid');
-            icon.style.color = '#FF9800';
-            span.textContent = '已收藏';
-        } else {
+        const heartCountEl = document.getElementById('heartCount');
+        
+        let favorites = JSON.parse(localStorage.getItem('article_favorites') || '[]');
+        const index = favorites.indexOf(shop.id);
+        
+        // 检查当前收藏状态
+        const isCurrentlyFavorited = index > -1;
+        
+        // 获取文章统计信息
+        let articleStats = JSON.parse(localStorage.getItem('article_stats') || '{}');
+        if (!articleStats[shop.id]) {
+            articleStats[shop.id] = { heart: shop.heart || 0, favorited: false };
+        }
+        
+        // 检查是否已经收藏过（防止重复增加 heartCount）
+        const wasFavorited = articleStats[shop.id].favorited || false;
+        
+        if (isCurrentlyFavorited) {
+            // 取消收藏
+            favorites.splice(index, 1);
             icon.classList.replace('fa-solid', 'fa-regular');
             icon.style.color = '#8E8E93';
             span.textContent = '收藏';
+            el.classList.remove('active');
+            
+            // 如果之前已经收藏过，取消收藏时 heartCount 减1
+            if (wasFavorited) {
+                articleStats[shop.id].heart = Math.max(0, articleStats[shop.id].heart - 1);
+                articleStats[shop.id].favorited = false;
+            }
+        } else {
+            // 收藏
+            favorites.push(shop.id);
+            icon.classList.replace('fa-regular', 'fa-solid');
+            icon.style.color = '#FF9800';
+            span.textContent = '已收藏';
+            el.classList.add('active');
+            
+            // 只有之前没有收藏过，才增加 heartCount
+            if (!wasFavorited) {
+                articleStats[shop.id].heart = (articleStats[shop.id].heart || 0) + 1;
+                articleStats[shop.id].favorited = true;
+            }
+        }
+        
+        localStorage.setItem('article_favorites', JSON.stringify(favorites));
+        localStorage.setItem('article_stats', JSON.stringify(articleStats));
+        
+        // 更新页面显示的收藏数
+        const newHeartCount = articleStats[shop.id].heart;
+        if (heartCountEl) {
+            heartCountEl.textContent = newHeartCount;
+        }
+        
+        // 触发自定义事件，通知其他页面更新（同页面内）
+        window.dispatchEvent(new CustomEvent('articleStatsUpdated'));
+        
+        // 触发 storage 事件，通知其他标签页更新
+        window.dispatchEvent(new Event('storage'));
+    }
+
+    function toggleMoreMenu() {
+        const menu = document.getElementById('moreMenu');
+        menu.classList.toggle('show');
+    }
+
+    function reportArticle() {
+        if (confirm('確定要檢舉這篇文章嗎？')) {
+            alert('檢舉已送出，我們會盡快處理。');
+            document.getElementById('moreMenu').classList.remove('show');
         }
     }
+
+    function deleteArticle() {
+        const shopId = parseInt(new URLSearchParams(window.location.search).get('id')) || 0;
+        const shop = locations.find(loc => loc.id === shopId) || locations[shopId];
+        
+        if (!shop) return;
+        
+        if (confirm('確定要刪除這篇文章嗎？此操作無法復原。')) {
+            // 从 all_articles 中删除
+            let allArticles = JSON.parse(localStorage.getItem('all_articles') || '[]');
+            allArticles = allArticles.filter(art => art.id !== shop.id);
+            localStorage.setItem('all_articles', JSON.stringify(allArticles));
+            
+            // 从收藏中删除
+            let favorites = JSON.parse(localStorage.getItem('article_favorites') || '[]');
+            favorites = favorites.filter(id => id !== shop.id);
+            localStorage.setItem('article_favorites', JSON.stringify(favorites));
+            
+            alert('文章已刪除');
+            window.location.href = 'article.html';
+        }
+        document.getElementById('moreMenu').classList.remove('show');
+    }
+
+    // 点击其他地方关闭菜单
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('moreMenu');
+        const btn = document.querySelector('.top-nav button');
+        if (!menu.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+            menu.classList.remove('show');
+        }
+    });
+
+    // 打开 Google Maps 导航
+    function openGoogleMaps(event) {
+        event.preventDefault();
+        const shopId = parseInt(new URLSearchParams(window.location.search).get('id')) || 0;
+        const shop = locations.find(loc => loc.id === shopId) || locations[shopId];
+        
+        if (!shop || !shop.pos) {
+            alert('無法獲取位置資訊');
+            return;
+        }
+        
+        const lat = shop.pos[0];
+        const lng = shop.pos[1];
+        // 使用 Google Maps 导航链接
+        const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+        window.open(googleMapsUrl, '_blank');
+    }
+
+    // 打开照片预览
+    function openPhotoModal(event, photoSrc) {
+        event.stopPropagation();
+        const modal = document.getElementById('photoModal');
+        const modalPhoto = document.getElementById('modalPhoto');
+        modalPhoto.src = photoSrc;
+        modal.classList.add('show');
+    }
+
+    // 关闭照片预览
+    function closePhotoModal() {
+        const modal = document.getElementById('photoModal');
+        modal.classList.remove('show');
+    }
+
+    // 按 ESC 键关闭预览
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePhotoModal();
+        }
+    });
 </script>
 
 </body>

@@ -55,6 +55,22 @@
             font-size: 16px;
             outline: none;
         }
+        .search-bar .microphone-btn {
+            cursor: pointer;
+            padding: 5px;
+            transition: opacity 0.2s;
+        }
+        .search-bar .microphone-btn:active {
+            opacity: 0.6;
+        }
+        .search-bar .microphone-btn.recording {
+            color: #ff4444;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
 
         .filter-scroll {
             display: flex;
@@ -94,6 +110,20 @@
             position: relative;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             cursor: pointer;
+            opacity: 0;
+            transform: translateX(100px);
+            animation: slideInFromRight 0.5s ease-out forwards;
+        }
+        
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .card-top {
@@ -103,15 +133,19 @@
         }
 
         .shop-img {
-            width: 100px;
-            height: 100px;
+            width: 130px;
+            height: 130px;
             border-radius: 15px;
             object-fit: cover;
             background: #eee;
+            flex-shrink: 0;
         }
 
         .card-content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 130px;
         }
 
         .shop-name-row {
@@ -133,21 +167,39 @@
             line-height: 1.4;
             display: -webkit-box;
             -webkit-line-clamp: 3;
+            line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            flex: 1;
+            min-height: 60px;
         }
 
-        .card-footer {
+        .card-footer-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 5px;
-            font-size: 13px;
+            margin-top: auto;
+        }
+        .post-time {
+            font-size: 12px;
             color: #888;
         }
-
-        .footer-left { display: flex; gap: 10px; }
-        .footer-right { display: flex; align-items: center; gap: 4px; color: #FF9800; }
+        .heart-count {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            font-size: 13px;
+            color: #FF9800;
+        }
+        .heart-count i {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         .add-post-btn {
             position: fixed;
@@ -213,8 +265,8 @@
     <div class="search-section">
         <div class="search-bar">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="搜尋餐廳">
-            <i class="fa-solid fa-microphone"></i>
+            <input type="text" id="searchInput" placeholder="搜尋餐廳">
+            <i class="fa-solid fa-microphone microphone-btn" id="microphoneBtn" onclick="startVoiceInput()"></i>
         </div>
     </div>
 
@@ -242,17 +294,66 @@
 
 <script>
     // 資料集加上 id 以固定圖片與連結
-    const locations = [
-        { id: 0, name: "沐沐MUMU 茶飲", pos: [22.703508, 120.301304], info: "高雄市楠梓區宏毅一路6號", price: "100-200", date: "2025年12月10日", heart: 156, desc: "這家茶飲店的環境非常放鬆，適合帶著毛孩一起來喝杯特調。推薦他們的招牌水果茶與現烤鬆餅！" },
-        { id: 1, name: "Bon appétit 葩那貝蒂", pos: [22.736657, 120.329098], info: "高雄市楠梓區土庫一路198號", price: "300-500", date: "2025年11月15日", heart: 242, desc: "精緻的法式甜點與輕食餐點，每一盤都像藝術品一般。是週末帶著毛孩優雅聚餐的好地方。" },
-        { id: 2, name: "究鶴餐館", pos: [22.659232, 120.306703], info: "高雄市左營區富國路98號", price: "200-400", date: "2025年12月01日", heart: 189, desc: "主打豐盛的家常美味定食，食材新鮮且味道紮實。空間寬敞明亮，毛孩可以落地活動，深受毛爸媽推薦。" },
-        { id: 3, name: "鸚鵡螺餐酒館", pos: [22.660084, 120.306481], info: "高雄市左營區富國路101號", price: "600-800", date: "2025年10月20日", heart: 310, desc: "很有氛圍的西式餐酒，無論是義大利麵或是炸物小點都在水準之上。晚上帶著毛孩來小酌一番也非常合適。" },
-        { id: 4, name: "ROSA義大利餐廳", pos: [22.687341, 120.313866], info: "高雄市左營區華夏路1422號", price: "400-600", date: "2025年12月05日", heart: 125, desc: "道地的義大利料理，手工窯烤披薩香氣誘人。戶外空間寬敞，用餐時還能感受到微風，非常愜意。" },
-        { id: 5, name: "貓之家俱樂部", pos: [22.668809, 120.299941], info: "高雄市左營區新勝街26號", price: "200-300", date: "2025年11月28日", heart: 420, desc: "這家的下午茶組合非常精緻，尤其是草莓塔與手沖咖啡。環境安靜且整潔，是與寵物共度靜謐時光的首選。" },
-        { id: 6, name: "萊Bar音樂餐酒館", pos: [22.679911, 120.311226], info: "高雄市左營區文自路571號", price: "500-700", date: "2025年12月12日", heart: 98, desc: "除了有現場音樂演奏，餐點的調味也極具創意。炸雞翅與調酒是必點組合，狗狗只要在籠內就能一同進店。" },
-        { id: 7, name: "逅巷咖啡定食", pos: [22.669228, 120.304374], info: "高雄市左營區新上街307巷15號", price: "250-400", date: "2025年12月18日", heart: 175, desc: "藏身巷弄，主打健康的日式定食。份量誠意十足，老闆對毛孩非常友善，會主動提供寵物專用水盆。" },
-        { id: 8, name: "心滿義廚", pos: [22.666260, 120.307573], info: "高雄市立信路28號", price: "300-500", date: "2025年12月22日", heart: 132, desc: "溫馨的居家裝潢，招牌奶油燉飯香氣四溢。每一盤料理都能感受到主廚的用心，是下班後帶著毛孩用餐的好去處。" }
+    let locations = [
+        { id: 0, name: "沐沐MUMU 茶飲", pos: [22.703508, 120.301304], info: "高雄市楠梓區宏毅一路6號", price: "100-200", date: "2025年12月10日", heart: 0, desc: "這家茶飲店的環境非常放鬆，適合帶著毛孩一起來喝杯特調。推薦他們的招牌水果茶與現烤鬆餅！" },
+        { id: 1, name: "Bon appétit 葩那貝蒂", pos: [22.736657, 120.329098], info: "高雄市楠梓區土庫一路198號", price: "300-500", date: "2025年11月15日", heart: 0, desc: "精緻的法式甜點與輕食餐點，每一盤都像藝術品一般。是週末帶著毛孩優雅聚餐的好地方。" },
+        { id: 2, name: "究鶴餐館", pos: [22.659232, 120.306703], info: "高雄市左營區富國路98號", price: "200-400", date: "2025年12月01日", heart: 0, desc: "主打豐盛的家常美味定食，食材新鮮且味道紮實。空間寬敞明亮，毛孩可以落地活動，深受毛爸媽推薦。" },
+        { id: 3, name: "鸚鵡螺餐酒館", pos: [22.660084, 120.306481], info: "高雄市左營區富國路101號", price: "600-800", date: "2025年10月20日", heart: 0, desc: "很有氛圍的西式餐酒，無論是義大利麵或是炸物小點都在水準之上。晚上帶著毛孩來小酌一番也非常合適。" },
+        { id: 4, name: "ROSA義大利餐廳", pos: [22.687341, 120.313866], info: "高雄市左營區華夏路1422號", price: "400-600", date: "2025年12月05日", heart: 0, desc: "道地的義大利料理，手工窯烤披薩香氣誘人。戶外空間寬敞，用餐時還能感受到微風，非常愜意。" },
+        { id: 5, name: "貓之家俱樂部", pos: [22.668809, 120.299941], info: "高雄市左營區新勝街26號", price: "200-300", date: "2025年11月28日", heart: 0, desc: "這家的下午茶組合非常精緻，尤其是草莓塔與手沖咖啡。環境安靜且整潔，是與寵物共度靜謐時光的首選。" },
+        { id: 6, name: "萊Bar音樂餐酒館", pos: [22.679911, 120.311226], info: "高雄市左營區文自路571號", price: "500-700", date: "2025年12月12日", heart: 0, desc: "除了有現場音樂演奏，餐點的調味也極具創意。炸雞翅與調酒是必點組合，狗狗只要在籠內就能一同進店。" },
+        { id: 7, name: "逅巷咖啡定食", pos: [22.669228, 120.304374], info: "高雄市左營區新上街307巷15號", price: "250-400", date: "2025年12月18日", heart: 0, desc: "藏身巷弄，主打健康的日式定食。份量誠意十足，老闆對毛孩非常友善，會主動提供寵物專用水盆。" },
+        { id: 8, name: "心滿義廚", pos: [22.666260, 120.307573], info: "高雄市立信路28號", price: "300-500", date: "2025年12月22日", heart: 0, desc: "溫馨的居家裝潢，招牌奶油燉飯香氣四溢。每一盤料理都能感受到主廚的用心，是下班後帶著毛孩用餐的好去處。" }
     ];
+
+    // 从内容中提取标题（支持 [xxx] 格式）
+    function extractTitle(content) {
+        if (!content) return '未命名文章';
+        const firstLine = content.split('\n')[0].trim();
+        // 匹配 [xxx] 格式，提取括号内的内容作为标题
+        const match = firstLine.match(/^\[([^\]]+)\]\s*(.*)$/);
+        if (match) {
+            // 如果有括号后的内容，使用括号后的内容作为标题
+            return match[2].trim() || match[1].trim() || '未命名文章';
+        }
+        // 如果没有匹配到，尝试移除 [title] 关键字
+        return firstLine.replace(/\[title\]/gi, '').trim() || '未命名文章';
+    }
+
+    // 加载发布的文章
+    function loadPublishedArticles() {
+        const allArticles = JSON.parse(localStorage.getItem('all_articles') || '[]');
+        allArticles.forEach(art => {
+            // 从内容中提取标题
+            const title = extractTitle(art.content);
+            const contentLines = art.content.split('\n');
+            // 移除第一行（标题行）后作为描述
+            const desc = contentLines.slice(1).join('\n').trim() || art.content;
+            
+            const articleData = {
+                id: art.id,
+                name: title,
+                title: title,
+                desc: desc,
+                content: art.content,
+                photos: art.photos || [],
+                img: art.photos && art.photos.length > 0 ? art.photos[0].src : `https://loremflickr.com/200/200/food,meal,cafe?random=${art.id}`,
+                pos: art.location ? [art.location.lat, art.location.lng] : [22.703508, 120.301304],
+                info: art.location ? art.location.addr : '照片位置',
+                date: new Date(art.time).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' }),
+                heart: 0,
+                isPublished: true
+            };
+            
+            // 检查是否已存在
+            const existingIndex = locations.findIndex(loc => loc.id === art.id);
+            if (existingIndex > -1) {
+                locations[existingIndex] = articleData;
+            } else {
+                locations.push(articleData);
+            }
+        });
+    }
 
     const listContainer = document.getElementById('articleList');
     const filterBtns = document.querySelectorAll('.filter-btn');
@@ -269,39 +370,177 @@
         return R * c;
     }
 
-    function renderArticles(data) {
-        listContainer.innerHTML = '';
-        data.forEach((loc) => {
-            const city = loc.info.substring(0, 2);
-            const card = document.createElement('div');
-            card.className = 'article-card';
-            card.onclick = () => window.location.href = `article-detail.html?id=${loc.id}`;
-            
-            card.innerHTML = `
-                <div class="card-top">
-                    <img src="https://loremflickr.com/200/200/food,meal,cafe?random=${loc.id}" class="shop-img" alt="food">
-                    <div class="card-content">
-                        <div class="shop-name-row">
-                            <span class="shop-name">${loc.name}</span>
-                            <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
-                        </div>
-                        <p class="description">${loc.desc}</p>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <div class="footer-left">
-                        <span>${city} | ${loc.price}</span>
-                        <span>${loc.date}</span>
-                    </div>
-                    <div class="footer-right">
-                        <i class="fa-solid fa-heart"></i>
-                        <span>${loc.heart}</span>
-                    </div>
-                </div>
-            `;
-            listContainer.appendChild(card);
-        });
+
+    // 获取文章收藏数（每个文章独立计数）
+    function getArticleHeart(articleId, defaultHeart) {
+        const stats = JSON.parse(localStorage.getItem('article_stats') || '{}');
+        // 如果该文章有统计记录，使用统计记录；否则使用默认值
+        if (stats[articleId]) {
+            return stats[articleId].heart;
+        }
+        return defaultHeart;
     }
+
+    // 分页相关变量
+    let currentPage = 0;
+    const articlesPerPage = 6;
+    let allArticlesData = [];
+
+    function renderArticles(data, append = false) {
+        if (!append) {
+            listContainer.innerHTML = '';
+            currentPage = 0;
+        }
+        
+        allArticlesData = data;
+        const startIndex = currentPage * articlesPerPage;
+        const endIndex = startIndex + articlesPerPage;
+        const articlesToShow = data.slice(startIndex, endIndex);
+        
+        // 如果是追加模式，直接显示，不应用动画
+        if (append) {
+            articlesToShow.forEach((loc) => {
+                const card = document.createElement('div');
+                card.className = 'article-card';
+                card.style.opacity = '1';
+                card.style.transform = 'translateX(0)';
+                card.style.animation = 'none';
+                
+                const heartCount = getArticleHeart(loc.id, loc.heart || 0);
+                
+                card.innerHTML = `
+                    <div class="card-top">
+                        <img src="${loc.img || `https://loremflickr.com/200/200/food,meal,cafe?random=${loc.id}`}" class="shop-img" alt="food">
+                        <div class="card-content">
+                            <div class="shop-name-row">
+                                <span class="shop-name">${loc.name || loc.title || '未命名文章'}</span>
+                                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+                            </div>
+                            <p class="description">${loc.desc || loc.content || ''}</p>
+                            <div class="card-footer-row">
+                                <span class="post-time">${loc.date || ''}</span>
+                                <div class="heart-count">
+                                    <i class="fa-solid fa-heart"></i>
+                                    <span>${heartCount}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                card.onclick = () => window.location.href = `article-detail.html?id=${loc.id}&from=article.html`;
+                listContainer.appendChild(card);
+            });
+        } else {
+            // 首次加载或重新加载时，逐一显示动画
+            articlesToShow.forEach((loc, index) => {
+                setTimeout(() => {
+                    const card = document.createElement('div');
+                    card.className = 'article-card';
+                    
+                    const heartCount = getArticleHeart(loc.id, loc.heart || 0);
+                    
+                    card.innerHTML = `
+                        <div class="card-top">
+                            <img src="${loc.img || `https://loremflickr.com/200/200/food,meal,cafe?random=${loc.id}`}" class="shop-img" alt="food">
+                            <div class="card-content">
+                                <div class="shop-name-row">
+                                    <span class="shop-name">${loc.name || loc.title || '未命名文章'}</span>
+                                    <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+                                </div>
+                                <p class="description">${loc.desc || loc.content || ''}</p>
+                                <div class="card-footer-row">
+                                    <span class="post-time">${loc.date || ''}</span>
+                                    <div class="heart-count">
+                                        <i class="fa-solid fa-heart"></i>
+                                        <span>${heartCount}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    card.onclick = () => window.location.href = `article-detail.html?id=${loc.id}&from=article.html`;
+                    listContainer.appendChild(card);
+                }, index * 100); // 每个卡片延迟 100ms，实现逐一出现的效果
+            });
+        }
+        
+        // 更新收藏数显示的函数
+        function updateHeartCounts() {
+            const cards = listContainer.querySelectorAll('.article-card');
+            cards.forEach((card, idx) => {
+                if (idx < articlesToShow.length) {
+                    const articleId = articlesToShow[idx].id;
+                    const heartCount = getArticleHeart(articleId, articlesToShow[idx].heart || 0);
+                    const heartCountSpan = card.querySelector('.heart-count span');
+                    if (heartCountSpan) {
+                        heartCountSpan.textContent = heartCount;
+                    }
+                }
+            });
+        }
+        
+        // 监听 storage 事件，当收藏数更新时重新渲染
+        window.addEventListener('storage', function() {
+            updateHeartCounts();
+        });
+        
+        // 也监听自定义事件（同页面内更新）
+        window.addEventListener('articleStatsUpdated', function() {
+            updateHeartCounts();
+        });
+        
+        // 如果还有更多文章，显示加载提示
+        if (endIndex < data.length) {
+            const existingIndicator = document.getElementById('loadMoreIndicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+            const loadMoreDiv = document.createElement('div');
+            loadMoreDiv.id = 'loadMoreIndicator';
+            loadMoreDiv.style.textAlign = 'center';
+            loadMoreDiv.style.padding = '20px';
+            loadMoreDiv.style.color = '#888';
+            loadMoreDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i>向下滚动加载更多...';
+            listContainer.appendChild(loadMoreDiv);
+        } else {
+            const existingIndicator = document.getElementById('loadMoreIndicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+        }
+    }
+
+    // 滚动加载更多
+    const articleList = document.getElementById('articleList');
+    let isLoading = false;
+    
+    articleList.addEventListener('scroll', function() {
+        if (isLoading) return;
+        
+        const scrollTop = articleList.scrollTop;
+        const scrollHeight = articleList.scrollHeight;
+        const clientHeight = articleList.clientHeight;
+        
+        // 当滚动到底部附近时加载更多
+        if (scrollTop + clientHeight >= scrollHeight - 100) {
+            const startIndex = (currentPage + 1) * articlesPerPage;
+            if (startIndex < allArticlesData.length) {
+                isLoading = true;
+                const loadMoreIndicator = document.getElementById('loadMoreIndicator');
+                if (loadMoreIndicator) {
+                    loadMoreIndicator.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i>加载中...';
+                }
+                
+                setTimeout(() => {
+                    currentPage++;
+                    renderArticles(allArticlesData, true);
+                    isLoading = false;
+                }, 800);
+            }
+        }
+    });
 
     filterBtns.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -313,14 +552,27 @@
 
             if (type === "最新") {
                 sortedData.sort((a, b) => {
-                    const dateA = new Date(a.date.replace(/年|月/g, '/').replace('日', ''));
-                    const dateB = new Date(b.date.replace(/年|月/g, '/').replace('日', ''));
+                    let dateA, dateB;
+                    if (a.isPublished && a.time) {
+                        dateA = new Date(a.time);
+                    } else {
+                        dateA = new Date(a.date.replace(/年|月/g, '/').replace('日', ''));
+                    }
+                    if (b.isPublished && b.time) {
+                        dateB = new Date(b.time);
+                    } else {
+                        dateB = new Date(b.date.replace(/年|月/g, '/').replace('日', ''));
+                    }
                     return dateB - dateA;
                 });
                 renderArticles(sortedData);
             } 
             else if (type === "熱門") {
-                sortedData.sort((a, b) => b.heart - a.heart);
+                sortedData.sort((a, b) => {
+                    const heartA = getArticleHeart(a.id, a.heart || 0);
+                    const heartB = getArticleHeart(b.id, b.heart || 0);
+                    return heartB - heartA;
+                });
                 renderArticles(sortedData);
             } 
             else if (type === "附近") {
@@ -346,13 +598,85 @@
             } 
             else {
                 // 全部
+                loadPublishedArticles();
                 renderArticles(locations);
             }
         });
     });
 
     // 初始進入頁面時渲染
+    loadPublishedArticles();
     renderArticles(locations);
+
+    // 语音输入功能
+    let recognition = null;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'zh-TW';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+    }
+
+    function startVoiceInput() {
+        const microphoneBtn = document.getElementById('microphoneBtn');
+        const searchInput = document.getElementById('searchInput');
+        
+        if (!recognition) {
+            alert('您的瀏覽器不支援語音輸入功能');
+            return;
+        }
+
+        microphoneBtn.classList.add('recording');
+        
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            searchInput.value = transcript;
+            microphoneBtn.classList.remove('recording');
+            
+            // 触发搜索
+            filterArticlesBySearch(transcript);
+        };
+
+        recognition.onerror = function(event) {
+            console.error('語音識別錯誤:', event.error);
+            microphoneBtn.classList.remove('recording');
+            alert('語音識別失敗，請重試');
+        };
+
+        recognition.onend = function() {
+            microphoneBtn.classList.remove('recording');
+        };
+
+        recognition.start();
+    }
+
+    function filterArticlesBySearch(keyword) {
+        if (!keyword) {
+            loadPublishedArticles();
+            renderArticles(locations);
+            return;
+        }
+        
+        const filtered = locations.filter(loc => {
+            const name = (loc.name || loc.title || '').toLowerCase();
+            const desc = (loc.desc || loc.content || '').toLowerCase();
+            const searchTerm = keyword.toLowerCase();
+            return name.includes(searchTerm) || desc.includes(searchTerm);
+        });
+        
+        renderArticles(filtered);
+    }
+
+    // 搜索输入监听
+    const searchInput = document.getElementById('searchInput');
+    let searchTimer = null;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+            filterArticlesBySearch(this.value);
+        }, 300);
+    });
 </script>
 
 </body>

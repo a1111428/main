@@ -27,15 +27,19 @@
             z-index: 1001;
         }
         .back-btn { font-size: 24px; color: #333; text-decoration: none; }
-        .action-group { display: flex; gap: 12px; align-items: center; }
+        .action-group { display: flex; gap: 8px; align-items: center; }
+        .glass-btn {
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            color: white; border-radius: 30px; padding: 8px 16px; display: flex;
+            align-items: center; font-size: 15px; border: none; cursor: pointer; text-decoration: none;
+        }
+        .glass-btn i { font-size: 18px; }
+        .glass-btn.active { background: rgba(255, 152, 0, 0.8); }
         .circle-btn { 
-            background-color: #D3C9B4; color: white; width: 36px; height: 36px; 
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            color: white; width: 36px; height: 36px; 
             border-radius: 50%; display: flex; justify-content: center; align-items: center; 
             cursor: pointer; font-size: 18px; 
-        }
-        .text-btn {
-            background-color: #8C8475; color: white; padding: 6px 16px; 
-            border-radius: 20px; font-weight: bold; font-size: 14px; cursor: pointer;
         }
 
         .album-list { 
@@ -90,39 +94,65 @@
             z-index: 2000; backdrop-filter: blur(5px);
         }
 
-        .add-modal, .search-modal {
+        .add-modal, .search-modal, .cover-option-modal {
             background: #FFF0D1; width: 90%; max-width: 380px; border-radius: 24px;
             position: relative; padding: 30px 25px; text-align: center;
+        }
+        .cover-option-btn {
+            background: white; color: #333; padding: 15px 20px; 
+            border-radius: 12px; margin: 10px 0; cursor: pointer;
+            font-size: 16px; font-weight: bold; border: 2px solid #FFB352;
+            transition: all 0.2s;
+        }
+        .cover-option-btn:hover {
+            background: #FFB352; color: white;
+        }
+        .photo-select-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            max-height: 300px; overflow-y: auto; margin: 20px 0;
+        }
+        .photo-select-item {
+            position: relative; padding-top: 100%; background: #eee; 
+            border-radius: 8px; overflow: hidden; cursor: pointer;
+            border: 3px solid transparent; transition: all 0.2s;
+        }
+        .photo-select-item:hover {
+            border-color: #FF9800;
+        }
+        .photo-select-item.selected {
+            border-color: #FF9800;
+        }
+        .photo-select-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
         }
 
         .edit-menu {
             position: absolute; 
             top: 70px; 
             right: 20px; 
-            background: white; border-radius: 18px; padding: 8px 0;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15); 
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px);
+            border-radius: 18px; padding: 8px 0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
             display: none; z-index: 1500;
-            flex-direction: column; min-width: 140px;
+            flex-direction: column; min-width: 180px;
         }
 
-        .sort-menu {
-            position: absolute; 
-            bottom: 80px; 
-            left: 20px; 
-            background: white; border-radius: 18px; padding: 8px 0;
-            box-shadow: 0 -8px 25px rgba(0,0,0,0.15); 
-            display: none; z-index: 1500;
-            flex-direction: column; min-width: 160px;
-        }
 
         .edit-menu button, .sort-menu button {
-            padding: 12px 20px; background: none; border: none; 
+            padding: 15px 20px; background: none; border: none; 
             font-size: 15px; cursor: pointer; text-align: left;
-            width: 100%; border-bottom: 1px solid #f5f5f5;
+            width: 100%; border-bottom: 1px solid rgba(0,0,0,0.08);
+            display: flex; align-items: center; gap: 12px; color: #333;
+            transition: background-color 0.2s;
         }
-        .edit-menu button:last-child, .sort-menu button:last-child { border-bottom: none; }
+        .edit-menu button:last-child { border-bottom: none; }
+        .edit-menu button:hover { background-color: rgba(0,0,0,0.05); }
+        .edit-menu button:active { background-color: rgba(0,0,0,0.1); }
         .edit-menu button:disabled { color: #ccc; cursor: not-allowed; }
-        .edit-menu button.danger { color: #ff4444; }
+        .edit-menu button.danger { color: #ff3b30; }
+        .edit-menu button i { width: 20px; text-align: center; color: #666; }
+        .edit-menu button.danger i { color: #ff3b30; }
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
@@ -137,6 +167,25 @@
             align-items: center; font-size: 22px; cursor: pointer; 
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
+
+        /* 搜尋結果區域 */
+        .search-results {
+            display: none;
+            padding: 20px;
+        }
+        .search-results.show { display: block; }
+        .search-section-title {
+            font-size: 20px; font-weight: bold; color: #333; margin: 20px 0 10px 0;
+        }
+        .search-photo-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-bottom: 30px;
+        }
+        .search-photo-item {
+            position: relative; padding-top: 100%; background: #eee; overflow: hidden; cursor: pointer;
+        }
+        .search-photo-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -146,17 +195,25 @@
             <a href="index.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
             <div class="action-group">
                 <div class="circle-btn" id="addBtn"><i class="fa-solid fa-plus"></i></div>
-                <div class="text-btn" id="selectBtn">選取</div>
+                <div class="glass-btn" id="selectBtn">選取</div>
+                <div class="circle-btn" id="openMoreBtn" style="display: none;"><i class="fa-solid fa-ellipsis-h"></i></div>
             </div>
             
             <div class="edit-menu" id="editMenu">
-                <button id="menuRename">更改名稱</button>
-                <button id="menuChangeCover">更換封面</button>
-                <button class="danger" id="menuDelete">刪除相簿</button>
+                <button id="menuRename"><i class="fa-solid fa-pen"></i> 更改名稱</button>
+                <button id="menuChangeCover"><i class="fa-solid fa-image"></i> 更換封面</button>
+                <button class="danger" id="menuDelete"><i class="fa-solid fa-trash-can"></i> 刪除相簿</button>
             </div>
         </div>
 
         <div class="album-list" id="albumContainer"></div>
+
+        <div class="search-results" id="searchResults">
+            <div class="search-section-title" id="albumResultsTitle" style="display: none;">搜尋到的相簿</div>
+            <div id="searchAlbumList"></div>
+            <div class="search-section-title" id="photoResultsTitle" style="display: none;">搜尋到的相片</div>
+            <div class="search-photo-grid" id="searchPhotoGrid"></div>
+        </div>
 
         <div class="no-result" id="noResult">
             <div>沒有結果</div>
@@ -165,11 +222,7 @@
 
         <div class="bottom-bar">
             <div style="position: relative;">
-                <div class="bottom-icon-btn" id="openSortBtn"><i class="fa-solid fa-arrow-up-wide-short"></i></div>
-                <div class="sort-menu" id="sortMenu">
-                    <button onclick="handleSort(false)"><i class="fa-solid fa-clock-rotate-left"></i> &nbsp;由新到舊</button>
-                    <button onclick="handleSort(true)"><i class="fa-solid fa-clock"></i> &nbsp;由舊到新</button>
-                </div>
+                <div class="bottom-icon-btn" id="openSortBtn" onclick="handleSort()"><i class="fa-solid fa-arrow-up-wide-short"></i></div>
             </div>
             <div class="bottom-icon-btn" id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i></div>
         </div>
@@ -191,16 +244,38 @@
     <div class="modal-overlay" id="searchModal">
         <div class="search-modal">
             <div style="position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer;" id="cancelSearch">×</div>
-            <div style="font-size: 18px; margin-bottom: 20px;">搜尋相簿</div>
-            <input type="text" id="searchInput" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: white; margin-bottom: 20px;">
+            <div style="font-size: 18px; margin-bottom: 20px;">搜尋相簿與相片</div>
+            <input type="text" id="searchInput" placeholder="輸入相簿名稱、相片名稱或標籤" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: white; margin-bottom: 20px;">
             <button class="add-modal-save" id="confirmSearch" style="width: 100%; padding: 14px; background: #FFB352; color: white; border: none; border-radius: 30px; font-weight: bold; cursor: pointer;">搜尋</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="coverOptionModal">
+        <div class="cover-option-modal">
+            <div style="position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer;" id="closeCoverOption">×</div>
+            <div style="font-size: 18px; margin-bottom: 20px;">選擇更換封面方式</div>
+            <div class="cover-option-btn" onclick="uploadCoverPhoto()">
+                <i class="fa-solid fa-upload"></i> 上傳相片
+            </div>
+            <div class="cover-option-btn" onclick="selectCoverFromAlbum()">
+                <i class="fa-solid fa-images"></i> 從相簿選擇
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="coverSelectModal">
+        <div class="cover-option-modal">
+            <div style="position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer;" id="closeCoverSelect">×</div>
+            <div style="font-size: 18px; margin-bottom: 20px;">選擇相片</div>
+            <div class="photo-select-grid" id="coverPhotoGrid"></div>
+            <button class="add-modal-save" id="confirmCoverSelect" style="width: 100%; padding: 14px; background: #FFB352; color: white; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; margin-top: 10px;">確定</button>
         </div>
     </div>
 
     <script>
         let editMode = false;
         let selectedAlbums = [];
-        let isAscending = false; 
+        let isAscending = false; // false = 由新到舊（預設），true = 由舊到新 
 
         document.addEventListener('DOMContentLoaded', () => {
             loadAlbums();
@@ -210,20 +285,36 @@
         function setupEventListeners() {
             document.getElementById('selectBtn').onclick = () => {
                 editMode = !editMode;
-                document.getElementById('selectBtn').textContent = editMode ? '取消' : '選取';
-                if (!editMode) clearSelection();
+                const selectBtn = document.getElementById('selectBtn');
+                const moreBtn = document.getElementById('openMoreBtn');
+                selectBtn.textContent = editMode ? '取消' : '選取';
+                selectBtn.classList.toggle('active', editMode);
+                moreBtn.style.display = editMode ? 'flex' : 'none';
+                if (!editMode) {
+                    clearSelection();
+                    document.getElementById('editMenu').style.display = 'none';
+                }
             };
-
-            document.getElementById('openSortBtn').onclick = (e) => {
+            
+            document.getElementById('openMoreBtn').onclick = (e) => {
                 e.stopPropagation();
-                const menu = document.getElementById('sortMenu');
+                selectedAlbums = Array.from(document.querySelectorAll('.album-card.selected')).map(c => c.dataset.name);
+                if (selectedAlbums.length === 0) {
+                    showToast("請先選取相簿");
+                    return;
+                }
+                updateEditMenu();
+                const menu = document.getElementById('editMenu');
                 menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
             };
-
-            document.addEventListener('click', () => {
+            
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#openMoreBtn') && !e.target.closest('#editMenu')) {
+                    document.getElementById('editMenu').style.display = 'none';
+                }
                 document.getElementById('sortMenu').style.display = 'none';
-                document.getElementById('editMenu').style.display = 'none';
             });
+
 
             document.getElementById('addBtn').onclick = () => {
                 document.getElementById('addModal').style.display = 'flex';
@@ -243,77 +334,232 @@
                 loadAlbums();
             };
             document.getElementById('confirmSearch').onclick = () => {
-                loadAlbums(document.getElementById('searchInput').value.trim().toLowerCase());
+                const searchKey = document.getElementById('searchInput').value.trim().toLowerCase();
+                if (!searchKey) {
+                    document.getElementById('searchResults').classList.remove('show');
+                    document.getElementById('albumContainer').style.display = 'block';
+                    loadAlbums();
+                    document.getElementById('searchModal').style.display = 'none';
+                    return;
+                }
+                
+                // 隱藏正常的相簿列表
+                document.getElementById('albumContainer').style.display = 'none';
+                document.getElementById('noResult').classList.remove('show');
+                
+                // 顯示搜尋結果區域
+                const searchResults = document.getElementById('searchResults');
+                searchResults.classList.add('show');
+                
+                // 清空之前的搜尋結果
+                const searchAlbumList = document.getElementById('searchAlbumList');
+                const searchPhotoGrid = document.getElementById('searchPhotoGrid');
+                searchAlbumList.innerHTML = '';
+                searchPhotoGrid.innerHTML = '';
+                
+                // 搜尋所有相簿和相片：檢查相簿名稱、相片名稱或標籤
+                const allPhotos = JSON.parse(localStorage.getItem('all_photos')) || [];
+                const customAlbums = JSON.parse(localStorage.getItem('custom_albums')) || [];
+                const covers = JSON.parse(localStorage.getItem('album_covers')) || {};
+                
+                // 過濾相簿：檢查相簿名稱或相簿中的照片名稱/標籤
+                const matchedAlbums = [];
+                const defaultPhotos = allPhotos.filter(p => !p.restaurant && !p.customAlbum);
+                
+                // 檢查 Default 相簿
+                const defaultMatch = 'default'.includes(searchKey) || 
+                    defaultPhotos.some(p => 
+                        (p.name && p.name.toLowerCase().includes(searchKey)) ||
+                        (p.tag && p.tag.toLowerCase().includes(searchKey))
+                    );
+                if (defaultMatch) {
+                    matchedAlbums.push({ name: 'default', type: 'default', photos: defaultPhotos });
+                }
+                
+                // 檢查自訂相簿
+                customAlbums.forEach(albumName => {
+                    const albumPhotos = allPhotos.filter(p => p.customAlbum === albumName);
+                    const match = albumName.toLowerCase().includes(searchKey) ||
+                        albumPhotos.some(p => 
+                            (p.name && p.name.toLowerCase().includes(searchKey)) ||
+                            (p.tag && p.tag.toLowerCase().includes(searchKey))
+                        );
+                    if (match) {
+                        matchedAlbums.push({ name: albumName, type: 'custom', photos: albumPhotos });
+                    }
+                });
+                
+                // 顯示匹配的相簿
+                const albumResultsTitle = document.getElementById('albumResultsTitle');
+                if (matchedAlbums.length > 0) {
+                    albumResultsTitle.style.display = 'block';
+                    matchedAlbums.forEach(album => {
+                        const albumCard = document.createElement('div');
+                        albumCard.className = 'album-card';
+                        albumCard.dataset.name = album.name;
+                        albumCard.dataset.type = album.type;
+                        
+                        const thumbSrc = covers[album.name] || (album.photos.length > 0 ? album.photos[album.photos.length - 1].src : '');
+                        const thumb = thumbSrc 
+                            ? `<img src="${thumbSrc}" class="album-thumb">`
+                            : `<div class="album-thumb default-icon"><i class="fa-solid fa-image"></i></div>`;
+                        
+                        albumCard.innerHTML = `
+                            ${thumb}
+                            <div class="album-info">
+                                <div class="album-title">${album.name === 'default' ? 'Default' : album.name}</div>
+                                <div class="album-meta">共 ${album.photos.length} 張相片</div>
+                            </div>
+                        `;
+                        albumCard.onclick = () => {
+                            window.location.href = `photo.html?album=${encodeURIComponent(album.name)}`;
+                        };
+                        searchAlbumList.appendChild(albumCard);
+                    });
+                } else {
+                    albumResultsTitle.style.display = 'none';
+                }
+                
+                // 搜尋相片
+                const matchedPhotos = [];
+                allPhotos.forEach(photo => {
+                    const photoName = (photo.name || '').toLowerCase();
+                    const photoTag = (photo.tag || '').toLowerCase();
+                    const albumName = (photo.customAlbum || 'default').toLowerCase();
+                    
+                    const match = albumName.includes(searchKey) || 
+                                 photoName.includes(searchKey) || 
+                                 photoTag.includes(searchKey);
+                    
+                    if (match) {
+                        matchedPhotos.push(photo);
+                    }
+                });
+                
+                // 顯示匹配的相片
+                const photoResultsTitle = document.getElementById('photoResultsTitle');
+                if (matchedPhotos.length > 0) {
+                    photoResultsTitle.style.display = 'block';
+                    matchedPhotos.forEach(photo => {
+                        const photoItem = document.createElement('div');
+                        photoItem.className = 'search-photo-item';
+                        photoItem.innerHTML = `<img src="${photo.src}" class="search-photo-img">`;
+                        photoItem.onclick = () => {
+                            localStorage.setItem('temp_photo_data', JSON.stringify(photo));
+                            const albumName = photo.customAlbum || 'default';
+                            const returnUrl = albumName === 'default' 
+                                ? 'photo.html' 
+                                : `photo.html?album=${encodeURIComponent(albumName)}`;
+                            localStorage.setItem('photo_info_return_url', returnUrl);
+                            window.location.href = 'photo_info.html';
+                        };
+                        searchPhotoGrid.appendChild(photoItem);
+                    });
+                } else {
+                    photoResultsTitle.style.display = 'none';
+                }
+                
+                if (matchedAlbums.length === 0 && matchedPhotos.length === 0) {
+                    document.getElementById('noResult').classList.add('show');
+                    document.getElementById('noResultText').textContent = '找不到匹配的相簿或相片';
+                    searchResults.classList.remove('show');
+                    document.getElementById('albumContainer').style.display = 'block';
+                }
+                
                 document.getElementById('searchModal').style.display = 'none';
             };
 
             document.getElementById('menuRename').onclick = renameSelected;
             document.getElementById('menuChangeCover').onclick = changeCoverSelected;
             document.getElementById('menuDelete').onclick = deleteSelected;
+            
+            document.getElementById('closeCoverOption').onclick = () => {
+                document.getElementById('coverOptionModal').style.display = 'none';
+            };
+            document.getElementById('closeCoverSelect').onclick = () => {
+                document.getElementById('coverSelectModal').style.display = 'none';
+            };
         }
 
-        function handleSort(ascending) {
-            isAscending = ascending;
+        function handleSort() {
+            isAscending = !isAscending;
             loadAlbums();
             document.getElementById('sortMenu').style.display = 'none';
         }
 
-        function loadAlbums(filter = '') {
+        function loadAlbums(filter = '', matchedAlbums = null) {
             const container = document.getElementById('albumContainer');
             container.innerHTML = '';
-            const allPhotos = JSON.parse(localStorage.getItem('all_photos')) || [];
-            const customAlbums = JSON.parse(localStorage.getItem('custom_albums')) || [];
-            const albumDataMeta = JSON.parse(localStorage.getItem('album_data_meta')) || {};
-            const covers = JSON.parse(localStorage.getItem('album_covers')) || {};
+            
+            try {
+                const allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+                const customAlbums = JSON.parse(localStorage.getItem('custom_albums')) || [];
+                const albumDataMeta = JSON.parse(localStorage.getItem('album_data_meta')) || {};
+                const covers = JSON.parse(localStorage.getItem('album_covers')) || {};
 
-            let albumData = [];
+                let albumData = [];
 
-            // Default
-            const defPhotos = allPhotos.filter(p => !p.restaurant && !p.customAlbum);
-            albumData.push({ 
-                name: 'default', 
-                photos: defPhotos, 
-                type: 'default', 
-                cover: covers['default'],
-                createTime: albumDataMeta['default'] || '2025/01/01 00:00'
-            });
-
-            // Custom
-            customAlbums.forEach(name => {
-                const photos = allPhotos.filter(p => p.customAlbum === name);
-                albumData.push({ 
-                    name: name, 
-                    photos: photos, 
-                    type: 'custom', 
-                    cover: covers[name],
-                    createTime: albumDataMeta[name] || '----'
-                });
-            });
-
-            // --- 核心改進：根據畫面顯示的時間進行排序 ---
-            albumData.sort((a, b) => {
-                // 優先取最後照片的 id (timestamp)，若沒照片則轉換建立時間字串為時間戳
-                let valA = a.photos.length > 0 ? a.photos[a.photos.length - 1].id : new Date(a.createTime).getTime();
-                let valB = b.photos.length > 0 ? b.photos[b.photos.length - 1].id : new Date(b.createTime).getTime();
-                
-                // 處理可能出現的 NaN (例如建立時間為 ----)
-                if (isNaN(valA)) valA = 0;
-                if (isNaN(valB)) valB = 0;
-
-                return isAscending ? valA - valB : valB - valA;
-            });
-
-            let visibleCount = 0;
-            albumData.forEach(data => {
-                const match = filter === '' || data.name.toLowerCase().includes(filter);
-                if (match) {
-                    renderAlbum(data.name, data.photos, data.type, data.cover, data.createTime);
-                    visibleCount++;
+                // Default
+                const defPhotos = allPhotos.filter(p => !p.restaurant && !p.customAlbum);
+                if (!matchedAlbums || matchedAlbums.includes('default')) {
+                    albumData.push({ 
+                        name: 'default', 
+                        photos: defPhotos, 
+                        type: 'default', 
+                        cover: covers['default'],
+                        createTime: albumDataMeta['default'] || '2025/01/01 00:00'
+                    });
                 }
-            });
 
-            const noRes = document.getElementById('noResult');
-            noRes.classList.toggle('show', visibleCount === 0 && filter !== '');
+                // Custom
+                customAlbums.forEach(name => {
+                    if (!matchedAlbums || matchedAlbums.includes(name)) {
+                        const photos = allPhotos.filter(p => p.customAlbum === name);
+                        albumData.push({ 
+                            name: name, 
+                            photos: photos, 
+                            type: 'custom', 
+                            cover: covers[name],
+                            createTime: albumDataMeta[name] || '----'
+                        });
+                    }
+                });
+
+                // --- 核心改進：根據畫面顯示的時間進行排序 ---
+                // Default 相簿始終在最上方
+                albumData.sort((a, b) => {
+                    // Default 相簿始終在最前面
+                    if (a.name === 'default') return -1;
+                    if (b.name === 'default') return 1;
+                    
+                    // 其他相簿根據時間排序
+                    let valA = a.photos.length > 0 ? a.photos[a.photos.length - 1].id : new Date(a.createTime).getTime();
+                    let valB = b.photos.length > 0 ? b.photos[b.photos.length - 1].id : new Date(b.createTime).getTime();
+                    
+                    // 處理可能出現的 NaN (例如建立時間為 ----)
+                    if (isNaN(valA)) valA = 0;
+                    if (isNaN(valB)) valB = 0;
+
+                    return isAscending ? valA - valB : valB - valA;
+                });
+
+                let visibleCount = 0;
+                albumData.forEach(data => {
+                    const match = filter === '' || data.name.toLowerCase().includes(filter);
+                    if (match) {
+                        renderAlbum(data.name, data.photos, data.type, data.cover, data.createTime);
+                        visibleCount++;
+                    }
+                });
+
+                const noRes = document.getElementById('noResult');
+                noRes.classList.toggle('show', visibleCount === 0 && filter !== '');
+            } catch (e) {
+                console.error('載入相簿時發生錯誤：', e);
+                const noRes = document.getElementById('noResult');
+                noRes.classList.add('show');
+                document.getElementById('noResultText').textContent = '載入相簿時發生錯誤，請重新整理頁面';
+            }
         }
 
         function renderAlbum(name, photos, type, customCover, createTime) {
@@ -353,7 +599,8 @@
                 e.stopPropagation();
                 if (editMode && type === 'custom') {
                     card.classList.toggle('selected');
-                    updateEditMenu();
+                    // 只更新選取狀態，不自動顯示菜單
+                    selectedAlbums = Array.from(document.querySelectorAll('.album-card.selected')).map(c => c.dataset.name);
                 } else if (!editMode) {
                     window.location.href = `photo.html?album=${encodeURIComponent(name)}`;
                 }
@@ -364,7 +611,7 @@
         function updateEditMenu() {
             selectedAlbums = Array.from(document.querySelectorAll('.album-card.selected')).map(c => c.dataset.name);
             const menu = document.getElementById('editMenu');
-            menu.style.display = selectedAlbums.length > 0 ? 'flex' : 'none';
+            // 只在點擊"更多"按鈕時顯示，不在選取時自動顯示
             document.getElementById('menuRename').disabled = selectedAlbums.length !== 1;
             document.getElementById('menuChangeCover').disabled = selectedAlbums.length !== 1;
         }
@@ -375,18 +622,59 @@
             document.getElementById('editMenu').style.display = 'none';
         }
 
+        // 壓縮圖片
+        function compressImage(file, maxWidth = 800, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > maxWidth) {
+                            height = (height * maxWidth) / width;
+                            width = maxWidth;
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        canvas.toBlob((blob) => {
+                            const reader2 = new FileReader();
+                            reader2.onload = (e2) => resolve(e2.target.result);
+                            reader2.onerror = reject;
+                            reader2.readAsDataURL(blob);
+                        }, 'image/jpeg', quality);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
         function chooseCover() {
             const input = document.createElement('input');
             input.type = 'file'; input.accept = 'image/*';
-            input.onchange = (e) => {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    document.getElementById('previewImg').src = ev.target.result;
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    // 壓縮圖片以減少存儲空間
+                    const compressedSrc = await compressImage(file, 800, 0.7);
+                    document.getElementById('previewImg').src = compressedSrc;
                     document.getElementById('previewImg').style.display = 'block';
                     document.querySelector('#previewArea i').style.display = 'none';
-                    window.tempCoverSrc = ev.target.result;
-                };
-                reader.readAsDataURL(e.target.files[0]);
+                    window.tempCoverSrc = compressedSrc;
+                } catch (error) {
+                    alert('處理圖片時發生錯誤：' + error.message);
+                }
             };
             input.click();
         }
@@ -409,13 +697,46 @@
             albumMeta[name] = createTimeFormatted;
             localStorage.setItem('album_data_meta', JSON.stringify(albumMeta));
 
+            // 如果有上傳的圖片，保存到相簿中並設為封面
             if (window.tempCoverSrc) {
-                let covers = JSON.parse(localStorage.getItem('album_covers')) || {};
-                covers[name] = window.tempCoverSrc;
-                localStorage.setItem('album_covers', JSON.stringify(covers));
+                try {
+                    let covers = JSON.parse(localStorage.getItem('album_covers')) || {};
+                    covers[name] = window.tempCoverSrc;
+                    localStorage.setItem('album_covers', JSON.stringify(covers));
+                    
+                    // 將圖片保存到 all_photos 並標記為該相簿的照片
+                    try {
+                        let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+                        const newPhoto = {
+                            id: Date.now(),
+                            src: window.tempCoverSrc,
+                            name: name + " 封面",
+                            tag: "",
+                            date: dateStr,
+                            time: timeStr,
+                            customAlbum: name
+                        };
+                        allPhotos.push(newPhoto);
+                        localStorage.setItem('all_photos', JSON.stringify(allPhotos));
+                    } catch (e) {
+                        if (e.name === 'QuotaExceededError') {
+                            alert('儲存空間不足，無法將封面圖片加入相簿。封面圖已設置，但圖片未加入相簿。請刪除一些照片後再試。');
+                        } else {
+                            console.error('保存封面圖片到相簿時發生錯誤：', e);
+                        }
+                    }
+                } catch (e) {
+                    if (e.name === 'QuotaExceededError') {
+                        alert('儲存空間不足，無法保存封面圖。相簿已創建，但未設置封面。請刪除一些照片後再試。');
+                    } else {
+                        alert('保存封面圖時發生錯誤：' + e.message);
+                    }
+                }
             }
+            
             loadAlbums();
             document.getElementById('addModal').style.display = 'none';
+            window.tempCoverSrc = null; // 清除臨時變數
         }
 
         function renameSelected() {
@@ -435,19 +756,95 @@
         }
 
         function changeCoverSelected() {
+            if (selectedAlbums.length !== 1) {
+                showToast("請只選取一個相簿");
+                return;
+            }
+            document.getElementById('editMenu').style.display = 'none';
+            document.getElementById('coverOptionModal').style.display = 'flex';
+        }
+
+        function uploadCoverPhoto() {
+            document.getElementById('coverOptionModal').style.display = 'none';
             const input = document.createElement('input');
             input.type = 'file'; input.accept = 'image/*';
-            input.onchange = (e) => {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    // 壓縮圖片
+                    const compressedSrc = await compressImage(file, 800, 0.7);
                     let covers = JSON.parse(localStorage.getItem('album_covers')) || {};
-                    covers[selectedAlbums[0]] = ev.target.result;
+                    covers[selectedAlbums[0]] = compressedSrc;
                     localStorage.setItem('album_covers', JSON.stringify(covers));
-                    loadAlbums(); clearSelection();
-                };
-                reader.readAsDataURL(e.target.files[0]);
+                    loadAlbums(); 
+                    clearSelection();
+                    showToast("封面已更新");
+                } catch (error) {
+                    alert('處理圖片時發生錯誤：' + error.message);
+                }
             };
             input.click();
+        }
+
+        function selectCoverFromAlbum() {
+            document.getElementById('coverOptionModal').style.display = 'none';
+            const albumName = selectedAlbums[0];
+            
+            // 獲取該相簿的所有照片
+            const allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+            const albumPhotos = allPhotos.filter(p => p.customAlbum === albumName);
+            
+            if (albumPhotos.length === 0) {
+                showToast("該相簿沒有照片");
+                return;
+            }
+            
+            // 顯示照片選擇網格
+            const grid = document.getElementById('coverPhotoGrid');
+            grid.innerHTML = '';
+            let selectedPhotoSrc = null;
+            
+            albumPhotos.forEach(photo => {
+                const item = document.createElement('div');
+                item.className = 'photo-select-item';
+                item.innerHTML = `<img src="${photo.src}" class="photo-select-img">`;
+                item.onclick = () => {
+                    // 移除其他選中狀態
+                    document.querySelectorAll('.photo-select-item').forEach(el => el.classList.remove('selected'));
+                    item.classList.add('selected');
+                    selectedPhotoSrc = photo.src;
+                };
+                grid.appendChild(item);
+            });
+            
+            document.getElementById('coverSelectModal').style.display = 'flex';
+            
+            // 確認按鈕
+            document.getElementById('confirmCoverSelect').onclick = () => {
+                if (!selectedPhotoSrc) {
+                    showToast("請選擇一張照片");
+                    return;
+                }
+                
+                let covers = JSON.parse(localStorage.getItem('album_covers')) || {};
+                covers[albumName] = selectedPhotoSrc;
+                localStorage.setItem('album_covers', JSON.stringify(covers));
+                loadAlbums();
+                clearSelection();
+                document.getElementById('coverSelectModal').style.display = 'none';
+                showToast("封面已更新");
+            };
+        }
+
+        function showToast(msg) {
+            // 簡單的提示功能
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: white; padding: 12px 24px; border-radius: 30px; z-index: 5000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: bold;';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
         }
 
         function deleteSelected() {

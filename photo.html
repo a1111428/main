@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Luffy Cafe 相簿</title>
+    <title>Default 相簿</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; }
@@ -33,25 +33,24 @@
         /* 更多功能下拉選單 */
         .more-dropdown {
             position: absolute; top: 70px; right: 15px;
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px);
-            border-radius: 18px; width: 160px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px);
+            border-radius: 18px; width: 180px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             display: none; flex-direction: column; overflow: hidden; z-index: 2000;
         }
         .dropdown-item {
-            padding: 15px; font-size: 15px; color: #333; border-bottom: 1px solid rgba(0,0,0,0.05);
-            display: flex; align-items: center; gap: 10px; cursor: pointer;
+            padding: 15px 20px; font-size: 15px; color: #333; border-bottom: 1px solid rgba(0,0,0,0.08);
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+            transition: background-color 0.2s;
         }
-        .dropdown-item.highlighted {
-            background-color: #FFF0D1;
-            color: #FF9800;
-            font-weight: bold;
-            border-left: 4px solid #FF9800;
-        }
-        .dropdown-item:active { background: rgba(0,0,0,0.05); }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background-color: rgba(0,0,0,0.05); }
+        .dropdown-item:active { background-color: rgba(0,0,0,0.1); }
+        .dropdown-item i { width: 20px; text-align: center; color: #666; }
         .dropdown-item.danger { color: #ff3b30; }
+        .dropdown-item.danger i { color: #ff3b30; }
 
         /* 照片網格區域 */
-        .content-scroll { height: 100vh; overflow-y: auto; padding-bottom: 150px; }
+        .content-scroll { height: 100vh; overflow-y: auto; padding-top: 80px; padding-bottom: 100px; }
         .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
         
         /* 搜尋狀態樣式 */
@@ -66,17 +65,6 @@
         .album-title { font-size: 32px; font-weight: 800; color: #000; margin-bottom: 8px; }
         .photo-count-subtitle { font-size: 18px; color: #555; }
 
-        /* 底部功能按鈕 */
-        .bottom-actions {
-            position: fixed; bottom: 30px; left: 0; width: 100%;
-            display: flex; justify-content: space-between; padding: 0 25px;
-            z-index: 1000; pointer-events: none;
-        }
-        .action-circle {
-            width: 56px; height: 56px; background: rgba(80, 80, 80, 0.8); backdrop-filter: blur(10px);
-            color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            font-size: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: auto; cursor: pointer;
-        }
 
         /* 選取標記 */
         .selection-overlay { 
@@ -86,6 +74,7 @@
         }
         body.select-mode .selection-overlay { display: flex; }
         .photo-item.selected .selection-overlay { background: #007AFF; border-color: white; }
+        .photo-item.selected .selection-overlay::before { content: '✓'; font-size: 14px; font-weight: bold; }
         .photo-item.selected .photo-img { transform: scale(0.9); opacity: 0.8; }
         
         /* 彈出視窗樣式 */
@@ -103,11 +92,51 @@
         .move-cancel { text-align: right; margin-top: 15px; color: #666; font-size: 15px; cursor: pointer; }
 
         .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: white; padding: 12px 24px; border-radius: 30px; z-index: 4000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: bold; }
+
+        /* 搜尋結果區域 */
+        .search-results {
+            display: none;
+            padding: 20px;
+        }
+        .search-results.show { display: block; }
+        .search-section-title {
+            font-size: 20px; font-weight: bold; color: #333; margin: 20px 0 10px 0;
+        }
+        .search-album-list {
+            display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px;
+        }
+        .search-album-item {
+            background: white; border-radius: 12px; padding: 15px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .search-album-item:active { transform: scale(0.98); }
+        .search-album-thumb {
+            width: 60px; height: 60px; border-radius: 8px; object-fit: cover; background: #f0f0f0;
+        }
+        .search-album-info { flex: 1; }
+        .search-album-name { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 4px; }
+        .search-album-count { font-size: 13px; color: #888; }
+
+        /* 底部功能按鈕欄 */
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            padding: 12px 30px; padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+            background: #FFF9EB; display: flex; justify-content: space-between; 
+            align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+        .bottom-icon-btn {
+            background: #8E8E93; color: white; width: 48px; height: 48px; 
+            border-radius: 50%; display: flex; justify-content: center; 
+            align-items: center; font-size: 22px; cursor: pointer; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body id="mainBody">
 
-    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
 
     <div class="header-overlay">
         <a href="photo_album.html" class="glass-btn">
@@ -121,28 +150,31 @@
     </div>
 
     <div class="more-dropdown" id="moreDropdown">
-        <div class="dropdown-item highlighted" onclick="handleMove()"><i class="fa-solid fa-folder-open"></i> 搬移相片</div>
-        <div class="dropdown-item highlighted" onclick="openOrangeModal('tag')"><i class="fa-solid fa-tag"></i> 批量標籤</div>
+        <div class="dropdown-item" onclick="handleMove()"><i class="fa-solid fa-folder-open"></i> 搬移相片</div>
+        <div class="dropdown-item" onclick="setAsCover()"><i class="fa-solid fa-image"></i> 設為預覽圖</div>
+        <div class="dropdown-item" onclick="openOrangeModal('tag')"><i class="fa-solid fa-tag"></i> 批量標籤</div>
+        <div class="dropdown-item" onclick="openOrangeModal('removeTag')"><i class="fa-solid fa-tag"></i> 批次刪除標籤</div>
         <div class="dropdown-item danger" onclick="handleDelete()"><i class="fa-solid fa-trash-can"></i> 刪除相片</div>
     </div>
 
     <div class="content-scroll">
+        <div class="search-results" id="searchResults">
+            <div class="search-section-title" id="albumResultsTitle" style="display: none;">搜尋到的相簿</div>
+            <div class="search-album-list" id="searchAlbumList"></div>
+            <div class="search-section-title" id="photoResultsTitle" style="display: none;">搜尋到的相片</div>
+        </div>
         <div class="photo-grid" id="photoGrid"></div>
         <div class="album-info-section">
-            <h1 class="album-title">Luffy Cafe 相簿</h1>
+            <h1 class="album-title">Default 相簿</h1>
             <p class="photo-count-subtitle" id="totalCountDisplay">0 張照片</p>
         </div>
     </div>
 
-    <div class="bottom-actions">
-        <div class="action-circle" id="openSortBtn"><i class="fa-solid fa-arrow-up-down"></i></div>
-        <div class="action-circle" id="openSearchBtn"><i class="fa-solid fa-magnifying-glass"></i></div>
-    </div>
 
     <div id="orangeModalOverlay" class="orange-modal-overlay">
         <div class="orange-modal-content">
-            <h3 id="modalTitle" style="margin-top:0">搜尋照片</h3>
-            <input type="text" id="inputName" placeholder="輸入照片名稱" style="width:100%; margin:10px 0; padding:12px; border-radius:8px; border:1px solid #ddd;">
+            <h3 id="modalTitle" style="margin-top:0">搜尋相簿與相片</h3>
+            <input type="text" id="inputName" placeholder="輸入相簿名稱或照片名稱" style="width:100%; margin:10px 0; padding:12px; border-radius:8px; border:1px solid #ddd;">
             <input type="text" id="inputTag" placeholder="輸入標籤 (例如: #狗狗)" style="width:100%; margin:10px 0; padding:12px; border-radius:8px; border:1px solid #ddd;">
             <button id="modalConfirmBtn" style="width:100%; padding:12px; background:#FFB352; border:none; border-radius:10px; color:white; font-weight:bold;">執行</button>
             <p onclick="closeOrange()" style="margin-top:20px; cursor:pointer; color:#888;">取消</p>
@@ -156,6 +188,11 @@
     </div>
 
     <div id="toast" class="toast"><span id="toastMsg"></span></div>
+
+    <div class="bottom-bar">
+        <div class="bottom-icon-btn" id="openSortBtn"><i class="fa-solid fa-arrow-up-wide-short"></i></div>
+        <div class="bottom-icon-btn" id="openSearchBtn"><i class="fa-solid fa-magnifying-glass"></i></div>
+    </div>
 
     <script>
         const photoGrid = document.getElementById('photoGrid');
@@ -176,18 +213,26 @@
                 return;
             }
 
-            // 讀取相簿清單
-            const albums = JSON.parse(localStorage.getItem('albums')) || [{name: '預設相簿'}, {name: '我的最愛'}];
+            // 讀取相簿清單：Default 是常駐的，加上所有自訂相簿
+            const customAlbums = JSON.parse(localStorage.getItem('custom_albums')) || [];
             const content = document.getElementById('moveModalContent');
             
             // 重建內容
             content.innerHTML = '<div class="move-modal-title">選擇目標相簿</div>';
             
-            albums.forEach(album => {
+            // 添加 Default 相簿（常駐）
+            const defaultDiv = document.createElement('div');
+            defaultDiv.className = 'move-option';
+            defaultDiv.textContent = 'Default';
+            defaultDiv.onclick = () => confirmMove('default');
+            content.appendChild(defaultDiv);
+            
+            // 添加所有自訂相簿
+            customAlbums.forEach(albumName => {
                 const div = document.createElement('div');
                 div.className = 'move-option';
-                div.textContent = album.name;
-                div.onclick = () => confirmMove(album.name);
+                div.textContent = albumName;
+                div.onclick = () => confirmMove(albumName);
                 content.appendChild(div);
             });
 
@@ -198,6 +243,7 @@
             content.appendChild(cancel);
 
             document.getElementById('moveModalOverlay').style.display = 'flex';
+            moreDropdown.style.display = 'none';
         }
 
         function closeMoveModal() {
@@ -205,10 +251,71 @@
         }
 
         function confirmMove(albumName) {
-            const count = document.querySelectorAll('.photo-item.selected').length;
-            showToast(`已將 ${count} 張照片搬移至「${albumName}」`);
+            const selectedItems = document.querySelectorAll('.photo-item.selected');
+            let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+            let movedCount = 0;
+            
+            selectedItems.forEach(item => {
+                const photoId = item.getAttribute('data-id');
+                const photo = allPhotos.find(p => p.id == photoId || p.id == parseInt(photoId));
+                if (photo) {
+                    if (albumName === 'default') {
+                        // 移到 Default：移除 customAlbum 屬性
+                        delete photo.customAlbum;
+                    } else {
+                        // 移到自訂相簿：設置 customAlbum
+                        photo.customAlbum = albumName;
+                    }
+                    movedCount++;
+                }
+            });
+            
+            if (movedCount > 0) {
+                localStorage.setItem('all_photos', JSON.stringify(allPhotos));
+                showToast(`已將 ${movedCount} 張照片搬移至「${albumName === 'default' ? 'Default' : albumName}」`);
+                loadPhotos();
+            }
             closeMoveModal();
             clearSelection();
+        }
+        
+        // 設為預覽圖功能
+        function setAsCover() {
+            const selectedItems = document.querySelectorAll('.photo-item.selected');
+            if (selectedItems.length === 0) {
+                showToast("請先選取照片");
+                return;
+            }
+            if (selectedItems.length > 1) {
+                showToast("請只選取一張照片");
+                return;
+            }
+            
+            // 獲取當前相簿名稱（從 URL 參數或默認為 default）
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentAlbum = urlParams.get('album') || 'default';
+            
+            if (currentAlbum === 'default') {
+                showToast("Default 相簿無法設定預覽圖");
+                moreDropdown.style.display = 'none';
+                return;
+            }
+            
+            const selectedItem = selectedItems[0];
+            const photoId = selectedItem.getAttribute('data-id');
+            const allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+            const photo = allPhotos.find(p => p.id == photoId || p.id == parseInt(photoId));
+            
+            if (photo && photo.src) {
+                let covers = JSON.parse(localStorage.getItem('album_covers')) || {};
+                covers[currentAlbum] = photo.src;
+                localStorage.setItem('album_covers', JSON.stringify(covers));
+                showToast("已設為預覽圖");
+                moreDropdown.style.display = 'none';
+                clearSelection();
+            } else {
+                showToast("無法設定預覽圖");
+            }
         }
 
         // --- 2. 搜尋與標籤功能 (修復並整合) ---
@@ -226,90 +333,400 @@
             if (type === 'tag') {
                 title.textContent = "批量標籤";
                 btn.textContent = "確定修改";
+                // 批量標籤時只顯示標籤輸入框，隱藏名稱輸入框
+                inputName.style.display = 'none';
+                inputTag.style.display = 'block';
+                inputTag.placeholder = "輸入標籤 (例如: #狗狗)";
                 btn.onclick = () => {
                     const selected = document.querySelectorAll('.photo-item.selected');
                     if (selected.length === 0) { showToast("請先選取照片"); return; }
                     
+                    const allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+                    const tagValue = inputTag.value.trim();
+                    
+                    if (!tagValue) {
+                        showToast("請輸入標籤");
+                        return;
+                    }
+                    
                     selected.forEach(item => {
-                        item.setAttribute('data-name', inputName.value || item.getAttribute('data-name'));
-                        item.setAttribute('data-tag', inputTag.value);
+                        const photoId = item.getAttribute('data-id');
+                        const photo = allPhotos.find(p => p.id == photoId || p.id == parseInt(photoId));
+                        if (photo) {
+                            // 增加標籤而不是替換
+                            const existingTags = (photo.tag || '').split(/[,\s]+/).filter(t => t.trim());
+                            const newTag = tagValue.startsWith('#') ? tagValue : '#' + tagValue;
+                            
+                            // 如果標籤已存在，則不重複添加
+                            if (!existingTags.includes(newTag)) {
+                                existingTags.push(newTag);
+                                photo.tag = existingTags.join(' ');
+                            }
+                            
+                            // 更新 DOM 屬性
+                            item.setAttribute('data-tag', photo.tag || '');
+                        }
                     });
-                    showToast("標籤修改成功");
+                    
+                    // 保存到 localStorage
+                    localStorage.setItem('all_photos', JSON.stringify(allPhotos));
+                    showToast("標籤添加成功");
+                    closeOrange();
+                    clearSelection();
+                };
+            } else if (type === 'removeTag') {
+                title.textContent = "批次刪除標籤";
+                btn.textContent = "全部清除";
+                // 批次刪除標籤時隱藏輸入框，直接顯示清除選項
+                inputName.style.display = 'none';
+                inputTag.style.display = 'none';
+                btn.onclick = () => {
+                    const selected = document.querySelectorAll('.photo-item.selected');
+                    if (selected.length === 0) { showToast("請先選取照片"); return; }
+                    
+                    if (!confirm(`確定要清除 ${selected.length} 張照片的所有標籤嗎？`)) {
+                        return;
+                    }
+                    
+                    const allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+                    
+                    selected.forEach(item => {
+                        const photoId = item.getAttribute('data-id');
+                        const photo = allPhotos.find(p => p.id == photoId || p.id == parseInt(photoId));
+                        if (photo) {
+                            // 清除所有標籤
+                            photo.tag = '';
+                            
+                            // 更新 DOM 屬性
+                            item.setAttribute('data-tag', '');
+                        }
+                    });
+                    
+                    // 保存到 localStorage
+                    localStorage.setItem('all_photos', JSON.stringify(allPhotos));
+                    showToast("標籤已全部清除");
                     closeOrange();
                     clearSelection();
                 };
             } else {
-                title.textContent = "搜尋照片";
+                title.textContent = "搜尋相簿與相片";
                 btn.textContent = "開始搜尋";
+                // 搜尋時只顯示一個輸入框（合併名稱和標籤搜尋）
+                inputName.style.display = 'block';
+                inputTag.style.display = 'none';
+                inputName.placeholder = "輸入相簿名稱、相片名稱或標籤";
                 btn.onclick = runSearch;
             }
         }
 
         function runSearch() {
-            const nameKey = document.getElementById('inputName').value.toLowerCase();
-            const tagKey = document.getElementById('inputTag').value.toLowerCase();
+            const searchKey = document.getElementById('inputName').value.trim().toLowerCase();
             
-            if (!nameKey && !tagKey) { showToast("請輸入關鍵字"); return; }
+            if (!searchKey) { showToast("請輸入關鍵字"); return; }
             
-            let found = false;
-            document.querySelectorAll('.photo-item').forEach(item => {
-                const n = (item.getAttribute('data-name') || '').toLowerCase();
-                const t = (item.getAttribute('data-tag') || '').toLowerCase();
-                
-                if ((nameKey && n.includes(nameKey)) || (tagKey && t.includes(tagKey))) {
-                    item.classList.add('found');
-                    found = true;
-                } else {
-                    item.classList.remove('found');
+            const allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+            const customAlbums = JSON.parse(localStorage.getItem('custom_albums')) || [];
+            const covers = JSON.parse(localStorage.getItem('album_covers')) || {};
+            
+            // 隱藏正常的照片網格和相簿資訊
+            photoGrid.style.display = 'none';
+            document.querySelector('.album-info-section').style.display = 'none';
+            
+            // 顯示搜尋結果區域
+            const searchResults = document.getElementById('searchResults');
+            searchResults.classList.add('show');
+            
+            // 清空之前的搜尋結果
+            const searchAlbumList = document.getElementById('searchAlbumList');
+            searchAlbumList.innerHTML = '';
+            photoGrid.innerHTML = '';
+            
+            // 搜尋相簿
+            const matchedAlbums = [];
+            const defaultPhotos = allPhotos.filter(p => !p.restaurant && !p.customAlbum);
+            
+            // 檢查 Default 相簿
+            const defaultMatch = 'default'.includes(searchKey) || 
+                defaultPhotos.some(p => 
+                    (p.name && p.name.toLowerCase().includes(searchKey)) ||
+                    (p.tag && p.tag.toLowerCase().includes(searchKey))
+                );
+            if (defaultMatch) {
+                matchedAlbums.push({ name: 'default', type: 'default', photos: defaultPhotos });
+            }
+            
+            // 檢查自訂相簿
+            customAlbums.forEach(albumName => {
+                const albumPhotos = allPhotos.filter(p => p.customAlbum === albumName);
+                const match = albumName.toLowerCase().includes(searchKey) ||
+                    albumPhotos.some(p => 
+                        (p.name && p.name.toLowerCase().includes(searchKey)) ||
+                        (p.tag && p.tag.toLowerCase().includes(searchKey))
+                    );
+                if (match) {
+                    matchedAlbums.push({ name: albumName, type: 'custom', photos: albumPhotos });
                 }
             });
-
-            if (found) {
-                photoGrid.classList.add('searching');
-                showToast("搜尋完成");
-                closeOrange();
+            
+            // 顯示匹配的相簿
+            const albumResultsTitle = document.getElementById('albumResultsTitle');
+            if (matchedAlbums.length > 0) {
+                albumResultsTitle.style.display = 'block';
+                matchedAlbums.forEach(album => {
+                    const albumItem = document.createElement('div');
+                    albumItem.className = 'search-album-item';
+                    const thumbSrc = covers[album.name] || (album.photos.length > 0 ? album.photos[album.photos.length - 1].src : '');
+                    const thumb = thumbSrc 
+                        ? `<img src="${thumbSrc}" class="search-album-thumb">`
+                        : `<div class="search-album-thumb" style="display: flex; align-items: center; justify-content: center; color: #ccc;"><i class="fa-solid fa-image"></i></div>`;
+                    
+                    albumItem.innerHTML = `
+                        ${thumb}
+                        <div class="search-album-info">
+                            <div class="search-album-name">${album.name === 'default' ? 'Default' : album.name}</div>
+                            <div class="search-album-count">共 ${album.photos.length} 張相片</div>
+                        </div>
+                    `;
+                    albumItem.onclick = () => {
+                        window.location.href = `photo.html?album=${encodeURIComponent(album.name)}`;
+                    };
+                    searchAlbumList.appendChild(albumItem);
+                });
             } else {
-                showToast("找不到結果");
+                albumResultsTitle.style.display = 'none';
             }
+            
+            // 搜尋相片
+            const matchedPhotos = [];
+            allPhotos.forEach(photo => {
+                const photoName = (photo.name || '').toLowerCase();
+                const photoTag = (photo.tag || '').toLowerCase();
+                const albumName = (photo.customAlbum || 'default').toLowerCase();
+                
+                const match = albumName.includes(searchKey) || 
+                             photoName.includes(searchKey) || 
+                             photoTag.includes(searchKey);
+                
+                if (match) {
+                    matchedPhotos.push(photo);
+                }
+            });
+            
+            // 顯示匹配的相片
+            const photoResultsTitle = document.getElementById('photoResultsTitle');
+            if (matchedPhotos.length > 0) {
+                photoResultsTitle.style.display = 'block';
+                photoGrid.style.display = 'grid';
+                matchedPhotos.forEach(photo => {
+                    addPhotoToGrid(photo.src, photo.id, photo.name || '', photo.tag || '', true);
+                });
+            } else {
+                photoResultsTitle.style.display = 'none';
+            }
+            
+            if (matchedAlbums.length === 0 && matchedPhotos.length === 0) {
+                showToast("找不到結果");
+                searchResults.classList.remove('show');
+                photoGrid.style.display = 'grid';
+                document.querySelector('.album-info-section').style.display = 'block';
+                loadPhotos();
+            } else {
+                showToast(`找到 ${matchedAlbums.length} 個相簿，${matchedPhotos.length} 張相片`);
+            }
+            
+            closeOrange();
         }
 
         function clearSearch() {
-            photoGrid.classList.remove('searching');
-            document.querySelectorAll('.photo-item.found').forEach(el => el.classList.remove('found'));
+            const searchResults = document.getElementById('searchResults');
+            searchResults.classList.remove('show');
+            photoGrid.style.display = 'grid';
+            document.querySelector('.album-info-section').style.display = 'block';
+            photoGrid.innerHTML = '';
+            loadPhotos();
         }
 
         function closeOrange() { document.getElementById('orangeModalOverlay').style.display = 'none'; }
 
         // --- 3. 基礎載入與照片邏輯 ---
         fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const newPhoto = { id: Date.now(), src: event.target.result, name: "新照片 " + new Date().toLocaleDateString(), tag: "實拍", date: new Date().toLocaleDateString() };
-                let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-                allPhotos.push(newPhoto);
-                localStorage.setItem('all_photos', JSON.stringify(allPhotos));
-                showToast("照片上傳成功！");
-                loadPhotos();
-            };
-            reader.readAsDataURL(file);
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+            
+            let validFiles = [];
+            let hasNoLocation = false;
+            
+            files.forEach(file => {
+                if (file.name.toLowerCase() === 'no_location.jpg') {
+                    hasNoLocation = true;
+                } else {
+                    validFiles.push(file);
+                }
+            });
+            
+            if (hasNoLocation) {
+                showToast("無法加入未有定位之相片");
+            }
+            
+            if (validFiles.length === 0) {
+                fileInput.value = '';
+                return;
+            }
+            
+            let processedCount = 0;
+            let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+            
+            // 獲取當前相簿名稱（從 URL 參數）
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentAlbum = urlParams.get('album') || 'default';
+            
+            // 壓縮圖片函數
+            function compressImage(file, maxWidth = 800, quality = 0.7) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            
+                            if (width > maxWidth) {
+                                height = (height * maxWidth) / width;
+                                width = maxWidth;
+                            }
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            canvas.toBlob((blob) => {
+                                const reader2 = new FileReader();
+                                reader2.onload = (e2) => resolve(e2.target.result);
+                                reader2.onerror = reject;
+                                reader2.readAsDataURL(blob);
+                            }, 'image/jpeg', quality);
+                        };
+                        img.onerror = reject;
+                        img.src = e.target.result;
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            // 使用 Promise.all 處理所有文件
+            Promise.all(validFiles.map(async (file, index) => {
+                try {
+                    // 壓縮圖片以減少存儲空間
+                    const compressedSrc = await compressImage(file, 800, 0.7);
+                    
+                    const newPhoto = { 
+                        id: Date.now() + index, 
+                        src: compressedSrc, 
+                        name: "新照片 " + new Date().toLocaleDateString(), 
+                        tag: "實拍", 
+                        date: new Date().toLocaleDateString(),
+                        time: new Date().toLocaleTimeString('zh-TW', {hour12: false})
+                    };
+                    
+                    // 根據當前相簿設置 customAlbum
+                    if (currentAlbum !== 'default') {
+                        newPhoto.customAlbum = currentAlbum;
+                    }
+                    // Default 相簿不需要設置 customAlbum（保持 undefined）
+                    
+                    return newPhoto;
+                } catch (error) {
+                    showToast('處理照片時發生錯誤：' + error.message);
+                    return null;
+                }
+            })).then(newPhotos => {
+                // 過濾掉失敗的照片
+                const validPhotos = newPhotos.filter(p => p !== null);
+                if (validPhotos.length === 0) {
+                    fileInput.value = '';
+                    return;
+                }
+                
+                // 添加到 allPhotos
+                allPhotos.push(...validPhotos);
+                
+                try {
+                    localStorage.setItem('all_photos', JSON.stringify(allPhotos));
+                    showToast(`已成功上傳 ${validPhotos.length} 張照片！`);
+                    loadPhotos();
+                    fileInput.value = '';
+                } catch (e) {
+                    if (e.name === 'QuotaExceededError') {
+                        showToast('儲存空間不足，無法保存照片。請刪除一些照片後再試。');
+                        // 移除已添加但未保存的照片
+                        allPhotos = allPhotos.filter(p => !validPhotos.some(vp => vp.id === p.id));
+                    } else {
+                        showToast('保存照片時發生錯誤：' + e.message);
+                    }
+                    fileInput.value = '';
+                }
+            });
         });
 
         function loadPhotos() {
-            photoGrid.innerHTML = ''; 
-            let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
-            allPhotos.sort((a, b) => isAscending ? a.id - b.id : b.id - a.id);
-            
-            // 載入真實照片
-            allPhotos.forEach(photo => addPhotoToGrid(photo.src, photo.id, photo.name, photo.tag, true));
-            
-            // 載入 40 張範例照片
-            for (let i = 0; i < 40; i++) {
-                const exampleUrl = `https://picsum.photos/id/${i+18}/200/200`;
-                addPhotoToGrid(exampleUrl, `ex-${i}`, `範例 ${i}`, '範例', false);
+            try {
+                photoGrid.innerHTML = ''; 
+                let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+                
+                // 獲取當前相簿名稱（從 URL 參數）
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentAlbum = urlParams.get('album') || 'default';
+                
+                // 根據相簿過濾照片
+                let filteredPhotos = [];
+                if (currentAlbum === 'default') {
+                    // Default 相簿：顯示沒有 customAlbum 且沒有 restaurant 的照片
+                    filteredPhotos = allPhotos.filter(p => !p.restaurant && !p.customAlbum);
+                } else {
+                    // 自訂相簿：顯示 customAlbum 等於當前相簿名稱的照片
+                    filteredPhotos = allPhotos.filter(p => p.customAlbum === currentAlbum);
+                }
+                
+                // 更新相簿標題
+                const albumTitle = document.querySelector('.album-title');
+                if (albumTitle) {
+                    albumTitle.textContent = currentAlbum === 'default' ? 'Default 相簿' : currentAlbum;
+                }
+                
+                // 先載入 40 張範例照片（放在最上面，僅在 Default 相簿顯示）
+                if (currentAlbum === 'default') {
+                    for (let i = 0; i < 40; i++) {
+                        const exampleUrl = `https://picsum.photos/id/${i+18}/200/200`;
+                        addPhotoToGrid(exampleUrl, `ex-${i}`, `範例 ${i}`, '範例', false);
+                    }
+                }
+                
+                // 對真實照片進行排序：最新的在下面
+                // isAscending = true 表示舊到新（升序，舊的在上新的在下），false 表示新到舊（降序，新的在上舊的在下）
+                filteredPhotos.sort((a, b) => isAscending ? a.id - b.id : b.id - a.id);
+                
+                // 載入真實照片（放在範例照片下面）
+                filteredPhotos.forEach(photo => {
+                    if (photo && photo.src) {
+                        addPhotoToGrid(photo.src, photo.id, photo.name || '', photo.tag || '', true);
+                    }
+                });
+                
+                const exampleCount = currentAlbum === 'default' ? 40 : 0;
+                totalCountDisplay.textContent = (filteredPhotos.length + exampleCount) + ' 張照片';
+            } catch (e) {
+                console.error('載入照片時發生錯誤：', e);
+                showToast('載入照片時發生錯誤，請重新整理頁面');
             }
-            totalCountDisplay.textContent = (allPhotos.length + 40) + ' 張照片';
+        }
+        
+        function handleSort() {
+            isAscending = !isAscending;
+            loadPhotos();
+            showToast(isAscending ? "排序：舊到新" : "排序：新到舊");
         }
 
         function addPhotoToGrid(src, id, name, tag, isReal) {
@@ -321,11 +738,41 @@
             div.innerHTML = `<img src="${src}" class="photo-img"><div class="selection-overlay"></div>`;
             div.onclick = () => {
                 if (photoGrid.classList.contains('searching')) { clearSearch(); return; }
-                if (isSelectMode) { div.classList.toggle('selected'); updateCountDisplay(); } 
-                else if (isReal) {
+                const isSelectingForArticle = localStorage.getItem('select_photo_for_article') === 'true';
+                
+                if (isSelectingForArticle) {
+                    const currentSelected = document.querySelectorAll('.photo-item.selected').length;
+                    if (div.classList.contains('selected')) {
+                        div.classList.remove('selected');
+                    } else {
+                        if (currentSelected >= 4) {
+                            showToast("最多只能選擇 4 張照片");
+                            return;
+                        }
+                        div.classList.add('selected');
+                    }
+                    updateCountDisplay();
+                } else if (isSelectMode) {
+                    div.classList.toggle('selected');
+                    updateCountDisplay();
+                } else if (isReal) {
                     const allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
                     const photo = allPhotos.find(p => p.id == id);
-                    if (photo) { localStorage.setItem('temp_photo_data', JSON.stringify(photo)); window.location.href = 'photo_info.html'; }
+                    if (photo) { 
+                        localStorage.setItem('temp_photo_data', JSON.stringify(photo));
+                        
+                        // 獲取當前相簿名稱（從 URL 參數）
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const currentAlbum = urlParams.get('album') || 'default';
+                        
+                        // 設置返回 URL，包含相簿參數
+                        const returnUrl = currentAlbum === 'default' 
+                            ? 'photo.html' 
+                            : `photo.html?album=${encodeURIComponent(currentAlbum)}`;
+                        localStorage.setItem('photo_info_return_url', returnUrl);
+                        
+                        window.location.href = 'photo_info.html'; 
+                    }
                 }
             };
             photoGrid.appendChild(div);
@@ -359,20 +806,63 @@
         function updateCountDisplay() {
             const count = document.querySelectorAll('.photo-item.selected').length;
             selectToggle.textContent = count > 0 ? `選取 (${count})` : '選取';
-            let i = 1;
-            document.querySelectorAll('.photo-item.selected .selection-overlay').forEach(el => el.textContent = i++);
+            // 不再顯示計數，只顯示打勾圖標
         }
 
-        selectToggle.onclick = () => {
-            isSelectMode = !isSelectMode;
-            if (isSelectMode) { mainBody.classList.add('select-mode'); selectToggle.textContent = '取消'; selectToggle.classList.add('active'); } 
-            else { clearSelection(); }
-        };
+        const isSelectingForArticle = localStorage.getItem('select_photo_for_article') === 'true';
+        if (isSelectingForArticle) {
+            isSelectMode = true;
+            mainBody.classList.add('select-mode');
+            selectToggle.textContent = '取消';
+            selectToggle.classList.add('active');
+            
+            selectToggle.onclick = () => {
+                const selected = document.querySelectorAll('.photo-item.selected');
+                if (selected.length > 0) {
+                    const allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
+                    const selectedPhotos = [];
+                    selected.forEach(item => {
+                        const photoId = item.getAttribute('data-id');
+                        const photo = allPhotos.find(p => p.id == photoId || p.id == parseInt(photoId));
+                        if (photo && selectedPhotos.length < 4) {
+                            if (!photo.lat || !photo.lng) {
+                                const baseLocation = selectedPhotos.length > 0 && selectedPhotos[0].lat ? 
+                                    { lat: selectedPhotos[0].lat, lng: selectedPhotos[0].lng } : 
+                                    { lat: 22.732775, lng: 120.288438 };
+                                photo.lat = baseLocation.lat + (Math.random() - 0.5) * 0.002;
+                                photo.lng = baseLocation.lng + (Math.random() - 0.5) * 0.002;
+                            }
+                            selectedPhotos.push(photo);
+                        }
+                    });
+                    
+                    if (selectedPhotos.length > 4) {
+                        showToast("最多只能選擇 4 張照片");
+                        return;
+                    }
+                    
+                    if (selectedPhotos.length > 0) {
+                        localStorage.setItem('selected_photos_for_article', JSON.stringify(selectedPhotos));
+                        localStorage.removeItem('select_photo_for_article');
+                        window.location.href = 'article-post.html';
+                    }
+                } else {
+                    localStorage.removeItem('select_photo_for_article');
+                    window.location.href = 'article-post.html';
+                }
+            };
+        } else {
+            selectToggle.onclick = () => {
+                isSelectMode = !isSelectMode;
+                if (isSelectMode) { mainBody.classList.add('select-mode'); selectToggle.textContent = '取消'; selectToggle.classList.add('active'); } 
+                else { clearSelection(); }
+            };
+        }
 
         document.getElementById('openMoreBtn').onclick = (e) => { e.stopPropagation(); moreDropdown.style.display = moreDropdown.style.display === 'flex' ? 'none' : 'flex'; };
         document.body.onclick = () => { moreDropdown.style.display = 'none'; };
         document.getElementById('openSearchBtn').onclick = () => openOrangeModal('search');
-        document.getElementById('openSortBtn').onclick = () => { isAscending = !isAscending; loadPhotos(); showToast(isAscending ? "排序：舊到新" : "排序：新到舊"); };
+        document.getElementById('openSortBtn').onclick = () => handleSort();
 
         loadPhotos();
     </script>

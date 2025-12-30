@@ -18,8 +18,18 @@
 
         .title-section { display: flex; align-items: center; gap: 10px; font-size: 22px; color: #333; margin-top: 5px; }
 
-        /* 社群圖示列 */
-        .social-group { display: flex; gap: 12px; margin: 10px 0; overflow-x: auto; padding-bottom: 5px; }
+        .social-group {
+            display: flex;
+            gap: 12px;
+            margin: 10px 0 15px 0;
+            overflow-x: auto;
+            padding: 10px 0 15px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .social-group::-webkit-scrollbar {
+            display: none;
+        }
         .social-item { position: relative; width: 60px; height: 60px; flex-shrink: 0; cursor: pointer; transition: all 0.3s ease; }
         .social-item.unbind { filter: grayscale(100%); opacity: 0.4; }
         .social-item.bind { filter: grayscale(0%); opacity: 1; transform: scale(1.05); }
@@ -44,40 +54,127 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
         }
 
-        /* 文字輸入區 (上方) */
-        textarea { 
-            width: 100%; 
+        textarea {
+            width: 100%;
             min-height: 150px;
-            border: none; 
-            outline: none; 
-            resize: none; 
-            font-size: 17px; 
-            color: #333; 
-            line-height: 1.6; 
+            border: none;
+            outline: none;
+            resize: none;
+            font-size: 17px;
+            color: #333;
+            line-height: 1.6;
             background: transparent;
             margin-bottom: 15px;
         }
+        textarea::placeholder {
+            color: #999;
+        }
 
-        /* 圖片預覽區 (下方) */
-        .image-preview-container { 
-            width: 100%; 
-            display: none; 
-            position: relative; 
-            margin-top: auto; /* 確保在有空間時推到下方 */
+        .image-preview-container {
+            width: 100%;
+            display: none;
+            position: relative;
+            margin-top: auto;
             padding-top: 10px;
         }
-        .preview-img { 
-            width: 100%; 
-            border-radius: 12px; 
-            object-fit: cover; 
-            max-height: 250px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .preview-slider {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 12px;
+            margin-bottom: 10px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .preview-slider::-webkit-scrollbar {
+            display: none;
+        }
+        .preview-item {
+            position: relative;
+            flex: 0 0 calc(100% - 12px);
+            min-width: calc(100% - 12px);
+            aspect-ratio: 4/3;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #eee;
+            scroll-snap-align: start;
+            border: 2px solid transparent;
+        }
+        .preview-item.error {
+            border: 2px solid #ff4444;
+        }
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
         }
         .remove-img-btn {
-            position: absolute; top: 20px; right: 10px;
-            background: rgba(0,0,0,0.6); color: white;
-            border: none; border-radius: 50%; width: 28px; height: 28px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            z-index: 10;
+        }
+        .photo-location-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .photo-location-item {
+            font-size: 12px;
+            color: #666;
+            padding: 8px 12px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .photo-location-item.error {
+            background: #ffe6e6;
+            color: #ff4444;
+            border: 1px solid #ff9999;
+        }
+        .photo-location-item i {
+            color: #FFB352;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .photo-location-item.error i {
+            color: #ff4444;
+        }
+        .location-delete-btn {
+            margin-left: auto;
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff4444;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .location-delete-btn:hover {
+            background: rgba(255, 0, 0, 0.2);
+        }
+        .error-message {
+            font-size: 11px;
+            color: #ff4444;
+            margin-top: 4px;
+            font-weight: 600;
         }
 
         /* 工具列 */
@@ -128,18 +225,20 @@
         </div>
 
         <div class="post-content-wrapper">
-            <textarea id="articleContent" placeholder="在此輸入文章內容..."></textarea>
+            <textarea id="articleContent" placeholder="[title] 輸入文章標題&#10;&#10;在此輸入文章內容..."></textarea>
 
             <div id="imagePreviewContainer" class="image-preview-container">
-                <img id="previewImg" class="preview-img" src="">
-                <button class="remove-img-btn" onclick="removeImage()">✕</button>
+                <div class="preview-slider" id="previewSlider"></div>
+                <div class="photo-location-list" id="photoLocationList"></div>
             </div>
 
             <div class="toolbar">
                 <div class="tool-btn" onclick="goToAlbum()"><i class="fa-regular fa-image"></i></div>
                 <div class="tool-btn" onclick="triggerCamera()"><i class="fa-solid fa-camera"></i></div>
-                <a href="article-generate.html" class="tool-btn"><i class="fa-solid fa-list-check"></i></a>
-                <div class="tool-btn" onclick="resetContent()"><i class="fa-solid fa-rotate-left"></i></div>
+                <a href="article-generate.html" class="tool-btn"><i class="fa-solid fa-wand-magic-sparkles"></i></a>
+                <div class="tool-btn" onclick="undoContent()" title="復原" id="undoBtn"><i class="fa-solid fa-rotate-left"></i></div>
+                <div class="tool-btn" onclick="redoContent()" title="重做" id="redoBtn" style="opacity: 0.4; cursor: not-allowed;"><i class="fa-solid fa-rotate-right"></i></div>
+                <div class="tool-btn" onclick="resetContent()" title="清除全部"><i class="fa-solid fa-trash"></i></div>
             </div>
         </div>
     </div>
@@ -158,51 +257,249 @@
 
     <script>
         const platforms = ['Facebook', 'Instagram', 'Threads', 'X', 'BlueSky'];
+        const MAX_PHOTOS = 4;
+        const MAX_DISTANCE_METERS = 500;
 
-window.onload = () => {
-    initSocialIcons();
-    loadDraftPhoto(); 
-    loadDraftContent(); // 新增：頁面載入時讀取暫存的文章內容
-};
+        let photos = [];
 
-function loadDraftContent() {
-    // 從 localStorage 取得剛才在 AI 小幫手生成並儲存的內容
-    const content = localStorage.getItem('articleContent');
-    if (content) {
-        // 將內容填入 textarea
-        document.getElementById('articleContent').value = content;
-    }
-}
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
 
-        // --- 圖片預覽與連動邏輯 ---
-        function loadDraftPhoto() {
-            const draft = localStorage.getItem('draft_photo');
-            if (draft) {
-                const photo = JSON.parse(draft);
-                showPreview(photo.src);
+        function checkPhotoDistance(newLat, newLng) {
+            if (photos.length === 0) return true;
+            
+            for (let photo of photos) {
+                if (photo.lat && photo.lng) {
+                    const distance = calculateDistance(photo.lat, photo.lng, newLat, newLng);
+                    if (distance > MAX_DISTANCE_METERS) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        window.onload = () => {
+            initSocialIcons();
+            loadDraftPhotos();
+            
+            setTimeout(() => {
+                loadDraftContent();
+                const currentContent = document.getElementById('articleContent').value;
+                
+                if (contentHistory.length === 0) {
+                    if (currentContent) {
+                        contentHistory = [currentContent];
+                        historyIndex = 0;
+                    } else {
+                        contentHistory = [''];
+                        historyIndex = 0;
+                    }
+                }
+                updateUndoRedoButtons();
+            }, 50);
+        };
+
+        window.addEventListener('focus', () => {
+            loadDraftPhotos();
+            const savedContent = localStorage.getItem('articleContent');
+            if (savedContent) {
+                const currentContent = document.getElementById('articleContent').value;
+                // 只有当当前内容为空时才恢复保存的内容，避免覆盖用户正在输入的内容
+                if (!currentContent || currentContent.trim() === '') {
+                    if (contentHistory.length === 0) {
+                        contentHistory = [savedContent];
+                        historyIndex = 0;
+                    } else if (contentHistory[contentHistory.length - 1] !== savedContent) {
+                        contentHistory.push(savedContent);
+                        historyIndex = contentHistory.length - 1;
+                    }
+                    document.getElementById('articleContent').value = savedContent;
+                    updateUndoRedoButtons();
+                } else {
+                    // 如果当前有内容，更新 localStorage 保存当前内容
+                    localStorage.setItem('articleContent', currentContent);
+                }
+            }
+        });
+
+        function loadDraftContent() {
+            const content = localStorage.getItem('articleContent');
+            if (content) {
+                const currentValue = document.getElementById('articleContent').value;
+                document.getElementById('articleContent').value = content;
+                if (contentHistory.length === 0) {
+                    if (currentValue && currentValue !== content) {
+                        contentHistory = [currentValue, content];
+                        historyIndex = 1;
+                    } else {
+                        contentHistory = [content];
+                        historyIndex = 0;
+                    }
+                } else if (contentHistory[contentHistory.length - 1] !== content) {
+                    if (currentValue && currentValue !== content && currentValue !== contentHistory[contentHistory.length - 1]) {
+                        contentHistory.push(currentValue);
+                    }
+                    contentHistory.push(content);
+                    historyIndex = contentHistory.length - 1;
+                }
             }
         }
 
-        function showPreview(src) {
-            const container = document.getElementById('imagePreviewContainer');
-            const img = document.getElementById('previewImg');
-            img.src = src;
-            container.style.display = 'block';
+        function loadDraftPhotos() {
+            const selectedPhotos = localStorage.getItem('selected_photos_for_article');
+            if (selectedPhotos) {
+                const photosToAdd = JSON.parse(selectedPhotos);
+                photosToAdd.forEach(photo => {
+                    const existingIndex = photos.findIndex(p => p.id === photo.id);
+                    if (existingIndex === -1 && photos.length < MAX_PHOTOS) {
+                        if (!photo.lat || !photo.lng) {
+                            const baseLocation = photos.length > 0 && photos[0].lat ? 
+                                { lat: photos[0].lat, lng: photos[0].lng } : 
+                                { lat: 22.732775, lng: 120.288438 };
+                            photo.lat = baseLocation.lat + (Math.random() - 0.5) * 0.002;
+                            photo.lng = baseLocation.lng + (Math.random() - 0.5) * 0.002;
+                        }
+                        photos.push(photo);
+                    }
+                });
+                if (photos.length === 4 && photos[3]) {
+                    photos[3].lat = 25.0330;
+                    photos[3].lng = 121.5654;
+                }
+                localStorage.removeItem('selected_photos_for_article');
+                updatePreview();
+                saveDraftPhotos();
+            } else {
+                const draft = localStorage.getItem('draft_photo');
+                if (draft) {
+                    const photo = JSON.parse(draft);
+                    const existingIndex = photos.findIndex(p => p.id === photo.id);
+                    if (existingIndex === -1) {
+                        if (!photo.lat || !photo.lng) {
+                            const baseLocation = photos.length > 0 && photos[0].lat ? 
+                                { lat: photos[0].lat, lng: photos[0].lng } : 
+                                { lat: 22.732775, lng: 120.288438 };
+                            photo.lat = baseLocation.lat + (Math.random() - 0.5) * 0.002;
+                            photo.lng = baseLocation.lng + (Math.random() - 0.5) * 0.002;
+                        }
+                        if (photos.length < MAX_PHOTOS) {
+                            photos.push(photo);
+                            if (photos.length === 4) {
+                                photo.lat = 25.0330;
+                                photo.lng = 121.5654;
+                            }
+                            updatePreview();
+                            saveDraftPhotos();
+                        } else {
+                            alert(`最多只能上傳 ${MAX_PHOTOS} 張照片`);
+                        }
+                    }
+                }
+            }
         }
 
-        function removeImage() {
-            localStorage.removeItem('draft_photo');
-            document.getElementById('imagePreviewContainer').style.display = 'none';
+        function updatePreview() {
+            const container = document.getElementById('imagePreviewContainer');
+            const slider = document.getElementById('previewSlider');
+            const locationList = document.getElementById('photoLocationList');
+            
+            if (photos.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            slider.innerHTML = '';
+            locationList.innerHTML = '';
+            
+            photos.forEach((photo, index) => {
+                const isError = index === 3;
+                const item = document.createElement('div');
+                item.className = 'preview-item' + (isError ? ' error' : '');
+                item.innerHTML = `
+                    <img src="${photo.src}" class="preview-img" alt="照片${index + 1}">
+                    <button class="remove-img-btn" onclick="removePhoto(${index})">✕</button>
+                `;
+                slider.appendChild(item);
+                
+                const locationItem = document.createElement('div');
+                locationItem.className = 'photo-location-item' + (isError ? ' error' : '');
+                if (isError) {
+                    locationItem.innerHTML = `
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <div style="flex: 1;">
+                            <div>照片 ${index + 1}: 緯度 ${photo.lat.toFixed(6)}, 經度 ${photo.lng.toFixed(6)}</div>
+                            <div class="error-message">經緯度錯誤，請更換照片</div>
+                        </div>
+                        <button class="location-delete-btn" onclick="removePhoto(${index})">刪除</button>
+                    `;
+                } else {
+                    locationItem.innerHTML = `
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span style="flex: 1;">照片 ${index + 1}: 緯度 ${photo.lat.toFixed(6)}, 經度 ${photo.lng.toFixed(6)}</span>
+                        <button class="location-delete-btn" onclick="removePhoto(${index})">刪除</button>
+                    `;
+                }
+                locationList.appendChild(locationItem);
+            });
+        }
+
+        function removePhoto(index) {
+            photos.splice(index, 1);
+            updatePreview();
+            saveDraftPhotos();
+        }
+
+        function saveDraftPhotos() {
+            if (photos.length > 0) {
+                localStorage.setItem('draft_photo', JSON.stringify(photos[0]));
+            } else {
+                localStorage.removeItem('draft_photo');
+            }
         }
 
         function goToAlbum() {
+            // 保存当前内容到 localStorage，防止丢失
+            const currentContent = document.getElementById('articleContent').value;
+            if (currentContent) {
+                localStorage.setItem('articleContent', currentContent);
+            }
+            localStorage.setItem('select_photo_for_article', 'true');
             window.location.href = 'photo.html';
         }
 
         // --- 相機與 HEIC 處理邏輯 ---
         const cameraInput = document.getElementById('cameraInput');
 
+        function generateRandomLocation(baseLat, baseLng) {
+            const offset = 0.001;
+            return {
+                lat: baseLat + (Math.random() - 0.5) * offset * 2,
+                lng: baseLng + (Math.random() - 0.5) * offset * 2
+            };
+        }
+
         function triggerCamera() {
+            // 保存当前内容到 localStorage，防止丢失
+            const currentContent = document.getElementById('articleContent').value;
+            if (currentContent) {
+                localStorage.setItem('articleContent', currentContent);
+            }
+            
+            const baseLocation = photos.length > 0 && photos[0].lat ? 
+                { lat: photos[0].lat, lng: photos[0].lng } : 
+                { lat: 22.732775, lng: 120.288438 };
+            
+            window.currentCapturePos = generateRandomLocation(baseLocation.lat, baseLocation.lng);
             cameraInput.click();
         }
 
@@ -210,8 +507,32 @@ function loadDraftContent() {
             const file = e.target.files[0];
             if (!file) return;
 
+            if (photos.length >= MAX_PHOTOS) {
+                alert(`最多只能上傳 ${MAX_PHOTOS} 張照片`);
+                e.target.value = '';
+                return;
+            }
+
             let blob = file;
-            // 如果是 HEIC 格式則進行轉換
+            let capturedLocation = window.currentCapturePos;
+            
+            if (!capturedLocation) {
+                const baseLocation = photos.length > 0 && photos[0].lat ? 
+                    { lat: photos[0].lat, lng: photos[0].lng } : 
+                    { lat: 22.732775, lng: 120.288438 };
+                capturedLocation = generateRandomLocation(baseLocation.lat, baseLocation.lng);
+            }
+
+            if (photos.length > 0 && photos.length < 3 && !checkPhotoDistance(capturedLocation.lat, capturedLocation.lng)) {
+                alert('照片位置距離太遠，請上傳相近位置的照片');
+                e.target.value = '';
+                return;
+            }
+            
+            if (photos.length === 3) {
+                capturedLocation = { lat: 25.0330, lng: 121.5654 };
+            }
+            
             if (file.type.includes("heic") || file.name.toLowerCase().endsWith(".heic")) {
                 try {
                     blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.7 });
@@ -225,7 +546,6 @@ function loadDraftContent() {
             reader.onload = (event) => {
                 const img = new Image();
                 img.onload = () => {
-                    // 壓縮圖片
                     const canvas = document.createElement('canvas');
                     const maxWidth = 1024;
                     let w = img.width, h = img.height;
@@ -235,12 +555,24 @@ function loadDraftContent() {
                     
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
                     
-                    // 存入草稿並顯示預覽
-                    const newPhoto = { src: dataUrl, date: '今日', id: Date.now() };
-                    localStorage.setItem('draft_photo', JSON.stringify(newPhoto));
-                    showPreview(dataUrl);
+                    const newPhoto = {
+                        src: dataUrl,
+                        date: '今日',
+                        id: Date.now(),
+                        lat: capturedLocation.lat,
+                        lng: capturedLocation.lng,
+                        addr: '照片位置'
+                    };
+                    
+                    if (photos.length === 3) {
+                        newPhoto.lat = 25.0330;
+                        newPhoto.lng = 121.5654;
+                    }
+                    
+                    photos.push(newPhoto);
+                    updatePreview();
+                    saveDraftPhotos();
 
-                    // 同步更新相簿
                     let allPhotos = JSON.parse(localStorage.getItem('all_photos') || '[]');
                     allPhotos.push(newPhoto);
                     localStorage.setItem('all_photos', JSON.stringify(allPhotos));
@@ -248,6 +580,7 @@ function loadDraftContent() {
                 img.src = event.target.result;
             };
             reader.readAsDataURL(blob);
+            e.target.value = '';
         });
 
         // --- 社交平台狀態邏輯 ---
@@ -266,43 +599,174 @@ function loadDraftContent() {
             initSocialIcons();
         }
 
-        // --- 發佈與 Modal ---
-        function openModal() { document.getElementById('publishModal').classList.add('show'); }
-        function closeModal() { document.getElementById('publishModal').classList.remove('show'); }
-        function confirmPublish() { 
-            alert('文章已同步發佈至選中平台！'); 
-            localStorage.removeItem('draft_photo');
-            window.location.href = 'index.html';
+        function openModal() {
+            document.getElementById('publishModal').classList.add('show');
         }
-        function resetContent() { 
-            if(confirm('確定清除內容與圖片？')) { 
-                document.getElementById('articleContent').value = ''; 
-                removeImage(); 
-            } 
+        
+        function closeModal() {
+            document.getElementById('publishModal').classList.remove('show');
         }
-        function goToAIHelper() {
-    // 獲取目前文字框的內容
-    const content = document.getElementById('articleContent').value;
-    // 儲存到本地，讓 AI 小幫手能讀取
-    localStorage.setItem('articleContent', content);
-    window.location.href = 'article-generate.html';
-}
-// 修改 confirmPublish 函數
-function confirmPublish() { 
-    alert('文章已同步發佈至選中平台！'); 
-    localStorage.removeItem('draft_photo');
-    localStorage.removeItem('articleContent'); // 發佈後清除暫存內容
-    window.location.href = 'index.html';
-}
+        function hasLocationError() {
+            return photos.some((photo, index) => {
+                if (index === 3) {
+                    const baseLocation = photos.length > 0 && photos[0].lat ? 
+                        { lat: photos[0].lat, lng: photos[0].lng } : 
+                        { lat: 22.732775, lng: 120.288438 };
+                    const distance = calculateDistance(baseLocation.lat, baseLocation.lng, photo.lat, photo.lng);
+                    return distance > MAX_DISTANCE_METERS;
+                }
+                return false;
+            });
+        }
 
-// 修改 resetContent 函數
-function resetContent() { 
-    if(confirm('確定清除內容與圖片？')) { 
-        document.getElementById('articleContent').value = ''; 
-        localStorage.removeItem('articleContent'); // 清除文字框時也同步清除快取
-        removeImage(); 
-    } 
-}
+        function confirmPublish() {
+            const content = document.getElementById('articleContent').value.trim();
+            
+            if (photos.length === 0) {
+                alert('發佈文章必須要有照片！');
+                return;
+            }
+            
+            if (hasLocationError()) {
+                alert('有照片的經緯度錯誤，請更換錯誤的照片後再發佈！');
+                return;
+            }
+            
+            if (!photos[0].lat || !photos[0].lng) {
+                alert('發佈文章必須要有地點資訊！');
+                return;
+            }
+            
+            const articleData = {
+                id: Date.now(),
+                content: content,
+                photos: photos,
+                location: {
+                    lat: photos[0].lat,
+                    lng: photos[0].lng,
+                    addr: '照片位置',
+                    source: 'photo'
+                },
+                time: new Date().toISOString(),
+                platforms: platforms.filter(p => localStorage.getItem('social_' + p) === 'bind'),
+                heart: 0
+            };
+            
+            let allArticles = JSON.parse(localStorage.getItem('all_articles') || '[]');
+            allArticles.push(articleData);
+            localStorage.setItem('all_articles', JSON.stringify(allArticles));
+            
+            alert('文章已同步發佈至選中平台！');
+            photos = [];
+            localStorage.removeItem('draft_photo');
+            localStorage.removeItem('articleContent');
+            localStorage.removeItem('article_restaurant');
+            // 跳转到文章详情页，传递来源页面
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromPage = urlParams.get('from') || 'article.html';
+            window.location.href = `article-detail.html?id=${articleData.id}&from=${encodeURIComponent(fromPage)}`;
+        }
+
+        let contentHistory = [];
+        let historyIndex = -1;
+        let isUndoing = false;
+
+        function undoContent() {
+            if (historyIndex > 0) {
+                const currentValue = document.getElementById('articleContent').value;
+                if (historyIndex === contentHistory.length - 1 && contentHistory[historyIndex] !== currentValue) {
+                    contentHistory.push(currentValue);
+                }
+                historyIndex--;
+                isUndoing = true;
+                document.getElementById('articleContent').value = contentHistory[historyIndex];
+                updateUndoRedoButtons();
+                setTimeout(() => { isUndoing = false; }, 100);
+            } else {
+                alert('沒有可復原的內容');
+            }
+        }
+
+        function redoContent() {
+            if (historyIndex < contentHistory.length - 1) {
+                historyIndex++;
+                isUndoing = true;
+                document.getElementById('articleContent').value = contentHistory[historyIndex];
+                updateUndoRedoButtons();
+                setTimeout(() => { isUndoing = false; }, 100);
+            } else {
+                alert('沒有可重做的內容');
+            }
+        }
+
+        function updateUndoRedoButtons() {
+            const undoBtn = document.getElementById('undoBtn');
+            const redoBtn = document.getElementById('redoBtn');
+            
+            if (historyIndex > 0) {
+                undoBtn.style.opacity = '1';
+                undoBtn.style.cursor = 'pointer';
+            } else {
+                undoBtn.style.opacity = '0.4';
+                undoBtn.style.cursor = 'not-allowed';
+            }
+            
+            if (historyIndex < contentHistory.length - 1) {
+                redoBtn.style.opacity = '1';
+                redoBtn.style.cursor = 'pointer';
+            } else {
+                redoBtn.style.opacity = '0.4';
+                redoBtn.style.cursor = 'not-allowed';
+            }
+        }
+
+        function resetContent() {
+            if(confirm('確定清除內容與圖片？')) {
+                document.getElementById('articleContent').value = '';
+                localStorage.removeItem('articleContent');
+                photos = [];
+                contentHistory = [''];
+                historyIndex = 0;
+                updatePreview();
+                saveDraftPhotos();
+                updateUndoRedoButtons();
+            }
+        }
+
+        const articleContentInput = document.getElementById('articleContent');
+        let contentTimer = null;
+        
+        function saveToHistory(content) {
+            if (isUndoing) return;
+            
+            if (historyIndex < contentHistory.length - 1) {
+                contentHistory = contentHistory.slice(0, historyIndex + 1);
+            }
+            
+            if (contentHistory.length === 0 || contentHistory[contentHistory.length - 1] !== content) {
+                contentHistory.push(content);
+                historyIndex = contentHistory.length - 1;
+                
+                if (contentHistory.length > 20) {
+                    contentHistory.shift();
+                    historyIndex--;
+                }
+                updateUndoRedoButtons();
+            }
+        }
+        
+        articleContentInput.addEventListener('input', function() {
+            const currentContent = this.value;
+            // 实时保存内容到 localStorage，防止丢失
+            localStorage.setItem('articleContent', currentContent);
+            if (contentTimer) clearTimeout(contentTimer);
+            contentTimer = setTimeout(() => {
+                saveToHistory(currentContent);
+            }, 500);
+        });
+        
+        // 第二个 focus 事件监听器已移除，避免重复处理
+        
 
     </script>
 </body>

@@ -12,20 +12,105 @@
         body, html { 
             height: 100%; width: 100%; 
             font-family: "Microsoft JhengHei", -apple-system, sans-serif; 
-            background: #FFF3E0; 
-            overflow-y: auto; 
+            background: #000; 
+            overflow: hidden; 
         }
-        .photo-header { width: 100%; height: 50vh; position: relative; background: #000; }
-        .display-img { width: 100%; height: 100%; object-fit: contain; background: #000; }
-        .back-btn { position: absolute; top: 20px; left: 20px; font-size: 30px; color: white; cursor: pointer; z-index: 10; }
+        .photo-header { 
+            width: 100%; 
+            height: 100vh; 
+            position: relative; 
+            background: #000; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .photo-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .display-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            background: #000; 
+        }
+        .back-btn { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            font-size: 30px; 
+            color: white; 
+            cursor: pointer; 
+            z-index: 100; 
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 左右切換按鈕 */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 100;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        .nav-btn:hover { opacity: 1; }
+        .nav-btn.prev { left: 20px; }
+        .nav-btn.next { right: 20px; }
+        .nav-btn.hidden { display: none; }
         
         .info-card { 
             background: #FFF3E0; 
             border-radius: 30px 30px 0 0; 
-            margin-top: -30px; 
-            padding: 30px 20px 80px; 
-            position: relative; 
-            z-index: 1; 
+            padding: 20px 20px 80px; 
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 50;
+            transform: translateY(calc(100% - 60px));
+            transition: transform 0.3s ease-out;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+        }
+        .info-card.expanded {
+            transform: translateY(0);
+        }
+        .info-card-handle {
+            width: 50px;
+            height: 5px;
+            background: #ccc;
+            border-radius: 3px;
+            margin: 10px auto 15px auto;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .info-card-handle:hover {
+            background: #999;
         }
         
         .title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -46,7 +131,10 @@
             position: relative;
             cursor: pointer; /* 讓滑鼠移上去顯示手型，提示可以點擊 */
         }
-        #miniMap { height: 100%; width: 100%; }
+        #miniMap { 
+            height: 100%; 
+            width: 100%; 
+        }
 
         .address-overlay {
             position: absolute;
@@ -71,19 +159,24 @@
 <body>
     <div class="photo-header">
         <div class="back-btn" onclick="goBack()"><i class="fa-solid fa-xmark"></i></div>
-        <img id="mainImg" class="display-img" src="" alt="照片載入中...">
+        <div class="photo-container">
+            <div class="nav-btn prev" id="prevBtn" onclick="navigatePhoto(-1)"><i class="fa-solid fa-chevron-left"></i></div>
+            <img id="mainImg" class="display-img" src="" alt="照片載入中...">
+            <div class="nav-btn next" id="nextBtn" onclick="navigatePhoto(1)"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
     </div>
 
-    <div class="info-card">
+    <div class="info-card" id="infoCard">
+        <div class="info-card-handle" onclick="toggleInfoCard()"></div>
         <div class="title-bar">
             <div class="photo-title" id="photoTitle">載入中...</div>
             <button class="post-btn" onclick="writeArticle()">撰寫文章</button>
         </div>
         <div class="info-text" id="photoDetailText"></div>
-        <div class="tags-container"><div class="tag-btn">#Luffy</div><div class="tag-btn">#寵物咖啡廳</div><div class="tag-btn">#寵物友善</div></div>
+        <div class="tags-container" id="tagsContainer"></div>
         <div class="description">在熱騰騰的餐桌上，香氣四溢的料理總是最能療癒味蕾...</div>
 
-        <div class="mini-map-container" onclick="goBack()">
+        <div class="mini-map-container" id="miniMapContainer" onclick="goToLocation()">
             <div id="miniMap"></div>
             <div class="address-overlay">某甲市 某乙區 某丙路</div>
         </div>
@@ -91,60 +184,299 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
+        // 等待 Leaflet 加载完成
+        if (typeof L === 'undefined') {
+            console.error('Leaflet 庫未加載');
+        }
         let photo = null;
+        let allPhotos = [];
+        let currentPhotoIndex = 0;
         const fixedLocation = [22.732775288093578, 120.2884383523927];
 
-        window.onload = () => {
-            const tempData = localStorage.getItem('temp_photo_data');
-            if (!tempData) {
-                alert("無法載入照片，請重新拍照");
-                window.location.href = 'index.html';
+        function goToLocation() {
+            // 跳轉到 index.html 並顯示該位置
+            const lat = fixedLocation[0];
+            const lng = fixedLocation[1];
+            window.location.href = `index.html?lat=${lat}&lng=${lng}`;
+        }
+
+        function loadPhotoData(photoData) {
+            if (!photoData || !photoData.src) {
+                console.error('照片資料無效');
                 return;
             }
-
-            try {
-                photo = JSON.parse(tempData);
-                document.getElementById('mainImg').src = photo.src;
-                document.getElementById('photoTitle').textContent = photo.date + " 的紀錄";
-                
-                document.getElementById('photoDetailText').innerHTML = `
-                    ${photo.date} ${photo.time}<br>
+            
+            photo = photoData;
+            const mainImg = document.getElementById('mainImg');
+            if (mainImg) {
+                mainImg.src = photo.src;
+            }
+            
+            // 顯示照片名稱（如果有的話，否則顯示日期）
+            const photoTitle = photo.name || (photo.date ? photo.date + " 的紀錄" : "照片");
+            const titleElement = document.getElementById('photoTitle');
+            if (titleElement) {
+                titleElement.textContent = photoTitle;
+            }
+            
+            // 顯示標籤
+            const tagsContainer = document.getElementById('tagsContainer');
+            if (tagsContainer) {
+                tagsContainer.innerHTML = '';
+                if (photo.tag && photo.tag.trim()) {
+                    // 如果標籤包含多個標籤（用空格或逗號分隔），則分別顯示
+                    const tags = photo.tag.split(/[,\s]+/).filter(t => t.trim());
+                    tags.forEach(tag => {
+                        const tagBtn = document.createElement('div');
+                        tagBtn.className = 'tag-btn';
+                        tagBtn.textContent = tag.trim().startsWith('#') ? tag.trim() : '#' + tag.trim();
+                        tagsContainer.appendChild(tagBtn);
+                    });
+                } else {
+                    // 如果沒有標籤，顯示預設標籤
+                    tagsContainer.innerHTML = '<div class="tag-btn">#Luffy</div><div class="tag-btn">#寵物咖啡廳</div><div class="tag-btn">#寵物友善</div>';
+                }
+            }
+            
+            // 獲取相簿名稱
+            const albumName = photo.customAlbum || 'Default';
+            
+            const detailElement = document.getElementById('photoDetailText');
+            if (detailElement) {
+                detailElement.innerHTML = `
+                    ${photo.date || ''} ${photo.time || ''}<br>
                     經度：${fixedLocation[1].toFixed(6)}<br>
                     緯度：${fixedLocation[0].toFixed(6)}<br>
                     拍攝位置：某甲市某乙區某丙路<br>
-                    相簿：Furry Map 隨拍<br>
-                    檔案名稱：${photo.name}
+                    相簿：${albumName}<br>
+                    檔案名稱：${photo.name || '未命名'}
                 `;
+            }
+            
+            // 不立即初始化地圖，等待 info-card 展開後再初始化
+            // 因為地圖容器在 info-card 中，需要確保容器可見
+        }
 
-                const miniMap = L.map('miniMap', { 
-                    zoomControl: false, 
-                    attributionControl: false,
-                    dragging: false,      // 禁用拖拽，讓它像一張靜態圖
-                    touchZoom: false,
-                    scrollWheelZoom: false,
-                    doubleClickZoom: false
-                }).setView(fixedLocation, 16);
+        function navigatePhoto(direction) {
+            if (allPhotos.length <= 1) return;
+            
+            currentPhotoIndex += direction;
+            if (currentPhotoIndex < 0) currentPhotoIndex = allPhotos.length - 1;
+            if (currentPhotoIndex >= allPhotos.length) currentPhotoIndex = 0;
+            
+            const newPhoto = allPhotos[currentPhotoIndex];
+            loadPhotoData(newPhoto);
+            updateNavButtons();
+            
+            // 保存當前照片到 localStorage（用於返回時保持狀態）
+            localStorage.setItem('temp_photo_data', JSON.stringify(newPhoto));
+        }
 
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(miniMap);
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (allPhotos.length <= 1) {
+                prevBtn.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+            }
+        }
 
-                L.marker(fixedLocation, {
-                    icon: L.divIcon({
-                        className: 'custom-marker',
-                        html: '<i class="fa-solid fa-location-dot" style="color:#FF9800;font-size:32px;"></i>',
-                        iconSize: [30, 30],
-                        iconAnchor: [15, 30]
-                    })
-                }).addTo(miniMap);
+        function toggleInfoCard() {
+            const infoCard = document.getElementById('infoCard');
+            infoCard.classList.toggle('expanded');
+            
+            // 當 info-card 展開時，調整地圖大小
+            if (infoCard.classList.contains('expanded')) {
+                setTimeout(() => {
+                    if (window.miniMap && typeof window.miniMap.invalidateSize === 'function') {
+                        window.miniMap.invalidateSize();
+                    }
+                }, 400); // 等待展開動畫完成
+            }
+        }
 
+        window.onload = () => {
+            try {
+                const tempData = localStorage.getItem('temp_photo_data');
+                if (!tempData) {
+                    alert("無法載入照片，請重新拍照");
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                let currentPhoto;
+                try {
+                    currentPhoto = JSON.parse(tempData);
+                } catch (parseError) {
+                    console.error('解析 temp_photo_data 失敗:', parseError);
+                    alert("照片資料格式錯誤，請重新選擇照片");
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                if (!currentPhoto || !currentPhoto.src) {
+                    alert("照片資料不完整，請重新選擇照片");
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                // 獲取當前相簿的所有照片
+                let allPhotosData = [];
+                try {
+                    const allPhotosStr = localStorage.getItem('all_photos') || '[]';
+                    allPhotosData = JSON.parse(allPhotosStr);
+                    if (!Array.isArray(allPhotosData)) {
+                        allPhotosData = [];
+                    }
+                } catch (parseError) {
+                    console.error('解析 all_photos 失敗:', parseError);
+                    allPhotosData = [];
+                }
+                
+                const currentAlbum = currentPhoto.customAlbum || 'default';
+                
+                // 根據相簿過濾照片
+                if (currentAlbum === 'default') {
+                    allPhotos = allPhotosData.filter(p => p && !p.restaurant && !p.customAlbum);
+                } else {
+                    allPhotos = allPhotosData.filter(p => p && p.customAlbum === currentAlbum);
+                }
+                
+                // 對照片進行排序（與 photo.html 一致）
+                allPhotos.sort((a, b) => {
+                    const idA = a.id || 0;
+                    const idB = b.id || 0;
+                    return idA - idB;
+                });
+                
+                // 找到當前照片的索引
+                currentPhotoIndex = -1;
+                if (currentPhoto.id !== undefined) {
+                    currentPhotoIndex = allPhotos.findIndex(p => 
+                        p.id === currentPhoto.id || 
+                        p.id === parseInt(currentPhoto.id) ||
+                        String(p.id) === String(currentPhoto.id)
+                    );
+                }
+                
+                if (currentPhotoIndex === -1 && currentPhoto.src) {
+                    // 如果找不到，嘗試用 src 匹配
+                    currentPhotoIndex = allPhotos.findIndex(p => p.src === currentPhoto.src);
+                }
+                
+                if (currentPhotoIndex === -1) {
+                    // 如果還是找不到，使用當前照片（即使不在相簿列表中）
+                    currentPhotoIndex = 0;
+                    // 如果相簿有照片，使用第一張
+                    if (allPhotos.length > 0) {
+                        currentPhoto = allPhotos[0];
+                    } else {
+                        // 如果相簿沒有照片，將當前照片添加到列表中
+                        allPhotos = [currentPhoto];
+                        currentPhotoIndex = 0;
+                    }
+                } else {
+                    // 使用找到的照片（確保數據一致）
+                    currentPhoto = allPhotos[currentPhotoIndex];
+                }
+                
+                // 載入當前照片
+                if (currentPhoto && currentPhoto.src) {
+                    loadPhotoData(currentPhoto);
+                    updateNavButtons();
+                    
+                    // 直接初始化地圖（參考原始代碼的方式）
+                    try {
+                        const miniMap = L.map('miniMap', { 
+                            zoomControl: false, 
+                            attributionControl: false,
+                            dragging: false,      // 禁用拖拽，讓它像一張靜態圖
+                            touchZoom: false,
+                            scrollWheelZoom: false,
+                            doubleClickZoom: false
+                        }).setView(fixedLocation, 16);
+
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(miniMap);
+
+                        L.marker(fixedLocation, {
+                            icon: L.divIcon({
+                                className: 'custom-marker',
+                                html: '<i class="fa-solid fa-location-dot" style="color:#FF9800;font-size:32px;"></i>',
+                                iconSize: [30, 30],
+                                iconAnchor: [15, 30]
+                            })
+                        }).addTo(miniMap);
+                        
+                        window.miniMap = miniMap; // 保存引用以便後續使用
+                    } catch (e) {
+                        console.error('初始化地圖時發生錯誤:', e);
+                    }
+                } else {
+                    alert("無法載入照片資料");
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                // 添加觸摸滑動手勢支持
+                let touchStartX = 0;
+                let touchEndX = 0;
+                
+                const photoContainer = document.querySelector('.photo-container');
+                if (photoContainer) {
+                    photoContainer.addEventListener('touchstart', (e) => {
+                        touchStartX = e.changedTouches[0].screenX;
+                    }, { passive: true });
+                    
+                    photoContainer.addEventListener('touchend', (e) => {
+                        touchEndX = e.changedTouches[0].screenX;
+                        handleSwipe();
+                    }, { passive: true });
+                }
+                
+                function handleSwipe() {
+                    const swipeThreshold = 50;
+                    const diff = touchStartX - touchEndX;
+                    
+                    if (Math.abs(diff) > swipeThreshold) {
+                        if (diff > 0) {
+                            // 向左滑動，下一張
+                            navigatePhoto(1);
+                        } else {
+                            // 向右滑動，上一張
+                            navigatePhoto(-1);
+                        }
+                    }
+                }
+                
+                // 添加鍵盤支持（左右箭頭鍵）
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        navigatePhoto(-1);
+                    } else if (e.key === 'ArrowRight') {
+                        navigatePhoto(1);
+                    }
+                });
+                
             } catch (e) {
-                alert("資料解析錯誤");
+                console.error('載入照片時發生錯誤:', e);
+                alert("載入照片時發生錯誤：" + (e.message || "未知錯誤"));
                 window.location.href = 'index.html';
             }
         };
 
-        // 這個函數會引導回到首頁並觸發 index.html 的定位邏輯
+        // 這個函數會引導回到來源頁面
         function goBack() {
-            window.location.href = 'index.html?focus=photo';
+            const returnUrl = localStorage.getItem('photo_info_return_url');
+            if (returnUrl) {
+                localStorage.removeItem('photo_info_return_url');
+                window.location.href = returnUrl;
+            } else {
+                window.location.href = 'index.html?focus=photo';
+            }
         }
 
         function writeArticle() {
